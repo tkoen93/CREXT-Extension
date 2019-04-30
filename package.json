@@ -1,0 +1,41 @@
+{
+  "name": "crext",
+  "version": "0.0.1",
+  "description": "CREXT Credits Wallet Extension",
+  "main": "src/app.js",
+  "scripts": {
+    "build": "browserify src/app.js -o src/scripts.js",
+    "watch": "browserify src/app.js -o src/scripts.js"
+  },
+  "keywords": [
+    "CREXT",
+    "Credits",
+    "Extension",
+    "Wallet",
+    "Browser"
+  ],
+  "author": "Timo Koen",
+  "license": "ISC",
+  "dependencies": {
+    "abort-controller": "^3.0.0",
+    "bip39": "^2.6.0",
+    "bs58": "^4.0.1",
+    "bufferutil": "^4.0.1",
+    "jquery": "^3.4.0",
+    "js-sha512": "^0.8.0",
+    "secure-ls": "^1.2.5",
+    "thrift": "^0.12.0",
+    "tippy.js": "^4.2.1",
+    "tweetnacl": "^1.0.1",
+    "utf-8-validate": "^5.0.2"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.3",
+    "gulp": "^4.0.0",
+    "gulp-terser": "^1.1.7",
+    "gulp-uglify": "^3.0.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0",
+    "watchify": "^3.11.1"
+  }
+}

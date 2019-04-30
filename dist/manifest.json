@@ -1,0 +1,42 @@
+{
+  "name": "CREXT NodeJS",
+  "description": "Wallet plugin for Credits blockchain",
+  "manifest_version": 2,
+  "default_locale": "en",
+  "icons": {
+    "128": "img/crext128.png",
+    "64": "img/crext64.png"
+  },
+  "browser_action": {
+    "default_popup": "src/popup.html"
+  },
+  "version": "0.0.3",
+  "short_name": "credits-wallet",
+  "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["src/contentscript.js"],
+        "run_at": "document_start",
+        "all_frames": true
+      }
+    ],
+    "background": {
+      "scripts": [
+        "src/background.js"
+      ],
+      "persistent": true
+    },
+    "web_accessible_resources": [
+      "src/CreditsExtension.js"
+    ],
+  "permissions": [
+    "webRequest",
+    "storage",
+	  "tabs",
+    "activeTab",
+    "<all_urls>",
+    "*://*/*"
+  ],
+   "description": "This extension makes it possible to use a wallet on the Credits testnet",
+   "author": "Timo Koen"
+}

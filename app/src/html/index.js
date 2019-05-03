@@ -7,7 +7,7 @@ function html() {
         </div>
         <div class="keyLine row">
           <div class="pull-left" style="margin-left:20px;">Your public key</div>
-          <div class="pull-right">
+          <div class="pull-right" style="display:none;">
             <a href="#" data-toggle="popover" data-content="Export unencrypted keyfile" data-placement="right" name="exportkeyfile" id="exportkeyfile" style="margin-right:20px;color:#8EE1F1;border-bottom: 1px solid rgba(142, 225, 241, 0.4);">
                 Export raw keyfile
             </a>
@@ -89,9 +89,26 @@ function html() {
       <!-- /.confirmationtx -->
       <!-- confirmedtx -->
       <div class="panel-body" id="confirmedTX" style="display:none;">
-        <div class="form-group" id="completed">
-          <p class="complete" style="margin-bottom:15px;"><img src="../img/complete.png" /><br />Success</p>
+        <div class="form-group" id="completed" style="margin-top:-30px;display:none">
+        <svg class="checkIcon" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+        <circle class="path circle" fill="none" stroke="#2ac966" stroke-width="3" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+        <polyline class="path check" fill="none" stroke="#2ac966" stroke-width="3" stroke-linecap="round" stroke-miterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+        </svg>
+          <p class="complete" style="margin-bottom:15px;">Success</p>
           <hr />
+        </div>
+        <div class="form-group" id="failed" style="margin-top:-30px;display:none">
+        <svg class="checkIcon" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+        <circle class="path circle" fill="none" stroke="#ec4652" stroke-width="3" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+        <line class="path line" fill="none" stroke="#ec4652" stroke-width="3" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+        <line class="path line" fill="none" stroke="#ec4652" stroke-width="3" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+        </svg>
+          <p class="failed" style="margin-bottom:15px;">Failed</p>
+          <hr />
+        </div>
+        <div class="form-group" id="txLoader">
+        <img src="../img/loader.svg" width="98" height="98">
+        <hr />
         </div>
         <div class="row">
           <div class="confirmTitle">
@@ -129,6 +146,11 @@ function html() {
       </div>
       <div style="float:left;margin-left:15px;">
         <button type="button" name="checkMonitor" id="checkMonitor" class="btn btn-block btn-huge btn-tx btn-lg" style="width:207.5px;"><p class="medium" style="font-size:14px;">CHECK ON MONITOR</p></button>
+      </div>
+      </div>
+      <div class="form-group" id="failButton" style="display:none">
+      <div style="float:left;">
+        <button type="button" name="failMainPage" id="failMainPage" class="btn btn-block btn-huge btn-resettx btn-lg" style="width:435px;"><p class="medium" style="font-size:14px;">BACK TO MAIN PAGE</p></button>
       </div>
       </div>
       <!-- /.confirmtx -->

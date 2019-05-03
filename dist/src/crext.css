@@ -198,6 +198,11 @@ body::-webkit-scrollbar{display:none !important;}
   top: 145px;
 }
 
+.logoBigDapp img{
+  position: relative;
+  margin-bottom: 20px;
+}
+
 .logoGen img {
   margin-top:50px;
   margin-bottom:75px;
@@ -489,6 +494,12 @@ p.complete {
   color: #1ec45d;
 }
 
+p.failed {
+  font-size:14px;
+  font-family: RobotoMedium;
+  color: #ec4652;
+}
+
 p.txSent {
   font-size:12px;
   font-family: RobotoMedium;
@@ -555,6 +566,10 @@ p.revoke {
   margin-left: -10px;
 }
 
+.txdapp {
+  height: 360px;
+}
+
 .loginpanel {
   margin-top: 170px;
   height: 200px;
@@ -604,7 +619,7 @@ tr.txhistitle {
   width: 435px;
 }
 
-input[type=text] {
+input[type=text], textarea {
   font-family: RobotoBold;
   color: #a8bed4;
   font-size: 14px;
@@ -719,4 +734,60 @@ a.pageNumberActive:active {
   stroke-dashoffset: 42;
   transition: all 0.2s linear;
   transition-delay: 0.15s;
+}
+
+svg.checkIcon {
+width: 67px;
+display: block;
+margin: 40px auto 0;
+}
+.path {
+stroke-dasharray: 1000;
+stroke-dashoffset: 0;
+}
+.path.circle {
+-webkit-animation: dash 0.9s ease-in-out;
+animation: dash 0.9s ease-in-out;
+}
+.path.line {
+stroke-dashoffset: 1000;
+-webkit-animation: dash 0.9s 0.35s ease-in-out forwards;
+animation: dash 0.9s 0.35s ease-in-out forwards;
+}
+.path.check {
+stroke-dashoffset: -100;
+-webkit-animation: dash-check 0.9s 0.35s ease-in-out forwards;
+animation: dash-check 0.9s 0.35s ease-in-out forwards;
+}
+@-webkit-keyframes dash {
+0% {
+stroke-dashoffset: 1000;
+}
+100% {
+stroke-dashoffset: 0;
+}
+}
+@keyframes dash {
+0% {
+stroke-dashoffset: 1000;
+}
+100% {
+stroke-dashoffset: 0;
+}
+}
+@-webkit-keyframes dash-check {
+0% {
+stroke-dashoffset: -100;
+}
+100% {
+stroke-dashoffset: 900;
+}
+}
+@keyframes dash-check {
+0% {
+stroke-dashoffset: -100;
+}
+100% {
+stroke-dashoffset: 900;
+}
 }

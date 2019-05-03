@@ -49,6 +49,46 @@ function selectNode() {
             }
           });
         }
+      },
+      error: function() {
+        const result = $.ajax({
+          url: './node.json',
+          success: function(result) {
+            for(let index in result) {
+              var sendDate = (new Date()).getTime();
+              fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 500)
+              .then(function(val) {
+                var receiveDate = (new Date()).getTime();
+                var responseTimeMs = receiveDate - sendDate;
+                activeNodes.push([result[index].ip, responseTimeMs]);
+                completeRes++;
+                if(completeRes === result.length) {
+                  syncState(activeNodes)
+                  .then(function(r) {
+                    chrome.storage.local.set({
+                      'ip': r,
+                      'port': 8081
+                    });
+                    resolve(r);
+                  });
+                }
+              })
+              .catch(function(val) {
+                completeRes++;
+                if(completeRes === result.length) {
+                  syncState(activeNodes)
+                  .then(function(r) {
+                    chrome.storage.local.set({
+                      'ip': r,
+                      'port': 8081
+                    });
+                    resolve(r);
+                  });
+                }
+              });
+            }
+          }
+        });
       }
   	});
   });

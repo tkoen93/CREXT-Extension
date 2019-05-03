@@ -32,12 +32,16 @@ function nodeTest() {
 		})
     .catch(function(err) {
       console.log(err);
-      console.log(global.nodeIP + " unreachable, selecting new node");
+      console.log(ip + " unreachable, selecting new node");
 			selectNode()
 			.then(function(r) {
 				console.log("nodeTest.js selected node: " + r);
 				global.nodeIP = r;
         global.nodePORT = 8081;
+        chrome.storage.local.set({
+          'ip': r,
+          'port': 8081
+        });
 				resolve(r);
 			});
 		})

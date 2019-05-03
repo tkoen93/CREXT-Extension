@@ -100,7 +100,8 @@ async function CreateTransaction(Obj)
             let ByteCode = await connect().SmartContractCompile(Obj.SmartContract.Code);
             if (ByteCode.status.code === 0) {
                 for (let i in ByteCode.byteCodeObjects) {
-                    Target = concatTypedArrays(Target, ConvertCharToByte(ByteCode.byteCodeObjects[i].byteCode));
+                  console.log(ByteCode.byteCodeObjects[i].byteCode);
+                    Target = concatTypedArrays(Target, ByteCode.byteCodeObjects[i].byteCode);
                 }
             }
             else {
@@ -108,7 +109,7 @@ async function CreateTransaction(Obj)
                 return ResObj;
             }
 
-            Trans.target = blake2s(Target);
+            Trans.target = await Buffer.from(blake2s(Target));
         }
         else {
             let Target = CheckStrTransaction(Obj.Target, "Target");
@@ -171,7 +172,7 @@ async function CreateTransaction(Obj)
             else {
                 Trans.smartContract.method = Obj.SmartContract.Method;
                 UserField = concatTypedArrays(UserField, NumbToByte(Obj.SmartContract.Method.length, 4).reverse());
-                UserField = concatTypedArrays(UserField, ConvertCharToByte(Obj.SmartContract.Method));
+                UserField = concatTypedArrays(UserField, Buffer.from(ConvertCharToByte(Obj.SmartContract.Method)));
             }
 
             UserField = concatTypedArrays(UserField, new Uint8Array([15, 0, 2, 12]));
@@ -186,12 +187,24 @@ async function CreateTransaction(Obj)
 
                     switch (val.K)
                     {
-                        case "STRING":
+                      /*  case "STRING":
+                            console.log(Buffer.from(ConvertCharToByte(val.V)));
                             UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 17]));
                             UserField = concatTypedArrays(UserField, NumbToByte(val.V.length, 4).reverse());
-                            UserField = concatTypedArrays(UserField, ConvertCharToByte(val.V));
+                            UserField = concatTypedArrays(UserField, Buffer.from(ConvertCharToByte(val.V)));
                             Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_string: val.V }));
                             UserField = concatTypedArrays(UserField, new Uint8Array(1));
+                        break;*/
+                        case "STRING":
+                            UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 17]));
+                            UserField = concatTypedArrays(UserField, GetBitArray(Obj.SmartContract.Params[i].V.length, 4).reverse());
+                            var ParamBytes = new Uint8Array(Obj.SmartContract.Params[i].V.length + 1);
+
+                            for (let j in Obj.SmartContract.Params[i].V) {
+                                ParamBytes[j] = Obj.SmartContract.Params[i].V[j].charCodeAt();
+                            }
+                            UserField = concatTypedArrays(UserField, ParamBytes);
+                            Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_string: Obj.SmartContract.Params[i].V }));
                         break;
                     }
                 }
@@ -233,7 +246,7 @@ async function CreateTransaction(Obj)
 
                         UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 2]));
                         UserField = concatTypedArrays(UserField, NumbToByte(val.byteCode.length, 4).reverse());
-                        UserField = concatTypedArrays(UserField, ConvertCharToByte(val.byteCode));
+                        UserField = concatTypedArrays(UserField, val.byteCode);
                         Trans.smartContract.smartContractDeploy.byteCodeObjects.push(new GEN_TYPES.ByteCodeObject({
                             name: val.name,
                             byteCode: val.byteCode
@@ -252,7 +265,7 @@ async function CreateTransaction(Obj)
 
             UserField = concatTypedArrays(UserField, new Uint8Array(1));
             PerStr = concatTypedArrays(PerStr, NumbToByte(UserField.length, 4));
-            PerStr = concatTypedArrays(PerStr, UserField);
+            PerStr = Buffer.from(concatTypedArrays(PerStr, UserField));
         }
 
         var ArHex = "0123456789ABCDEF";

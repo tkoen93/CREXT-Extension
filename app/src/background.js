@@ -5,6 +5,7 @@ const API = require('./gen-nodejs/API');
 const selectNode = require('./lib/selectNode');
 const nodeTest = require('./lib/nodeTest');
 const convert = require('./lib/convert');
+const connect = require('./lib/connect');
 
 global.nodeIP;
 global.nodePORT;
@@ -43,8 +44,6 @@ window.onload = function(e) {
 
     chrome.runtime.onMessage.addListener( function(message, sender, callback) {
 
-      console.log(message);
-
     // for the current tab, inject the "inject.js" file & execute it
         let returnmsg;
 
@@ -52,6 +51,19 @@ window.onload = function(e) {
         chrome.tabs.executeScript({
           file: 'src/inject.js'
         });
+
+        chrome.storage.local.get(function(result) {
+  				loginTime = result.loginTime;
+          if(loginTime > 1) {
+  				    timeNow = new Date().getTime();
+  				    if((timeNow-loginTime > 1800000) || result.encryption == '') {
+  					     chrome.storage.local.set({
+  						      'encryption': ''
+  					     });
+              }
+          }
+        });
+
       } else if(message == 'Logout') {
         access = new Array();
         global.nodeIP = '';
@@ -63,9 +75,7 @@ window.onload = function(e) {
            global.nodeIP = result.ip;
            global.nodePORT = result.port;
            keyPublic = result.PublicKey;
-           keyPrivate = result.PrivateKey;
            access = result.access;
-           console.log(result);
          });
       } else if(message.CStype != null) {
 
@@ -77,10 +87,7 @@ window.onload = function(e) {
         } else {
 
           if(checkAccess(message.org, contentMessage, function(r) {
-            console.log(r);
             if(r) {
-
-              let Client = Connect();
 
               switch(message.CStype) {
                 case "TX":
@@ -88,8 +95,7 @@ window.onload = function(e) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender"}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
-                    //var popup = window.open("src/tx.html", "extension_popup", "width=500,height=600,status=no,scrollbars=no,resizable=no");
-                    PopupCenter("src/tx2.html", "extension_popup", "500", "636");
+                    PopupCenter("src/popup.html?t=123", "extension_popup", "500", "636");
                       setTimeout(
                       function() {
                         var port = chrome.runtime.connect({name: "sendData"});
@@ -99,7 +105,7 @@ window.onload = function(e) {
                   break;
                   case "balanceGet":
                   nodeTest().then(function(r) {
-                    Connect().WalletBalanceGet(bs58.decode(message.data.key), function(err, response) {
+                    connect().WalletBalanceGet(bs58.decode(message.data.key), function(err, response) {
                       let balance = response;
 
                     if(balance.status.message == 'Success') {
@@ -141,7 +147,7 @@ window.onload = function(e) {
                       sendMSG(sender.tab.id, returnmsg);
                     } else {
                       nodeTest().then(function(r) {
-                				Connect().WalletDataGet(bs58.decode(message.data.key), function(err, response) {
+                				connect().WalletDataGet(bs58.decode(message.data.key), function(err, response) {
                           walletdata = response;
 
                           let fraction = convert(walletdata.walletData.balance.fraction.buffer);
@@ -191,9 +197,9 @@ window.onload = function(e) {
     });
 
 function sendMSG(tab, msg) {
-//  setTimeout(function() {
+  setTimeout(function() {
     chrome.tabs.sendMessage(tab, msg);
-//  }, 800);
+  }, 250);
 }
 
 function PopupCenter(url, title, w, h) {
@@ -213,32 +219,11 @@ function PopupCenter(url, title, w, h) {
     if (window.focus) newWindow.focus();
 }
 
-function Connect() {
-
-let options = {
-  transport: thrift.TBufferedTransport,
-  protocol: thrift.TJSONProtocol,
-  path: "/thrift/service/Api",
-  https: false
-};
-
-  let connection = thrift.createHttpConnection(global.nodeIP, global.nodePORT, options);
-
-  connection.on("error", function(err) {
-    console.log(err);
-  });
-
-  let client = thrift.createHttpClient(API, connection);
-
-  return client;
-
-}
-
     function checkAccess(url, contentmessage = NULL, callback) {
       if(access.includes(url)) {
         callback(true);
       } else {
-        PopupCenter("src/tx2.html", "extension_popup", "500", "636");
+        PopupCenter("src/popup.html?t=123", "extension_popup", "500", "636");
           setTimeout(
           function() {
 
@@ -253,14 +238,12 @@ let options = {
           let promise1 = new Promise(function(resolve, reject) {
             chrome.runtime.onConnect.addListener(function(port) {
               port.onMessage.addListener(function(msg) {
-                console.log(msg);
                 resolve(msg);
               });
             });
           });
 
           promise1.then(function(val) {
-            console.log(val);
             if(val.CStype == 'confirm') {
               access.push(val.org);
               callback(true);

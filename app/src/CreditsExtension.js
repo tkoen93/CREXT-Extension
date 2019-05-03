@@ -53,14 +53,12 @@ function sendMsg(identifier, type, msg) {
 function checkTransaction(params) {
 
   let regexp = /^\d+(\.\d{1,18})?$/;
-  amount = params.amount;
-  amount = amount.replace(/,/, '.');
   fee = params.fee;
   fee = fee.replace(/,/, '.');
 
-  if(!Object.prototype.hasOwnProperty.call(params, "target") || !Object.prototype.hasOwnProperty.call(params, "amount")) {
+  if(!Object.prototype.hasOwnProperty.call(params, "fee")) {
     return false;
-  } else if(amount == '' || fee == '' || regexp.test(amount) != true || regexp.test(fee) != true) {
+  } else if(fee == '' || regexp.test(fee) != true) {
     return false;
   } else {
     return true;

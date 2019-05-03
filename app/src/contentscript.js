@@ -14,6 +14,5 @@ window.addEventListener("message", function(event) {
 }, false);
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
-  //message = {CSreturn: true, data: message};
   window.postMessage(message, window);
 });

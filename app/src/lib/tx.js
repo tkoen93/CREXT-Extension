@@ -5,7 +5,10 @@ const connect = require('./connect');
 const nodeTest = require('./nodeTest');
 const CreateTransaction = require('./signature');
 
+let maximumfee;
+
 function create(keyPublic) {
+
   $('input[type="text"]').css({"border" : "", "box-shadow" : ""});
   $('#tokeyError').hide();
   $('#tosendError').hide();
@@ -86,6 +89,7 @@ tippy('.txerrortippy', {
 
 
   if(cont) {
+    maximumfee = maxfee;
   if(amount.length > 8) {
     $('.confirmsize').css("font-size","18px");
   } else {
@@ -115,13 +119,12 @@ async function send(n = 0) {
   $('#confirmTXinfo').slideUp(250);
   $("#confirmButtons").slideUp(250, function () {
     $('#confirmedTX').slideDown(250);
-    $('#completeButtons').slideDown(250);
-    $('#completed').slideDown(1000);
+/*    $('#completeButtons').slideDown(250);
+    $('#completed').slideDown(1000);*/
 });
 
   let to = $('#tokey').val();
   let amount = $('#tosend').val();
-  let maxfee = $('#maxfeeto').val();
 
 
   if(!cont) { // Show error if one of the checks failed.
@@ -131,18 +134,26 @@ async function send(n = 0) {
 
   let Trans = CreateTransaction({
     Amount: amount,
-    Fee: maxfee,
+    Fee: maximumfee,
     Source: await key.exportPublic(n),
     PrivateKey: await key.exportPrivate(n),
     Target: to
   }).then(function(r) {
-      console.log(r);
-      if(r.error) {
-        console.error(r.message);
+      if(r.Message != undefined) {
+        console.error(r.Message);
       } else {
         nodeTest().then(function(nr) {
           connect().TransactionFlow(r.Result, function(err, r) {
             console.log(r);
+            if(r.status.code === 0) {
+              $('#completeButtons').slideDown(250);
+              $('#txLoader').hide();
+              $('#completed').show();
+            } else {
+              $('#failButton').slideDown(250);
+              $('#txLoader').hide();
+              $('#failed').show();
+            }
           });
         });
       }

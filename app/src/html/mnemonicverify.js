@@ -11,14 +11,23 @@ function html() {
         <p align="left">Please enter the requested phrase for verification</p>
       </div>
       <div class="form-group">
-        <p class="error" align="left">WARNING</p><p>: Never disclose your backup phrase. Anyone with this phrase can take your Credits forever.</p>
+        <div style="float:left;width:187.5px;margin-left:4px;">
+          <input type="text" id="w1" name="w1" class="form-control" placeholder="" style="height:50px;" required />
+        </div>
+        <div style="float:left;width:187.5px;margin-left:20px;">
+          <input type="text" id="w2" name="w2" class="form-control" placeholder="" style="height:50px;" required />
+        </div>
       </div>
-      <div class="form-group">
-        <p>Write this phrase on a piece of paper and store it in a secure location. If you want even more security, write it down on multiple pieces of paper and store each in different locations.</p>
+      <div class="form-group" style="height:20px;"></div>
+      <div class="form-group" style="margin-top:-40px;">
+        <div style="float:left;width:187.5px;margin-left:4px;">
+          <input type="text" id="w3" name="w3" class="form-control" placeholder="" style="height:50px;" required />
+        </div>
+        <div style="float:left;width:187.5px;margin-left:20px;">
+          <input type="text" id="w4" name="w4" class="form-control" placeholder="" style="height:50px;" required />
+        </div>
       </div>
-      <div class="form-group jumbotron" id="seedphrase">
-      </div>
-      <div class="form-group" style="margin-top:-15px;">
+      <div class="form-group" style="margin-top:50px;">
         <button type="button" name="verify" id="verify" class="btn btn-block btn-huge btn-tx btn-lg" style="width:207.5px;"><p class="medium" style="font-size:14px;">VERIFY</p></button>
       </div>
   </div>

@@ -40,15 +40,6 @@ gulp.task('crext', function() {
     .pipe(gulp.dest('./dist/src'));
 });
 
-gulp.task('tx', function() {
-  return browserify('./app/src/tx.js')
-    .bundle()
-    .pipe(source('tx.js'))
-    .pipe(buffer())
-    .pipe(terser())
-    .pipe(gulp.dest('./dist/src'));
-});
-
 gulp.task('contents', function() {
   return browserify('./app/src/contentscript.js')
     .bundle()
@@ -58,7 +49,7 @@ gulp.task('contents', function() {
     .pipe(gulp.dest('./dist/src'));
 });
 
-gulp.task('build', gulp.parallel('content', 'background', 'inject', 'crext', 'tx', 'contents'));
+gulp.task('build', gulp.parallel('content', 'background', 'inject', 'crext', 'contents'));
 
 gulp.task('content-dev', function() {
   return browserify('./app/src/scripts.js')
@@ -92,12 +83,5 @@ gulp.task('crext-dev', function() {
     .pipe(gulp.dest('./dist/src'));
 });
 
-gulp.task('tx-dev', function() {
-  return browserify('./app/src/tx.js')
-    .bundle()
-    .pipe(source('tx.js'))
-    .pipe(buffer())
-    .pipe(gulp.dest('./dist/src'));
-});
 
-gulp.task('build-dev', gulp.series('content-dev', 'background-dev', 'inject-dev', 'crext-dev', 'tx-dev'));
+gulp.task('build-dev', gulp.series('content-dev', 'background-dev', 'inject-dev', 'crext-dev'));

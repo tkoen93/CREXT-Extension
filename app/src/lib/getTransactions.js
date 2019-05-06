@@ -39,7 +39,7 @@ function getTransactions(key, start, amount) { // Get transactions history
     nodeTest().then(function(r) {
       connect().TransactionsGet(bs58.decode(key), start, amount, function (err, r) {
 
-        let total_tx = 99;
+        let total_tx = 99; // Fixed amount as total_trxns_count always returns 0
 
         console.log(r);
 

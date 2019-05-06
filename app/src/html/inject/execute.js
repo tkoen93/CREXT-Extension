@@ -7,7 +7,7 @@ function html() {
             <!-- txinfo -->
             <div class="panel-body" id="confirmTXinfo">
                 <div class="form-group">
-                  <p class="header" style="margin-bottom:15px;">Confirm transaction</p>
+                  <p class="header" style="margin-bottom:15px;">Confirm Smart Contract execution</p>
                   <hr />
                 </div>
                 <div class="row">
@@ -20,27 +20,35 @@ function html() {
                 <hr />
                 <div class="row">
                   <div class="confirmTitle left30" style="margin-right:20px;">
-                    TO
+                    Contract address
                   </div>
                   <div class="confirmText left30" id="to" style="margin-top:10px;">
                   </div>
                 </div>
                 <hr />
-                <div class="row">
-                  <div class="col-xs-6">
+                <div class="row" style="margin-top:30px;">
+                  <div class="col-xs-4">
                     <div class="col-xs-12 confirmTitle" align="left">
                       AMOUNT
                     </div>
                     <div class="col-xs-12" style="margin-top:10px;" align="left">
-                      <p class="medium confirmsize" style="font-size:24px;color:#5e6368;" id="amount"></p> <p class="medium confirmsize" style="font-size:24px;color:#5e6368;">CS</p>
+                      <p class="medium confirmsize" style="font-size:16px;color:#5e6368;" id="amount"></p> <p class="medium confirmsize" style="font-size:16px;color:#5e6368;">CS</p>
                     </div>
                   </div>
-                  <div class="col-xs-6">
+                  <div class="col-xs-4">
                     <div class="col-xs-12 confirmTitle left" align="left">
                       MAX CS FEE
                     </div>
                     <div class="col-xs-12 left" style="margin-top:10px;" align="left">
-                      <p class="medium confirmsize" style="font-size:24px;color:#5e6368;" id="fee"></p> <p class="medium confirmsize" style="font-size:24px;color:#5e6368;">CS</p>
+                      <p class="medium confirmsize" style="font-size:16px;color:#5e6368;" id="fee"></p> <p class="medium confirmsize" style="font-size:16px;color:#5e6368;">CS</p>
+                    </div>
+                  </div>
+                  <div class="col-xs-4">
+                    <div class="col-xs-12 confirmTitle left" align="left">
+                      Method
+                    </div>
+                    <div class="col-xs-12 left" style="margin-top:10px;" align="left">
+                      <p class="medium confirmsize" style="font-size:16px;color:#5e6368;" id="method"></p>
                     </div>
                   </div>
                 </div>
@@ -79,21 +87,35 @@ function html() {
                 <hr />
                 <div class="row">
                   <div class="confirmTitle">
-                    TO
+                    CONTRACT ADDRESS
                   </div>
                   <div class="confirmText" id="transactionto2" style="margin-top:0px;">
                   </div>
                 </div>
                 <hr />
-                <div class="row" style="margin-top:10px;">
-                  <div class="col-xs-6">
-                    <div class="col-xs-12 confirmTitle left">
-                      AMOUNT <p class="medium" style="font-size:12px;color:#5e6368;" id="tosendto2"></p> <p class="medium" style="font-size:12px;color:#5e6368;">CS</p>
+                <div class="row" style="margin-top:-6px;">
+                  <div class="col-xs-4">
+                    <div class="col-xs-12 confirmTitle left" align="left">
+                      AMOUNT
+                    </div>
+                    <div class="col-xs-12" style="margin-top:0px;" align="left">
+                      <p class="medium confirmsize" style="font-size:12px;color:#5e6368;" id="tosendto2"></p> <p class="medium confirmsize" style="font-size:12px;color:#5e6368;">CS</p>
                     </div>
                   </div>
-                  <div class="col-xs-6">
-                    <div class="col-xs-12 confirmTitle left">
-                      MAX CS FEE <p class="medium" style="font-size:12px;color:#5e6368;" id="maxfeeto2"></p> <p class="medium" style="font-size:12px;color:#5e6368;">CS</p>
+                  <div class="col-xs-4">
+                    <div class="col-xs-12 confirmTitle left" align="left">
+                      MAX CS FEE
+                    </div>
+                    <div class="col-xs-12 left" style="margin-top:0px;" align="left">
+                      <p class="medium confirmsize" style="font-size:12px;color:#5e6368;" id="maxfeeto2"></p> <p class="medium confirmsize" style="font-size:12px;color:#5e6368;">CS</p>
+                    </div>
+                  </div>
+                  <div class="col-xs-4">
+                    <div class="col-xs-12 confirmTitle left" align="left">
+                      Method
+                    </div>
+                    <div class="col-xs-12 left" style="margin-top:0px;" align="left">
+                      <p class="medium confirmsize" style="font-size:12px;color:#5e6368;" id="method2"></p>
                     </div>
                   </div>
                 </div>

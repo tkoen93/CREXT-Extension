@@ -52,16 +52,17 @@ function sendMsg(identifier, type, msg) {
 
 function checkTransaction(params) {
 
-  let regexp = /^\d+(\.\d{1,18})?$/;
-  fee = params.fee;
-  fee = fee.replace(/,/, '.');
-
   if(!Object.prototype.hasOwnProperty.call(params, "fee")) {
     return false;
-  } else if(fee == '' || regexp.test(fee) != true) {
-    return false;
   } else {
-    return true;
+    let regexp = /^\d+(\.\d{1,18})?$/;
+    fee = params.fee;
+    fee = fee.replace(/,/, '.');
+    if(fee == '' || regexp.test(fee) != true) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
 

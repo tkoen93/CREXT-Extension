@@ -1,5 +1,5 @@
 {
-  "name": "CREXT NodeJS",
+  "name": "CREXT",
   "description": "Wallet plugin for Credits blockchain",
   "manifest_version": 2,
   "default_locale": "en",
@@ -10,8 +10,8 @@
   "browser_action": {
     "default_popup": "src/popup.html"
   },
-  "version": "0.0.3",
-  "short_name": "credits-wallet",
+  "version": "0.0.4",
+  "short_name": "CREXT",
   "content_scripts": [
       {
         "matches": ["<all_urls>"],
@@ -37,6 +37,6 @@
     "<all_urls>",
     "*://*/*"
   ],
-   "description": "This extension makes it possible to use a wallet on the Credits testnet",
+   "description": "CREXT is a browser extension for the Credits blockchain.",
    "author": "Timo Koen"
 }

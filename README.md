@@ -11,3 +11,6 @@
 - Go to `chrome://extensions`
 - Enable developer mode
 - Load unpacked extension, browse to `./dist` folder
+
+## Usage of crext.zip
+- In case building the exentsion yourself isn't possible for whatever reason, you can use crext.zip.

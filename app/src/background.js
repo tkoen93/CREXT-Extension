@@ -95,7 +95,7 @@ window.onload = function(e) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender"}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
-                    PopupCenter("src/popup.html?t=123", "extension_popup", "500", "636");
+                    PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                       setTimeout(
                       function() {
                         var port = chrome.runtime.connect({name: "sendData"});
@@ -223,7 +223,7 @@ function PopupCenter(url, title, w, h) {
       if(access.includes(url)) {
         callback(true);
       } else {
-        PopupCenter("src/popup.html?t=123", "extension_popup", "500", "636");
+        PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
           setTimeout(
           function() {
 

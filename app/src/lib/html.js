@@ -35,7 +35,8 @@ let t = undefined;
 chrome.runtime.onConnect.addListener(function(port) {
   console.assert(port.name == "sendData");
   port.onMessage.addListener(function(msg) {
-		dAppTX(msg);
+		//dAppTX(msg);
+    console.log(msg);
 		msgInject = msg;
 	});
 });
@@ -91,8 +92,10 @@ CREXT = {
 							}
 					   });
 					 } else { // if t contains data
-						 //	dAppTX(msgInject);
 						 content("inject");
+             setTimeout(function(){
+               dAppTX(msgInject);
+             }, 1500);
 					 }
 				}
 			})

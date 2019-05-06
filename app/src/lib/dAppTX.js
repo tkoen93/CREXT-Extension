@@ -6,10 +6,13 @@ const $ = require('jquery');
 const connect = require('./connect');
 const key = require('./key');
 const CreateTransaction = require('./signature');
+const bs58 = require('bs58');
 
 let n;
 let receivedMessage;
 let tabID;
+let feecs;
+let amcs;
 
 CREXTdApp = {
   reject: function() {
@@ -66,6 +69,10 @@ CREXTdApp = {
         });
   },
   confirmdeploy: async function() {
+
+    $('#transactionfrom2').text(key.exportPublic());
+    $('#maxfeeto2').text($('#fee').text());
+
     $('#confirmTXinfo').slideUp(250);
     $("#confirmTXButtons").slideUp(250, function () {
       $('#confirmedTX').slideDown(250);
@@ -78,18 +85,21 @@ CREXTdApp = {
               SmartContract: {
                   Code: receivedMessage.data.smart.code
               }
-        }).then(function(r) {
-          console.log(r);
-          if(r.error) {
-            console.error(r.message);
+        }).then(function(txres) {
+          console.log(txres);
+          if(txres.error) {
+            console.error(txres.message);
           } else {
-              connect().TransactionFlow(r.Result, function(err, r) {
+              connect().TransactionFlow(txres.Result, function(err, r) {
                 let res = r;
                 console.log(r);
                 if(r.status.code === 0) {
+                  //transactionto2
+                  $('#transactionto2').text(bs58.encode(Buffer.from(txres.Result.target)));
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#completed').show();
+                  res.contractAddress = bs58.encode(Buffer.from(txres.Result.target));
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
                   chrome.tabs.sendMessage(tabID, retmsg);
                   console.log('tx send');
@@ -106,6 +116,17 @@ CREXTdApp = {
         });
   },
   confirmexecute: async function() {
+
+    let to = $('#to').text();
+    let amount = $('#amount').text();
+    let fee = $('#fee').text();
+
+    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionto2').text(to);
+    $('#tosendto2').text(amount);
+    $('#maxfeeto2').text(fee);
+    $('#method2').text(receivedMessage.data.smart.method);
+
     $('#confirmTXinfo').slideUp(250);
     $("#confirmTXButtons").slideUp(250, function () {
       $('#confirmedTX').slideDown(250);
@@ -213,6 +234,11 @@ async function content(page) {
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('reject').addEventListener('click', CREXTdApp.reject);
       document.getElementById('confirm').addEventListener('click', CREXTdApp.confirmdeploy);
+      document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
+      document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
+      feecs = Number(receivedMessage.data.fee).noExponents();
+      $('#from').text(key.exportPublic(n));
+      $('#fee').text(feecs);
     break;
     case "executetx":
     console.log(receivedMessage);
@@ -220,6 +246,15 @@ async function content(page) {
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('reject').addEventListener('click', CREXTdApp.reject);
       document.getElementById('confirm').addEventListener('click', CREXTdApp.confirmexecute);
+      document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
+      document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
+      amcs = Number(receivedMessage.data.amount).noExponents();
+      feecs = Number(receivedMessage.data.fee).noExponents();
+      $('#from').text(key.exportPublic(n));
+      $('#to').text(receivedMessage.data.target);
+      $('#amount').text(amcs);
+      $('#fee').text(feecs);
+      $('#method').text(receivedMessage.data.smart.method);
     break;
     case "normaltx":
       returnValue = await normaltx();
@@ -228,8 +263,8 @@ async function content(page) {
       document.getElementById('confirm').addEventListener('click', CREXTdApp.confirmnormal);
       document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
-      let amcs = Number(receivedMessage.data.amount).noExponents();
-      let feecs = Number(receivedMessage.data.fee).noExponents();
+      amcs = Number(receivedMessage.data.amount).noExponents();
+      feecs = Number(receivedMessage.data.fee).noExponents();
       $('#from').text(key.exportPublic(n));
       $('#to').text(receivedMessage.data.target);
       $('#amount').text(amcs);
@@ -260,6 +295,9 @@ Number.prototype.noExponents= function(){
 }
 
 function dAppTX(msg, n=0) {
+
+  console.log(msg);
+
   n=n;
 		tabID = msg.id;
 
@@ -268,6 +306,7 @@ function dAppTX(msg, n=0) {
     if(msg.CStype == "confirm") {
       content("connectrequest");
     } else if (msg.CStype == "TX") {
+      receivedMessage.data.fee = receivedMessage.data.fee.replace(/,/, '.');
       let typetx;
       if(!Object.prototype.hasOwnProperty.call(msg.data, "smart")) {
         content("normaltx");

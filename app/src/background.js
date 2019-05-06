@@ -1,4 +1,3 @@
-//var bip39 = require('bip39');
 const bs58 = require('bs58');
 const thrift = require('thrift');
 const API = require('./gen-nodejs/API');
@@ -34,6 +33,10 @@ window.onload = function(e) {
 				 console.log("Took " + responseTimeMs + "ms to select node");
 				 global.nodeIP = r;
 				 global.nodePORT = 8081;
+         chrome.storage.local.set({
+           'ip': r,
+           'port': 8081
+         });
 			 });
 		 }
 
@@ -44,7 +47,6 @@ window.onload = function(e) {
 
     chrome.runtime.onMessage.addListener( function(message, sender, callback) {
 
-    // for the current tab, inject the "inject.js" file & execute it
         let returnmsg;
 
       if(message == 'Inject') {
@@ -175,25 +177,19 @@ window.onload = function(e) {
                             };
                             returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: walletdatat}};
                             sendMSG(sender.tab.id, returnmsg);
-                            console.log(returnmsg);
                           } else {
                             returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: walletdata.status.message}};
                             sendMSG(sender.tab.id, returnmsg);
                           }
-
                         });
                       });
                     }
                   break;
-
-
               }
-
             }
           }));
         }
       }
-
     });
 
 function sendMSG(tab, msg) {
@@ -229,10 +225,8 @@ function PopupCenter(url, title, w, h) {
 
             var port = chrome.runtime.connect({name: "sendData"});
           port.postMessage({CStype: "confirm", id: contentmessage.id, data: contentmessage});
-          port.onMessage.addListener(function(msg) {
-            console.log(msg);
-          });
-
+            port.onMessage.addListener(function(msg) {
+            });
           }, 1000);
 
           let promise1 = new Promise(function(resolve, reject) {

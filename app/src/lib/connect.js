@@ -18,6 +18,11 @@ let options = {
 	https: false
 };
 
+if(global.nodeIP !== undefined) {
+  ip = global.nodeIP;
+  port = 8081;
+}
+
 	let connection = thrift.createHttpConnection(ip, port, options);
 
 	connection.on("error", function(err) {

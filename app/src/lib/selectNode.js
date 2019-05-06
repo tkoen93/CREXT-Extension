@@ -18,7 +18,7 @@ function selectNode() {
       success: function(result) {
         for(let index in result) {
           var sendDate = (new Date()).getTime();
-          fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 500)
+          fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
           .then(function(val) {
             var receiveDate = (new Date()).getTime();
             var responseTimeMs = receiveDate - sendDate;

@@ -7,6 +7,10 @@ const connect = require('./connect');
 const key = require('./key');
 const CreateTransaction = require('./signature');
 const bs58 = require('bs58');
+const LS = require('./ls');
+
+const store = new LS('CREXT');
+const currentSelected = store.getState().s;
 
 let n;
 let receivedMessage;
@@ -25,7 +29,7 @@ CREXTdApp = {
     let amount = $('#amount').text();
     let fee = $('#fee').text();
 
-    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionfrom2').text(key.exportPublic(currentSelected));
     $('#transactionto2').text(to);
     $('#tosendto2').text(amount);
     $('#maxfeeto2').text(fee);
@@ -38,8 +42,8 @@ CREXTdApp = {
       var Trans = await CreateTransaction({
             Amount: amount,
             Fee: fee,
-            Source: key.exportPublic(n),
-            PrivateKey: key.exportPrivate(n),
+            Source: key.exportPublic(currentSelected),
+            PrivateKey: key.exportPrivate(currentSelected),
             Target: to,
         }).then(function(r) {
           console.log(r);
@@ -70,7 +74,7 @@ CREXTdApp = {
   },
   confirmdeploy: async function() {
 
-    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionfrom2').text(key.exportPublic(currentSelected));
     $('#maxfeeto2').text($('#fee').text());
 
     $('#confirmTXinfo').slideUp(250);
@@ -80,8 +84,8 @@ CREXTdApp = {
 
       var Trans = await CreateTransaction({
             Fee: receivedMessage.data.fee,
-            Source: key.exportPublic(n),
-            PrivateKey: key.exportPrivate(n),
+            Source: key.exportPublic(currentSelected),
+            PrivateKey: key.exportPrivate(currentSelected),
               SmartContract: {
                   Code: receivedMessage.data.smart.code
               }
@@ -121,7 +125,7 @@ CREXTdApp = {
     let amount = $('#amount').text();
     let fee = $('#fee').text();
 
-    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionfrom2').text(key.exportPublic(currentSelected));
     $('#transactionto2').text(to);
     $('#tosendto2').text(amount);
     $('#maxfeeto2').text(fee);
@@ -135,8 +139,8 @@ CREXTdApp = {
       var Trans = await CreateTransaction({
             Amount: receivedMessage.data.amount,
             Fee: receivedMessage.data.fee,
-            Source: key.exportPublic(n),
-            PrivateKey: key.exportPrivate(n),
+            Source: key.exportPublic(currentSelected),
+            PrivateKey: key.exportPrivate(currentSelected),
             Target: receivedMessage.data.target,
               SmartContract: {
                   Method: receivedMessage.data.smart.method,
@@ -237,7 +241,7 @@ async function content(page) {
       document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
       feecs = Number(receivedMessage.data.fee).noExponents();
-      $('#from').text(key.exportPublic(n));
+      $('#from').text(key.exportPublic(currentSelected));
       $('#fee').text(feecs);
     break;
     case "executetx":
@@ -250,7 +254,7 @@ async function content(page) {
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
       amcs = Number(receivedMessage.data.amount).noExponents();
       feecs = Number(receivedMessage.data.fee).noExponents();
-      $('#from').text(key.exportPublic(n));
+      $('#from').text(key.exportPublic(currentSelected));
       $('#to').text(receivedMessage.data.target);
       $('#amount').text(amcs);
       $('#fee').text(feecs);
@@ -265,7 +269,7 @@ async function content(page) {
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
       amcs = Number(receivedMessage.data.amount).noExponents();
       feecs = Number(receivedMessage.data.fee).noExponents();
-      $('#from').text(key.exportPublic(n));
+      $('#from').text(key.exportPublic(currentSelected));
       $('#to').text(receivedMessage.data.target);
       $('#amount').text(amcs);
       $('#fee').text(feecs);

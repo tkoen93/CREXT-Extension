@@ -11,7 +11,7 @@ function html() {
                   <hr />
                 </div>
                 <div class="row">
-                  <div class="confirmTitle left30" style="margin-right:20px;">
+                  <div class="confirmTitle left30" style="margin-right:50px;">
                     FROM
                   </div>
                   <div class="confirmText left30" id="from" style="margin-top:10px;">
@@ -19,7 +19,7 @@ function html() {
                 </div>
                 <hr />
                 <div class="row">
-                  <div class="confirmTitle left30" style="margin-right:20px;">
+                  <div class="confirmTitle left30" style="margin-right:50px;">
                     TO
                   </div>
                   <div class="confirmText left30" id="to" style="margin-top:10px;">

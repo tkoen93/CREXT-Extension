@@ -47,6 +47,12 @@ window.onload = function(e) {
 
     chrome.runtime.onMessage.addListener( function(message, sender, callback) {
 
+      console.log(message);
+    /*  if(message.data !== undefined) {
+        message.data = JSON.parse(message.data);
+        console.log(message);
+      }*/
+
         let returnmsg;
 
       if(message == 'Inject') {
@@ -72,7 +78,8 @@ window.onload = function(e) {
         global.nodePORT = '';
         keyPublic = '';
         keyPrivate = '';
-      } else if(message == 'Login') {
+      } else if(message == 'Login' || message == 'update') {
+        console.log(message);
         chrome.storage.local.get(function(result) {
            global.nodeIP = result.ip;
            global.nodePORT = result.port;
@@ -95,6 +102,12 @@ window.onload = function(e) {
                 case "TX":
                   if(keyPublic === message.data.target) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender"}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  } else if(isNaN(message.data.amount)) {
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount"}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  } else if(isNaN(message.data.fee)) { 
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid fee"}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
                     PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");

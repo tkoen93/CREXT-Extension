@@ -5,6 +5,24 @@ const API = require('../gen-nodejs/API');
 const bs58 = require('bs58');
 const convert = require('./convert');
 
+Number.prototype.noExponents= function(){
+    var data= String(this).split(/[eE]/);
+    if(data.length== 1) return data[0];
+
+    var  z= '', sign= this<0? '-':'',
+    str= data[0].replace('.', ''),
+    mag= Number(data[1])+ 1;
+
+    if(mag<0){
+        z= sign + '0.';
+        while(mag++) z += '0';
+        return z + str.replace(/^\-/,'');
+    }
+    mag -= str.length;
+    while(mag--) z += '0';
+    return str + z;
+}
+
 function walletBalance(key) { // Function to show balance of public key.
 $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">');
     nodeTest().then(function(r) {
@@ -12,8 +30,8 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
         console.log(response);
           let fraction = convert(response.balance.fraction.buffer);
 
-          if (fraction == 0) {
-              fraction = 0;
+          if (fraction === 0) {
+              fraction = '00';
           }	else {
             if(fraction.toString().length != 18) {
               mLeadingZeros = 18 - fraction.toString().length;
@@ -22,8 +40,7 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
               }
             }
               fraction = "0." + fraction;
-              fraction = (fraction * 1).toString().split(".")[1];
-              fraction = fraction.toString().substring(0,2);
+              fraction = Number(fraction*1).noExponents().toString().split(".")[1].substring(0,2);
           }
 
           totalBalance = response.balance.integral + "." + fraction;

@@ -98,6 +98,7 @@ async function CreateTransaction(Obj)
             let Target = Trans.source;
             Target = concatTypedArrays(Target, NumbToByte(Trans.id, 6));
             let ByteCode = await connect().SmartContractCompile(Obj.SmartContract.Code);
+            console.log(ByteCode);
             if (ByteCode.status.code === 0) {
                 for (let i in ByteCode.byteCodeObjects) {
                   console.log(ByteCode.byteCodeObjects[i].byteCode);

@@ -1,18 +1,22 @@
 const $ = require('jquery');
 const selectNode = require('./lib/selectNode');
+const nodeTest = require('./lib/nodeTest');
 const CREXT = require('./lib/html').CREXT;
+const bs58 = require('bs58');
+const CW = require('./lib/CW');
 
-document.addEventListener("DOMContentLoaded", function(){
+global.nodeIP;
+global.nodePORT;
 
-	let sendDate = (new Date()).getTime();
-	selectNode()
-	.then(function(r) {
-	 let receiveDate = (new Date()).getTime();
-	 let responseTimeMs = receiveDate - sendDate;
-	 console.log("scripts.js selected node: " + r);
-	 console.log("Took " + responseTimeMs + "ms to select node");
-	 global.nodeIP = r;
-	 global.nodePORT = 8081;
+document.addEventListener("DOMContentLoaded", async function(){
+
+	$('#wrapper').html('<div class="init"><img src="../img/loader.svg"></div>');
+
+	await chrome.storage.local.get(async function(result) {
+	  global.nodeIP = result.ip;
+	  global.nodePORT = result.port;
+
+		await nodeTest();
 	});
 
 	CREXT.start();

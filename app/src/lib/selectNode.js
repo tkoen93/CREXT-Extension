@@ -11,7 +11,7 @@ function selectNode() {
   $('.overlayNode').show();
   $('.overlayNodeContent').html("<img src=\"../img/loader.svg\"><br /><p style=\"color:white;\">Selecting node...</p>");
 
-  let currentNet = store.getState().n;
+  let currentNet = store.getState() != undefined ? store.getState().n : 1;
 
   let publicFile;
   let localFile;

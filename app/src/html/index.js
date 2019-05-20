@@ -3,7 +3,7 @@ function html() {
       <div class="logo" id="logoSmall"><img src='../img/crext.png' /></div>
         <div id="balance" align="center" class="balance">
           <div id="balanceresult"></div>
-          <div style="position:absolute;top:0px;left:290px;"><img src="../img/refresh.png" id="refreshBalance" alt="Refresh Balance" /></div>
+          <div style="position:absolute;top:-10px;left:300px;"><img src="../img/refresh.png" id="refreshBalance" alt="Refresh Balance" /></div>
         </div>
         <div class="keyLine row">
           <div class="pull-left" style="margin-left:20px;">Your public key</div>

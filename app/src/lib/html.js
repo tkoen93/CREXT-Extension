@@ -14,7 +14,6 @@ const check_field = require('./check_field');
 const check_import = require('./check_import');
 const SecureLS = require('secure-ls');
 const sha512 = require('js-sha512').sha512;
-//const bip39 = require('bip39');
 const CW = require('./CW');
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
@@ -169,6 +168,7 @@ CREXT = {
 				ls.removeAll();
 	      ls.set('version', 1);
 				ls.set('initiate', 2);
+        bseed.custom = new Array();
 				ls.set('seed', bseed);
 				chrome.runtime.sendMessage('Login');
 				content("index");
@@ -199,6 +199,7 @@ CREXT = {
 				ls.removeAll();
 	      ls.set('version', 1);
 				ls.set('initiate', 2);
+        bseed.custom = new Array();
 				ls.set('seed', bseed);
 				chrome.runtime.sendMessage('Login');
 				content("index");
@@ -328,6 +329,16 @@ CREXT = {
       currentSelected = store.getState().a;
       store.putState({a: totalWallets, s: currentSelected});
       content("index");
+    },
+    addPrivate: function () {
+      let pkey = $('#addWalletPrivate').val();
+      let lsSeed = ls.get('seed');
+      lsSeed.custom.push(bs58.decode(pkey));
+      let curSelect = "c" + (lsSeed.custom.length - 1);
+      ls.set('seed', lsSeed);
+      let totalCustomWallets = store.getState().c + 1;
+      store.putState({s: curSelect, c: totalCustomWallets});
+      content("index");
     }
 }
 
@@ -374,6 +385,7 @@ async function content(page) {
 	      $('#seedphrase').text(mnemonic);
 				seed = mnemonic.split(" ");
 				ls.set('phrase', mnemonic.split(" "));
+        bseed.custom = new Array();
 	      ls.set('seed', bseed);
 
         global.keyPublic = bs58.encode(bseed.getKeypair(0)._publicKey);
@@ -415,8 +427,12 @@ async function content(page) {
 			$('#menu').show();
 			returnValue = await index();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
-			$('#copyKey').text(key.exportPublic(currentSelected));
-			await walletBalance(key.exportPublic(currentSelected));
+      global.keyPublic = key.exportPublic(currentSelected);
+			$('#copyKey').text(global.keyPublic);
+			await walletBalance(global.keyPublic);
+      chrome.storage.local.set({
+        'PublicKey': global.keyPublic
+      });
 			document.getElementById('refreshBalance').addEventListener('click', CREXT.refreshBalance);
 			document.getElementById('copy').addEventListener('click', CREXT.copyKey);
 			document.getElementById('createTX').addEventListener('click', CREXT.createTX);
@@ -447,6 +463,7 @@ async function content(page) {
       returnValue = await addWallet();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('addMnemonic').addEventListener('click', CREXT.addMnemonic);
+      document.getElementById('addPrivateKey').addEventListener('click', CREXT.addPrivate);
     break;
   }
 

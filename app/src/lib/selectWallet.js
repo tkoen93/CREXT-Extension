@@ -12,6 +12,7 @@ const store = new LS('CREXT');
 
 let totalWallets;
 let currentSelected;
+let customWallets;
 
 Number.prototype.noExponents= function(){
     var data= String(this).split(/[eE]/);
@@ -33,22 +34,31 @@ Number.prototype.noExponents= function(){
 
 async function selectWallet() {
 
+  customWallets = store.getState().c;
   totalWallets = store.getState().a;
   currentSelected = store.getState().s;
 
   let html = '';
 
-  //for(let i=0; i<totalWallets; i++) {
-  for(let i = totalWallets-1; i > -1; i--) {
+  for(let i = customWallets-1; i > -1; i--) {
+    let wallet = "c" + i;
+    let response = await addWallet(wallet);
 
+    html = response + html;
+
+    if(i === 0)
+      break;
+  }
+
+  for(let i = totalWallets-1; i > -1; i--) {
     let response = await addWallet(i);
 
     html = response + html;
 
       if(i === 0)
         break;
-
   }
+
   $('#dropdownSelect').html(html);
 }
 
@@ -93,7 +103,7 @@ $(document).on('click', '#selectWallet', function(event){
 
     chrome.runtime.sendMessage('update');
 
-    store.putState({s: Number(id)});
+    store.putState({s: id});
 
     walletBalance(newSelectedKey);
     	$('#copyKey').text(newSelectedKey);

@@ -8,7 +8,8 @@ class LS {
           version: 1,
           a: 1,
           s: 0,
-          n: 1
+          n: 1,
+          c: 0
         };
         localStorage.setItem(init, JSON.stringify(newStorage));
       } else {

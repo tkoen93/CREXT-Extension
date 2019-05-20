@@ -83,5 +83,14 @@ gulp.task('crext-dev', function() {
     .pipe(gulp.dest('./dist/src'));
 });
 
+gulp.task('contents-dev', function() {
+  return browserify('./app/src/contentscript.js')
+    .bundle()
+    .pipe(source('contentscript.js'))
+    .pipe(buffer())
+    .pipe(terser())
+    .pipe(gulp.dest('./dist/src'));
+});
 
-gulp.task('build-dev', gulp.series('content-dev', 'background-dev', 'inject-dev', 'crext-dev'));
+
+gulp.task('build-dev', gulp.series('content-dev', 'background-dev', 'inject-dev', 'crext-dev', 'contents-dev'));

@@ -332,13 +332,21 @@ CREXT = {
     },
     addPrivate: function () {
       let pkey = $('#addWalletPrivate').val();
-      let lsSeed = ls.get('seed');
-      lsSeed.custom.push(bs58.decode(pkey));
-      let curSelect = "c" + (lsSeed.custom.length - 1);
-      ls.set('seed', lsSeed);
-      let totalCustomWallets = store.getState().c + 1;
-      store.putState({s: curSelect, c: totalCustomWallets});
-      content("index");
+      if(pkey.length < 87 || pkey.length > 89) {
+        $('#addWalletPrivateError').text("Incorrect length!");
+      } else {
+        let lsSeed = ls.get('seed');
+        try {
+          lsSeed.custom.push(bs58.decode(pkey));
+          let curSelect = "c" + (lsSeed.custom.length - 1);
+          ls.set('seed', lsSeed);
+          let totalCustomWallets = store.getState().c + 1;
+          store.putState({s: curSelect, c: totalCustomWallets});
+          content("index");
+        } catch(e) {
+          $('#addWalletPrivateError').text("Invalid character detected!");
+        }
+      }
     }
 }
 

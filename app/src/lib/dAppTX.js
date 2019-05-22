@@ -206,6 +206,24 @@ CREXTdApp = {
   },
   closewindow: function() {
     window.close();
+  },
+  block: function() {
+
+    chrome.storage.local.get(function(result) {
+      blocked = result.blocked;
+      blocked.push(receivedMessage.data.org);
+      chrome.storage.local.set({
+        'blocked': blocked
+      });
+    });
+
+    returnmsg = {CREXTreturn: receivedMessage.data.CStype, CSID: receivedMessage.data.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.data.id}};
+  	chrome.tabs.sendMessage(tabID, returnmsg);
+    var port = chrome.runtime.connect({name: "returnAccess"});
+    port.postMessage({CStype: "blockPermanent", org: receivedMessage.data.org});
+    setTimeout(function() {
+      window.close();
+    }, 250);
   }
 }
 
@@ -232,6 +250,7 @@ async function content(page) {
 			});
       document.getElementById('cancel').addEventListener('click', CREXTdApp.cancel);
       document.getElementById('connect').addEventListener('click', CREXTdApp.connect);
+      document.getElementById('blockPermanent').addEventListener('click', CREXTdApp.block);
     break;
     case "deploytx":
       returnValue = await deploytx();

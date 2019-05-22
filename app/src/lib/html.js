@@ -8,6 +8,7 @@ const index = require("../html/index");
 const unlock = require("../html/unlock");
 const txhistory = require('../html/txhistory');
 const inject = require('../html/inject');
+const settings = require('../html/settings');
 const $ = require('jquery');
 const menu = require('./menu');
 const check_field = require('./check_field');
@@ -50,9 +51,10 @@ chrome.runtime.onConnect.addListener(function(port) {
 
 CREXT = {
 		start: function() {
-			menu('hide');
+			menu();
 			document.getElementById('openaccount').addEventListener('click', CREXT.openaccount);
 			document.getElementById('txhistory').addEventListener('click', CREXT.txhistory);
+      document.getElementById('settings').addEventListener('click', CREXT.settings);
 
 			let url_string = window.location.href;
 			let url = new URL(url_string);
@@ -130,7 +132,8 @@ CREXT = {
 	      chrome.storage.local.set({
 	    		'encryption': encryption,
 	        'loginTime': new Date().getTime(),
-					'access': new Array()
+					'access': new Array(),
+          'blocked': new Array()
 	    	});
 	       ls = new SecureLS({encodingType: 'aes', encryptionSecret: encryption});
 	      //alert($("#pass1").val());
@@ -162,6 +165,7 @@ CREXT = {
 	    		'encryption': encryption,
 	        'loginTime': new Date().getTime(),
 					'access': new Array(),
+          'blocked': new Array(),
 					'PublicKey': global.keyPublic
 	    	});
        	ls = new SecureLS({encodingType: 'aes', encryptionSecret: encryption});
@@ -193,6 +197,7 @@ CREXT = {
 	    		'encryption': encryption,
 	        'loginTime': new Date().getTime(),
 					'access': new Array(),
+          'blocked': new Array(),
 					'PublicKey': global.keyPublic
 	    	});
        	ls = new SecureLS({encodingType: 'aes', encryptionSecret: encryption});
@@ -347,6 +352,9 @@ CREXT = {
           $('#addWalletPrivateError').text("Invalid character detected!");
         }
       }
+    },
+    settings: function () {
+      content("settings");
     }
 }
 
@@ -472,6 +480,11 @@ async function content(page) {
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('addMnemonic').addEventListener('click', CREXT.addMnemonic);
       document.getElementById('addPrivateKey').addEventListener('click', CREXT.addPrivate);
+    break;
+    case "settings":
+    	$('#menu').show();
+      returnValue = await settings();
+      document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);;
     break;
   }
 

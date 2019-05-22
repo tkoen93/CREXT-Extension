@@ -10,6 +10,7 @@ global.nodeIP;
 global.nodePORT;
 let keyPublic;
 let access;
+let blocked;
 
 chrome.runtime.onInstalled.addListener((details) => {
   console.log(details);

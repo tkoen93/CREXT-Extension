@@ -9,8 +9,19 @@ const connect = require('./lib/connect');
 global.nodeIP;
 global.nodePORT;
 let keyPublic;
-let keyPrivate;
 let access;
+
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log(details);
+	if (details.reason === 'install') {
+	} else if (details.reason === 'update') {
+		const thisVersion = chrome.runtime.getManifest().version;
+    if(thisVersion !== details.previousVersion) {
+  		const statusMsg = `CREXT updated from ${details.previousVersion} to ${thisVersion}`;
+  		console.info(statusMsg);
+    }
+	}
+});
 
 
 
@@ -20,17 +31,12 @@ window.onload = function(e) {
      global.nodeIP = result.ip;
      global.nodePORT = result.port;
      keyPublic = result.PublicKey;
-     keyPrivate = result.PrivateKey;
      access = result.access;
+     blocked = result.blocked;
 
      if(global.nodeIP === undefined) {
-			 var sendDate = (new Date()).getTime();
 			 selectNode()
 			 .then(function(r) {
-				 var receiveDate = (new Date()).getTime();
-				 var responseTimeMs = receiveDate - sendDate;
-				 console.log("background.js selected node: " + r);
-				 console.log("Took " + responseTimeMs + "ms to select node");
 				 global.nodeIP = r;
 				 global.nodePORT = 8081;
          chrome.storage.local.set({
@@ -46,12 +52,6 @@ window.onload = function(e) {
 
 
     chrome.runtime.onMessage.addListener( function(message, sender, callback) {
-
-      console.log(message);
-    /*  if(message.data !== undefined) {
-        message.data = JSON.parse(message.data);
-        console.log(message);
-      }*/
 
         let returnmsg;
 
@@ -74,24 +74,24 @@ window.onload = function(e) {
 
       } else if(message == 'Logout') {
         access = new Array();
+        blocked = new Array();
         global.nodeIP = '';
         global.nodePORT = '';
         keyPublic = '';
-        keyPrivate = '';
       } else if(message == 'Login' || message == 'update') {
-        console.log(message);
         chrome.storage.local.get(function(result) {
            global.nodeIP = result.ip;
            global.nodePORT = result.port;
            keyPublic = result.PublicKey;
            access = result.access;
+           blocked = result.blocked;
          });
       } else if(message.CStype != null) {
 
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
         if(typeof keyPublic == 'undefined' || keyPublic == '') {
-          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "User not logged in"}};
+          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "User not logged in", id: message.data.id}};
           sendMSG(sender.tab.id, returnmsg);
         } else {
 
@@ -101,13 +101,13 @@ window.onload = function(e) {
               switch(message.CStype) {
                 case "TX":
                   if(keyPublic === message.data.target) {
-                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender"}};
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else if(isNaN(message.data.amount)) {
-                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount"}};
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
-                  } else if(isNaN(message.data.fee)) { 
-                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid fee"}};
+                  } else if(isNaN(message.data.fee)) {
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid fee", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
                     PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
@@ -229,7 +229,11 @@ function PopupCenter(url, title, w, h) {
 }
 
     function checkAccess(url, contentmessage = NULL, callback) {
-      if(access.includes(url)) {
+      if(blocked.includes(url)) {
+        returnmsg = {CREXTreturn: contentmessage.CStype, CSID: contentmessage.CSID, data:{success: false, message: "Access denied"}};
+        sendMSG(contentmessage.id, returnmsg);
+        callback(false);
+      } else if(access.includes(url)) {
         callback(true);
       } else {
         PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
@@ -256,6 +260,9 @@ function PopupCenter(url, title, w, h) {
               callback(true);
             } else if(val.CStype == 'confirmTX') {
               access.push(val.org);
+              callback(false);
+            } else if(val.CStype == 'blockPermanent') {
+              blocked.push(val.org);
               callback(false);
             }
           });

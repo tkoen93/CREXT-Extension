@@ -9,12 +9,10 @@ CREXT = {
     },
     sendTransaction: function(params) {
       if(checkTransaction(params)) {
-        if(params.amount !== "undefined") {
-          params.amount = params.amount.replace(/,/, '.');
-        }
-        if(params.fee !== "undefined") {
-          params.fee = params.fee.replace(/,/, '.');
-        }
+        console.log(params);
+        params.amount = String(params.amount).replace(',', '.');
+        params.fee = String(params.fee).replace(',', '.');
+        console.log(params);
         let identifier = genIdentifier(16);
         sendMsg(identifier, "TX", params);
         return returnPromise(identifier, "TX", 200);

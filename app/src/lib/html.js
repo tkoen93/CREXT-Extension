@@ -33,6 +33,7 @@ const store = new LS('CREXT');
 let currentSelected = store.getState().s;
 
 let ls;
+let p;
 global.keyPublic;
 let verifyArray = new Array();
 let seed;
@@ -358,6 +359,16 @@ CREXT = {
     },
     settings: function () {
       content("settings");
+    },
+    changePhising: function() {
+      let phisingCode = $('#newPhising').val();
+      if(phisingCode.length < 4 || phisingCode.length > 16) {
+        $('#mesPhising').text("Incorrect length!");
+      } else {
+        store.putState({p: phisingCode});
+        $('#curPhising').text(phisingCode);
+        $('#mesPhising').text('Code succesfully changed!');
+      }
     }
 }
 
@@ -423,6 +434,10 @@ async function content(page) {
       $('#menu').hide();
       returnValue = await unlock();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
 			document.getElementById('unlock').addEventListener('click', CREXT.unlock);
     break;
 		case "mnemonicverify":
@@ -487,7 +502,14 @@ async function content(page) {
     case "settings":
     	$('#menu').show();
       returnValue = await settings();
-      document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);;
+      document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
+      p = store.getState().p;
+      if(p === undefined) {
+        $('#curPhising').text("No code set");
+      } else {
+        $('#curPhising').text(p);
+      }
+      document.getElementById('changePhising').addEventListener('click', CREXT.changePhising);
     break;
   }
 

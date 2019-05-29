@@ -6,10 +6,13 @@ function html() {
           <div class="panel panel-default rounded80 txdapp" align="center">
             <!-- txinfo -->
             <div class="panel-body" id="confirmTXinfo">
-                <div class="form-group">
-                  <p class="header" style="margin-bottom:15px;">Confirm Smart Contract execution</p>
-                  <hr />
+            <div class="divPhising" style="position:absolute;top:129px;left:330px;height:71px;width:125px;border-left: 1px solid #DDEBFA;">
+              <p class="phising" id="showPhising"></p>
+            </div>
+                <div class="form-group" style="width:310px;float:left;margin-left:-16px;">
+                  <p class="header" style="margin-bottom:15px;;">Contract execution</p>
                 </div>
+                <hr style="margin-top:54px;"/>
                 <div class="row">
                   <div class="confirmTitle left30" style="margin-right:20px;">
                     FROM
@@ -45,7 +48,7 @@ function html() {
                   </div>
                   <div class="col-xs-4">
                     <div class="col-xs-12 confirmTitle left" align="left">
-                      Method
+                      METHOD
                     </div>
                     <div class="col-xs-12 left" style="margin-top:10px;" align="left">
                       <p class="medium confirmsize" style="font-size:16px;color:#5e6368;" id="method"></p>
@@ -112,7 +115,7 @@ function html() {
                   </div>
                   <div class="col-xs-4">
                     <div class="col-xs-12 confirmTitle left" align="left">
-                      Method
+                      METHOD
                     </div>
                     <div class="col-xs-12 left" style="margin-top:0px;" align="left">
                       <p class="medium confirmsize" style="font-size:12px;color:#5e6368;" id="method2"></p>

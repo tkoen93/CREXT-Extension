@@ -12,6 +12,7 @@ const LS = require('./ls');
 const store = new LS('CREXT');
 const currentSelected = store.getState().s;
 
+let p;
 let n;
 let receivedMessage;
 let tabID;
@@ -262,6 +263,10 @@ async function content(page) {
       feecs = Number(receivedMessage.data.fee).noExponents();
       $('#from').text(key.exportPublic(currentSelected));
       $('#fee').text(feecs);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
     break;
     case "executetx":
     console.log(receivedMessage);
@@ -278,6 +283,10 @@ async function content(page) {
       $('#amount').text(amcs);
       $('#fee').text(feecs);
       $('#method').text(receivedMessage.data.smart.method);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
     break;
     case "normaltx":
       returnValue = await normaltx();
@@ -292,6 +301,10 @@ async function content(page) {
       $('#to').text(receivedMessage.data.target);
       $('#amount').text(amcs);
       $('#fee').text(feecs);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
     break;
   }
 

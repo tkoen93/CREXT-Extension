@@ -89,6 +89,8 @@ window.onload = function(e) {
          });
       } else if(message.CStype != null) {
 
+        console.log(message);
+
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
         if(typeof keyPublic == 'undefined' || keyPublic == '') {
@@ -104,19 +106,31 @@ window.onload = function(e) {
                   if(keyPublic === message.data.target) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
-                  } /*else if(isNaN(message.data.amount)) {
-                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
-                    sendMSG(sender.tab.id, returnmsg);
-                  }*/ else if(isNaN(message.data.fee)) {
+                  } else if(isNaN(message.data.fee)) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid fee", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
-                    PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
-                      setTimeout(
-                      function() {
-                        var port = chrome.runtime.connect({name: "sendData"});
-                        port.postMessage(contentMessage);
-                      }, 1000);
+                    if(!Object.prototype.hasOwnProperty.call(message.data, "amount")) {
+                      PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
+                        setTimeout(
+                        function() {
+                          var port = chrome.runtime.connect({name: "sendData"});
+                          port.postMessage(contentMessage);
+                        }, 1000);
+                      } else {
+                        message.data.amount = String(message.data.amount).replace(',', '.');
+                        if(isNaN(message.data.amount)) {
+                          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        } else {
+                          PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
+                            setTimeout(
+                            function() {
+                              var port = chrome.runtime.connect({name: "sendData"});
+                              port.postMessage(contentMessage);
+                            }, 1000);
+                        }
+                      }
                   }
                   break;
                   case "balanceGet":
@@ -179,7 +193,7 @@ window.onload = function(e) {
                         returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Invalid key"}};
                         sendMSG(sender.tab.id, returnmsg);
                       }
-                      if(balanceKey !== undefined) {
+                      if(walletDataKey !== undefined) {
                         nodeTest().then(function(r) {
                   				connect().WalletDataGet(walletDataKey, function(err, response) {
                             walletdata = response;

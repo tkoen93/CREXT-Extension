@@ -104,10 +104,10 @@ window.onload = function(e) {
                   if(keyPublic === message.data.target) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
-                  } else if(isNaN(message.data.amount)) {
+                  } /*else if(isNaN(message.data.amount)) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
-                  } else if(isNaN(message.data.fee)) {
+                  }*/ else if(isNaN(message.data.fee)) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid fee", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
@@ -120,35 +120,45 @@ window.onload = function(e) {
                   }
                   break;
                   case "balanceGet":
-                  nodeTest().then(function(r) {
-                    connect().WalletBalanceGet(bs58.decode(message.data.key), function(err, response) {
-                      let balance = response;
+                  let balanceKey;
+                  try {
+                    balanceKey = bs58.decode(message.data.key);
+                  } catch(e) {
+                    returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Invalid key"}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  }
 
-                    if(balance.status.message == 'Success') {
+                  if(balanceKey !== undefined) {
+                      nodeTest().then(function(r) {
+                        connect().WalletBalanceGet(balanceKey, function(err, response) {
+                          let balance = response;
 
-                      let fraction = convert(balance.balance.fraction.buffer);
-                      if (fraction == 0) {
-                          fraction = 0;
-                      }	else {
-                        if(fraction.toString().length != 18) {
-                          mLeadingZeros = 18 - fraction.toString().length;
-                          for(i=0;i<mLeadingZeros;i++) {
-                            fraction = "0" + fraction;
+                        if(balance.status.message == 'Success') {
+
+                          let fraction = convert(balance.balance.fraction.buffer);
+                          if (fraction == 0) {
+                              fraction = 0;
+                          }	else {
+                            if(fraction.toString().length != 18) {
+                              mLeadingZeros = 18 - fraction.toString().length;
+                              for(i=0;i<mLeadingZeros;i++) {
+                                fraction = "0" + fraction;
+                              }
+                            }
+                              fraction = "0." + fraction;
+                              fraction = (fraction * 1).toString().split(".")[1];
                           }
-                        }
-                          fraction = "0." + fraction;
-                          fraction = (fraction * 1).toString().split(".")[1];
-                      }
 
-                      totalBalance = balance.balance.integral + "." + fraction;
-                      returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: {integral: balance.balance.integral, fraction: fraction, balance: totalBalance}}};
-                      sendMSG(sender.tab.id, returnmsg);
-                    } else {
-                      returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: balance.status.message}};
-                      sendMSG(sender.tab.id, returnmsg);
-                    }
-                  });
-                });
+                          totalBalance = balance.balance.integral + "." + fraction;
+                          returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: {integral: balance.balance.integral, fraction: fraction, balance: totalBalance}}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        } else {
+                          returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: balance.status.message}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        }
+                      });
+                    });
+                  }
                   break;
                   case "getKey":
                     returnmsg = {CREXTreturn: "getKey", CSID: message.CSID, data:{success: true, id: message.data.id, result: {publicKey: keyPublic}}};
@@ -162,41 +172,50 @@ window.onload = function(e) {
                       returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Not found"}};
                       sendMSG(sender.tab.id, returnmsg);
                     } else {
-                      nodeTest().then(function(r) {
-                				connect().WalletDataGet(bs58.decode(message.data.key), function(err, response) {
-                          walletdata = response;
+                      let walletDataKey;
+                      try {
+                        walletDataKey = bs58.decode(message.data.key);
+                      } catch(e) {
+                        returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Invalid key"}};
+                        sendMSG(sender.tab.id, returnmsg);
+                      }
+                      if(balanceKey !== undefined) {
+                        nodeTest().then(function(r) {
+                  				connect().WalletDataGet(walletDataKey, function(err, response) {
+                            walletdata = response;
 
-                          let fraction = convert(walletdata.walletData.balance.fraction.buffer);
-                          if (fraction == 0) {
-                			        fraction = 0;
-                					}	else {
-              							if(fraction.toString().length != 18) {
-              								mLeadingZeros = 18 - fraction.toString().length;
-              								for(i=0;i<mLeadingZeros;i++) {
-              									fraction = "0" + fraction;
-              								}
-              							}
-              						    fraction = "0." + fraction;
-              								fraction = (fraction * 1).toString().split(".")[1];
-                					}
+                            let fraction = convert(walletdata.walletData.balance.fraction.buffer);
+                            if (fraction == 0) {
+                  			        fraction = 0;
+                  					}	else {
+                							if(fraction.toString().length != 18) {
+                								mLeadingZeros = 18 - fraction.toString().length;
+                								for(i=0;i<mLeadingZeros;i++) {
+                									fraction = "0" + fraction;
+                								}
+                							}
+                						    fraction = "0." + fraction;
+                								fraction = (fraction * 1).toString().split(".")[1];
+                  					}
 
-                          let txid = convert(walletdata.walletData.lastTransactionId.buffer);
-                          let totalBalance = walletdata.walletData.balance.integral + "." + fraction;
+                            let txid = convert(walletdata.walletData.lastTransactionId.buffer);
+                            let totalBalance = walletdata.walletData.balance.integral + "." + fraction;
 
-                          if(walletdata.status.message == 'Success') {
-                            walletdatat = {
-                                "balance": {"integral": walletdata.walletData.balance.integral, "fraction": fraction, "balance": totalBalance},
-                                "lastTransactionId": txid,
-                                "walletId": walletdata.walletData.walletId
-                            };
-                            returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: walletdatat}};
-                            sendMSG(sender.tab.id, returnmsg);
-                          } else {
-                            returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: walletdata.status.message}};
-                            sendMSG(sender.tab.id, returnmsg);
-                          }
+                            if(walletdata.status.message == 'Success') {
+                              walletdatat = {
+                                  "balance": {"integral": walletdata.walletData.balance.integral, "fraction": fraction, "balance": totalBalance},
+                                  "lastTransactionId": txid,
+                                  "walletId": walletdata.walletData.walletId
+                              };
+                              returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: walletdatat}};
+                              sendMSG(sender.tab.id, returnmsg);
+                            } else {
+                              returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: walletdata.status.message}};
+                              sendMSG(sender.tab.id, returnmsg);
+                            }
+                          });
                         });
-                      });
+                      }
                     }
                   break;
               }

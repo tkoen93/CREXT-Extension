@@ -4,6 +4,7 @@ const key = require('./key');
 const connect = require('./connect');
 const nodeTest = require('./nodeTest');
 const CreateTransaction = require('./signature');
+const bs58 = require('bs58');
 
 const LS = require('./ls');
 
@@ -55,6 +56,16 @@ function create() {
     cont = false;
   }
 
+  try {
+    bs58.decode(to);
+  } catch(e) {
+    console.log(e);
+    $('#tokey').css("border","2px solid red");
+    $('#tokey').css("box-shadow","0 0 3px red");
+    $('#tippytoKey').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid public key</p>");
+    $('#tokeyError').show();
+  }
+
   if(amount == '') {
     $('#tosend').css("border","2px solid red");
     $('#tosend').css("box-shadow","0 0 3px red");
@@ -66,6 +77,12 @@ function create() {
         $('#tosend').css("border","2px solid red");
         $('#tosend').css("box-shadow","0 0 3px red");
         $('#tippytoSend').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid amount</p>");
+        $('#tosendError').show();
+        cont = false;
+      } else {
+        $('#tosend').css("border","2px solid red");
+        $('#tosend').css("box-shadow","0 0 3px red");
+        $('#tippytoSend').attr("data-tippy-content", "<p style=\"font-size:12px;\">Invalid</p>");
         $('#tosendError').show();
         cont = false;
       }
@@ -82,6 +99,12 @@ function create() {
         $('#maxfee').css("border","2px solid red");
         $('#maxfee').css("box-shadow","0 0 3px red");
         $('#tippymaxfee').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid amount</p>");
+        $('#maxfeeError').show();
+        cont = false;
+      } else {
+        $('#maxfee').css("border","2px solid red");
+        $('#maxfee').css("box-shadow","0 0 3px red");
+        $('#tippymaxfee').attr("data-tippy-content", "<p style=\"font-size:12px;\">Invalid</p>");
         $('#maxfeeError').show();
         cont = false;
       }
@@ -154,7 +177,6 @@ async function send(n = 0) {
         $('#txLoader').hide();
         $('#failed').show();
         $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.Message + "</div></div>");
-        // IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
       } else {
         nodeTest().then(function(nr) {
           console.log(r.Result);

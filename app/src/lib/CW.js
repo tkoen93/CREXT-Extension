@@ -100,7 +100,7 @@ class CW {
 
 
   getKeypair(index) {
-    const key = Buffer.from(this.derive(`m/44'/1'/${index}'`));
+    const key = Buffer.from(this.derive(`m/44'/1'/0'/${index}'`));
     return Keypair.fromRawEd25519Seed(key);
   }
 

@@ -79,12 +79,6 @@ function create() {
         $('#tippytoSend').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid amount</p>");
         $('#tosendError').show();
         cont = false;
-      } else {
-        $('#tosend').css("border","2px solid red");
-        $('#tosend').css("box-shadow","0 0 3px red");
-        $('#tippytoSend').attr("data-tippy-content", "<p style=\"font-size:12px;\">Invalid</p>");
-        $('#tosendError').show();
-        cont = false;
       }
     }
 
@@ -99,12 +93,6 @@ function create() {
         $('#maxfee').css("border","2px solid red");
         $('#maxfee').css("box-shadow","0 0 3px red");
         $('#tippymaxfee').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid amount</p>");
-        $('#maxfeeError').show();
-        cont = false;
-      } else {
-        $('#maxfee').css("border","2px solid red");
-        $('#maxfee').css("box-shadow","0 0 3px red");
-        $('#tippymaxfee').attr("data-tippy-content", "<p style=\"font-size:12px;\">Invalid</p>");
         $('#maxfeeError').show();
         cont = false;
       }

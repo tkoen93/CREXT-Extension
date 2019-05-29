@@ -42,12 +42,17 @@ let t = undefined;
 chrome.runtime.onConnect.addListener(function(port) {
   console.assert(port.name == "sendData");
   port.onMessage.addListener(function(msg) {
-		//dAppTX(msg);
-    console.log(msg);
 		msgInject = msg;
 	});
 });
 
+function checkAndContinue(data) {
+    if(data === undefined) {
+        setTimeout(checkAndContinue, 500, msgInject);
+    } else {
+      dAppTX(data);
+    }
+}
 
 CREXT = {
 		start: function() {
@@ -101,9 +106,7 @@ CREXT = {
 					   });
 					 } else { // if t contains data
 						 content("inject");
-             setTimeout(function(){
-               dAppTX(msgInject);
-             }, 1500);
+             checkAndContinue(msgInject);
 					 }
 				}
 			})
@@ -493,7 +496,7 @@ async function content(page) {
 }
 
 function randomNo(x,y){
-return Math.floor(Math.random() * ((y-x)+1) + x);
+  return Math.floor(Math.random() * ((y-x)+1) + x);
 }
 
 $(document).on('click', '#getstarted', function(event){
@@ -509,6 +512,18 @@ $(document).on('click', '#dropdownnet', async function(event){
         } else {
           $('ul.dropdownSelectNet').slideDown(500);
         }
+    });
+
+    $(document).on('click', '#openSetting', async function(event){
+      let set = $(this).attr("data-content");
+      if($('#' + set).is(':visible')) {
+        $('#' + set).slideUp(250);
+        $('#' + set + 'Badge').html('<i class="fas fa-angle-down"></i>');
+      } else {
+        $('#' + set).slideDown(250);
+        $('#' + set + 'Badge').html('<i class="fas fa-angle-up"></i>');
+        sw();
+      }
     });
 
 $(document).on('click', '#dropdownkey', async function(event){

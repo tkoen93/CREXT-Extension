@@ -90,7 +90,8 @@ class CW {
 
   /**
    * Derive key given a full BIP44 path
-   * @param {string} path BIP44 path string (eg. m/44'/148'/8')
+   * CS registered with index 334 (https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
+   * @param {string} path BIP44 path string (eg. m/44'/334'/8')
    * @return {Buffer} Key binary as Buffer
    */
   derive(path) {
@@ -100,7 +101,7 @@ class CW {
 
 
   getKeypair(index) {
-    const key = Buffer.from(this.derive(`m/44'/1'/0'/${index}'`));
+    const key = Buffer.from(this.derive(`m/44'/334'/0'/${index}'`));
     return Keypair.fromRawEd25519Seed(key);
   }
 

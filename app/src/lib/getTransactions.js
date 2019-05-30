@@ -7,9 +7,11 @@ const convert = require('./convert');
 const tippy = require('tippy.js');
 const copy = require('./copy');
 const txPages = require('./txpage');
+const LS = require('./ls');
+const store = new LS('CREXT');
 
-let monitorUrl = 'https://monitor.credits.com/testnet-r4_2/';
 let keyPublic;
+
 
 Number.prototype.noExponents= function(){
     var data= String(this).split(/[eE]/);
@@ -30,6 +32,10 @@ Number.prototype.noExponents= function(){
 }
 
 function getTransactions(key, start, amount) { // Get transactions history
+
+  let currentNet = store.getState() != undefined ? store.getState().n : 1;
+  let monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet-r4_2/' : 'https://monitor.credits.com/CreditsNetwork/';
+
   keyPublic = key;
   $('#showtx').fadeOut(250);
   $('#showtx').empty();

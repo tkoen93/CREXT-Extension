@@ -89,7 +89,7 @@ window.onload = function(e) {
          });
       } else if(message.CStype != null) {
 
-        console.log(message);
+        // console.log(message);
 
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
@@ -111,26 +111,36 @@ window.onload = function(e) {
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
                     if(!Object.prototype.hasOwnProperty.call(message.data, "amount")) {
-                      PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
-                        setTimeout(
-                        function() {
-                          var port = chrome.runtime.connect({name: "sendData"});
-                          port.postMessage(contentMessage);
-                        }, 1000);
-                      } else {
-                        message.data.amount = String(message.data.amount).replace(',', '.');
-                        if(isNaN(message.data.amount)) {
-                          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
-                          sendMSG(sender.tab.id, returnmsg);
-                        } else {
+                      checkContract(message, sender)
+                      .then(
+                        function(r) {
                           PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                             setTimeout(
                             function() {
                               var port = chrome.runtime.connect({name: "sendData"});
                               port.postMessage(contentMessage);
                             }, 1000);
-                        }
+                      })
+                      .catch(function(r) { console.warn(r); });
+                    } else {
+                      message.data.amount = String(message.data.amount).replace(',', '.');
+                      if(isNaN(message.data.amount)) {
+                        returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
+                        sendMSG(sender.tab.id, returnmsg);
+                      } else {
+                        checkContract(message, sender)
+                        .then(
+                          function(r) {
+                            PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
+                              setTimeout(
+                              function() {
+                                var port = chrome.runtime.connect({name: "sendData"});
+                                port.postMessage(contentMessage);
+                              }, 1000);
+                        })
+                        .catch(function(r) { });
                       }
+                    }
                   }
                   break;
                   case "balanceGet":
@@ -238,6 +248,41 @@ window.onload = function(e) {
         }
       }
     });
+
+function checkContract(message, sender) {
+  return new Promise(async function(resolve, reject) {
+    if(Object.prototype.hasOwnProperty.call(message.data, "smart")) {
+      if((!Object.prototype.hasOwnProperty.call(message.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(message.data.smart, "method"))) {
+        await connect().SmartContractDataGet(bs58.decode(message.data.target), function(err, r) {
+          if(r.status.code === 1) {
+            returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target address is not a contract", id: message.data.id}};
+            sendMSG(sender.tab.id, returnmsg);
+            reject("Target address is not a contract");
+          } else {
+            let found = false;
+            let methodNum = 0;
+              for(var i = 0; i < r.methods.length; i++) {
+                  if (r.methods[i].name == message.data.smart.method) {
+                      found = true;
+                      methodNum = i;
+                      break;
+                  }
+              }
+            if(!found) {
+              returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Method not found", id: message.data.id}};
+              sendMSG(sender.tab.id, returnmsg);
+              reject("Method not found in contract");
+            } else {
+              resolve(true);
+            }
+          }
+        });
+      }
+    } else {
+      resolve(true);
+    }
+  });
+}
 
 function sendMSG(tab, msg) {
   setTimeout(function() {

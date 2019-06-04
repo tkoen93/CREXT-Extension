@@ -88,18 +88,18 @@ CREXTdApp = {
             Source: key.exportPublic(currentSelected),
             PrivateKey: key.exportPrivate(currentSelected),
               SmartContract: {
-                  Code: receivedMessage.data.smart.code
+                  Code: receivedMessage.data.smart.code,
+                  forgetNewState: true
               }
         }).then(function(txres) {
           console.log(txres);
-          if(txres.error) {
+          if(txres.message !== null) {
             console.error(txres.message);
           } else {
               connect().TransactionFlow(txres.Result, function(err, r) {
                 let res = r;
                 console.log(r);
                 if(r.status.code === 0) {
-                  //transactionto2
                   $('#transactionto2').text(bs58.encode(Buffer.from(txres.Result.target)));
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
@@ -145,7 +145,8 @@ CREXTdApp = {
             Target: receivedMessage.data.target,
               SmartContract: {
                   Method: receivedMessage.data.smart.method,
-                  Params: receivedMessage.data.smart.params
+                  Params: receivedMessage.data.smart.params,
+                  forgetNewState: true
               }
         }).then(function(r) {
           console.log(r);
@@ -276,6 +277,9 @@ async function content(page) {
       document.getElementById('confirm').addEventListener('click', CREXTdApp.confirmexecute);
       document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
+      if(!receivedMessage.data.amount) {
+        receivedMessage.data.amount = 0;
+      }
       amcs = Number(receivedMessage.data.amount).noExponents();
       feecs = Number(receivedMessage.data.fee).noExponents();
       $('#from').text(key.exportPublic(currentSelected));
@@ -343,7 +347,6 @@ function dAppTX(msg, n=0) {
       content("connectrequest");
     } else if (msg.CStype == "TX") {
       receivedMessage.data.fee = receivedMessage.data.fee.replace(/,/, '.');
-      let typetx;
       if(!Object.prototype.hasOwnProperty.call(msg.data, "smart")) {
         content("normaltx");
       } else if((!Object.prototype.hasOwnProperty.call(msg.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(msg.data.smart, "method"))) {

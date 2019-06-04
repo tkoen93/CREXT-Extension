@@ -485,7 +485,7 @@ async function content(page) {
 			$('#menu').show();
 			returnValue = await txhistory();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
-			getTransactions(global.keyPublic, 0, 7);
+			getTransactions(global.keyPublic, 1, 7); // set page to 1 when using monitor as source, 0 when node
 		break;
 		case "inject":
 			$('#menu').hide();
@@ -510,6 +510,23 @@ async function content(page) {
         $('#curPhising').text(p);
       }
       document.getElementById('changePhising').addEventListener('click', CREXT.changePhising);
+      chrome.storage.local.get(['access','blocked'], function(r) {
+        if(r.access.length === 0) {
+          $('#accessList').append('<li class="list-group-item">No approved websites found</li>');
+        } else {
+          for(i=0; i<r.access.length; i++) {
+            $('#accessList').append('<li class="list-group-item" id="access' + i + '"><span class="badgeDelete" id="removeAccess" data-content="' + r.access[i] + '|' + i + '"><i class="far fa-trash-alt"></i></span>' + r.access[i] + '</li>');
+          }
+        }
+
+        if(r.blocked.length === 0) {
+          $('#blockedList').append('<li class="list-group-item">No blocked websites found</li>');
+        } else {
+          for(i=0; i<r.blocked.length; i++) {
+            $('#blockedList').append('<li class="list-group-item" id="blocked' + i + '"><span class="badgeDelete" id="removeBlocked" data-content="' + r.blocked[i] + '|' + i + '"><i class="far fa-trash-alt"></i></span>' + r.blocked[i] + '</li>');
+          }
+        }
+      });
     break;
   }
 
@@ -536,17 +553,55 @@ $(document).on('click', '#dropdownnet', async function(event){
         }
     });
 
-    $(document).on('click', '#openSetting', async function(event){
-      let set = $(this).attr("data-content");
-      if($('#' + set).is(':visible')) {
-        $('#' + set).slideUp(250);
-        $('#' + set + 'Badge').html('<i class="fas fa-angle-down"></i>');
-      } else {
-        $('#' + set).slideDown(250);
-        $('#' + set + 'Badge').html('<i class="fas fa-angle-up"></i>');
-        sw();
-      }
+$(document).on('click', '#openSetting', async function(event){
+  let set = $(this).attr("data-content");
+  if($('#' + set).is(':visible')) {
+    $('#' + set).slideUp(250);
+    $('#' + set + 'Badge').html('<i class="fas fa-angle-down"></i>');
+  } else {
+    $('#' + set).slideDown(250);
+    $('#' + set + 'Badge').html('<i class="fas fa-angle-up"></i>');
+    sw();
+  }
+});
+
+$(document).on('click', '#removeAccess', async function(event){
+  let removeURL = $(this).attr("data-content").split("|")[0];
+  let removeID = $(this).attr("data-content").split("|")[1];
+  chrome.storage.local.get(['access'], function(r) {
+    let n = arrayRemove(r.access, removeURL);
+    chrome.storage.local.set({
+      'access': n
     });
+    $('#access' + removeID).remove();
+    if(n.length === 0) {
+      $('#accessList').append('<li class="list-group-item">No approved websites found</li>');
+    }
+    chrome.runtime.sendMessage('update');
+  });
+});
+
+$(document).on('click', '#removeBlocked', async function(event){
+  let removeURL = $(this).attr("data-content").split("|")[0];
+  let removeID = $(this).attr("data-content").split("|")[1];
+  chrome.storage.local.get(['blocked'], function(r) {
+    let n = arrayRemove(r.blocked, removeURL);
+    chrome.storage.local.set({
+      'blocked': n
+    });
+    $('#blocked' + removeID).remove();
+    if(n.length === 0) {
+      $('#blockedList').append('<li class="list-group-item">No blocked websites found</li>');
+    }
+    chrome.runtime.sendMessage('update');
+  });
+});
+
+function arrayRemove(arr, value) {
+   return arr.filter(function(ele){
+       return ele != value;
+   });
+}
 
 $(document).on('click', '#dropdownkey', async function(event){
         if($('ul.dropdown').is(':visible')) {

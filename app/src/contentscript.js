@@ -1,8 +1,17 @@
-chrome.runtime.sendMessage('Inject');
+/**
+ * Only inject CreditsExtension.js when a website uses https.
+ */
+
+if (location.protocol === 'https:') {
+  chrome.runtime.sendMessage('Inject');
+}
 
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves
   if (event.source != window)
+    return;
+
+  if(location.protocol !== 'https:')
     return;
 
   if(typeof event.data.CStype != 'undefined') {

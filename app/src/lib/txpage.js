@@ -1,6 +1,11 @@
 var $ = require('jquery');
 
 function txPages(pageNumber, pageNumberSelect, maxPages) {
+
+pageNumber = Number(pageNumber);
+pageNumberSelect = Number(pageNumberSelect);
+maxPages = Number(maxPages);
+
   if(maxPages <= 7) {
     if(pageNumber == 1) {
       $('#txPaging').html("<p class=\"pull-left\" style=\"position:fixed;left:42px;\"><a class=\"pageNumber\"><i class=\"fas fa-arrow-left\"></i></a></p>");

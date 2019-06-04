@@ -42,17 +42,25 @@ function getTransactions(key, start, amount) { // Get transactions history
   $('#txPaging').fadeOut(250);
   $('#txPaging').empty();
   $('#txLoader').html('<img src="../img/loader.svg">');
-    nodeTest().then(function(r) {
-      connect().TransactionsGet(bs58.decode(key), start, amount, function (err, r) {
+//    nodeTest().then(function(r) {
+//      connect().TransactionsGet(bs58.decode(key), start, amount, function (err, r) {
+//url: monitorUrl + 'API/AccountTransactions?id=' + key + '&page=' + start + '&limit=' + amount,
+$.ajax({
+  type: "GET",
+  url: monitorUrl + 'API/AccountTransactions',
+  dataType: 'json',
+  data: { id : key, page: start, limit: amount },
+  success: function(r) {
+    console.log(r);
 
-        let total_tx = 99; // Fixed amount as total_trxns_count always returns 0
+      //  let total_tx = 99; // Fixed amount as total_trxns_count always returns 0
 
-        console.log(r);
+      let total_tx = r.txCount;
 
         $('#txLoader').empty();
 
         for(let index in r.transactions) {
-          let from = bs58.encode(Buffer.from(r.transactions[index].trxn.source));
+      /*    let from = bs58.encode(Buffer.from(r.transactions[index].trxn.source));
           let to = bs58.encode(Buffer.from(r.transactions[index].trxn.target));
           let poolHash = Buffer.from(r.transactions[index].id.poolHash).toString('hex');
 
@@ -74,19 +82,36 @@ function getTransactions(key, start, amount) { // Get transactions history
           let amount = r.transactions[index].trxn.amount.integral + "." + fraction.toString().substring(0,2);
           let fullAmount = r.transactions[index].trxn.amount.integral + "." + fraction + " CS";
 
-          let url = monitorUrl + 'transaction/' + poolHash + '.' + (r.transactions[index].id.index + 1);
+          let url = monitorUrl + 'transaction/' + poolHash + '.' + (r.transactions[index].id.index + 1);*/
+
+          let from = r.transactions[index].fromAccount;
+          let to = r.transactions[index].toAccount;
+          let url = monitorUrl + 'transaction/' + r.transactions[index].id;
+          let value = r.transactions[index].value + ".";
+          let frac = value.split(".");
+          let fraction;
+          if(frac[1].length === 0) {
+            fraction = '00';
+          } else if(frac[1].length === 1) {
+            fraction = frac[1] + "0";
+          } else {
+            fraction = frac[1].toString().substring(0,2);
+          }
+          let amount = frac[0] + "." + fraction + " " + r.transactions[index].currency;
+          let fullAmount = r.transactions[index].value + " " + r.transactions[index].currency;
 
           if(key == from) {
             account = to.substring(0, 16);
-            $('#showtx').append("<tr class='txhisrow'><td width='30'>&nbsp;</td><td width='120'><img src=\"/img/sent.png\"/><p class=\"txSent\">Sent</p></td><td width='160' class='flex' id=\"copyTX\" data-content='" + to + "'><a href='#'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + to + "</p>'>" + account + " ...</p></a></td><td width='85'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + fullAmount + "</p>'>" + amount + " CS</p></td><td data-toggle='popover' data-content='View on monitor' data-placement='left'><a href=\"" + url + "\" target=\"_blank\"><i class=\"fas fa-external-link-alt\" style=\"color:#5cacf6;\"></i></a></td></tr>");
+            $('#showtx').append("<tr class='txhisrow'><td width='30'>&nbsp;</td><td width='120'><img src=\"/img/sent.png\"/><p class=\"txSent\">Sent</p></td><td width='160' class='flex' id=\"copyTX\" data-content='" + to + "'><a href='#'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + to + "</p>'>" + account + " ...</p></a></td><td width='85'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + fullAmount + "</p>'>" + amount + "</p></td><td data-toggle='popover' data-content='View on monitor' data-placement='left'><a href=\"" + url + "\" target=\"_blank\"><i class=\"fas fa-external-link-alt\" style=\"color:#5cacf6;\"></i></a></td></tr>");
           } else if(key == to){
             account = from.substring(0, 16);
-            $('#showtx').append("<tr class='txhisrow'><td width='30'>&nbsp;</td><td width='120'><img src=\"/img/received.png\"/><p class=\"txReceived\">Received</p></td><td width='160' class='flex' id=\"copyTX\" data-content='" + from + "'><a href='#'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + from + "</p>'>" + account + " ...</p></a></td><td width='85'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + fullAmount + "</p>'>" + amount + " CS</p></td><td data-toggle='popover' data-content='View on monitor' data-placement='left'><a href=\"" + url + "\" target=\"_blank\"><i class=\"fas fa-external-link-alt\" style=\"color:#5cacf6;\"></i></a></td></tr>");
+            $('#showtx').append("<tr class='txhisrow'><td width='30'>&nbsp;</td><td width='120'><img src=\"/img/received.png\"/><p class=\"txReceived\">Received</p></td><td width='160' class='flex' id=\"copyTX\" data-content='" + from + "'><a href='#'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + from + "</p>'>" + account + " ...</p></a></td><td width='85'><p class=\"txHisr\" id=\"tippy\" data-tippy-content='<p style=\"font-size:12px;\">" + fullAmount + "</p>'>" + amount + "</p></td><td data-toggle='popover' data-content='View on monitor' data-placement='left'><a href=\"" + url + "\" target=\"_blank\"><i class=\"fas fa-external-link-alt\" style=\"color:#5cacf6;\"></i></a></td></tr>");
           }
 
         }
 
-        let pageNumber = (start / 7)+1;
+      //  let pageNumber = (start / 7)+1;
+      let pageNumber = start;
         let pageNumberSelect;
 
         let maxPages = Math.ceil((total_tx / 7));
@@ -110,10 +135,16 @@ function getTransactions(key, start, amount) { // Get transactions history
           arrow: true,
           arrowType: 'round',
         });
+      },
+      error: function(xhr, status, error){
+         var errorMessage = xhr.status + ': ' + xhr.statusText
+//         alert('Error - ' + errorMessage);
+         $('#showtx').append("<tr><td>No transactions history found for this wallet</td></tr>");
+       }
 
 
       });
-    });
+//    }); end nodetest
 }
 
 $(document).on('click', '#copyTX', function(event){
@@ -137,7 +168,8 @@ function showCopyAlert() { // Show result for a few seconds before message disap
 $(document).on('click', '#selectPage', function(event) {
 	let selectedPage = $(this).attr("page");
 	let start = (selectedPage-1) * 7;
-	getTransactions(keyPublic, start, 7);
+//	getTransactions(keyPublic, start, 7);
+	getTransactions(keyPublic, selectedPage, 7);
 });
 
 module.exports = getTransactions;

@@ -25,8 +25,8 @@ function html() {
           </div>
           <div class="row" style="margin-top:52px;">
             <hr style="margin-left:15px;" />
-            <p class="warning" style="text-decoration:underline line-through;position:relative;top:-10px;">
-              <a href="#" id="blockPermanent"><i class="fas fa-ban fa-flip-horizontal"></i> Block this website from getting access permanently</a>
+            <p class="warning" style="text-decoration:underline;position:relative;top:-10px;">
+              <a href="#" id="blockPermanent" style="color:red;"><i class="fas fa-ban fa-flip-horizontal"></i> Block this website from getting access permanently</a>
             </p>
           </div>
           <div class="row">

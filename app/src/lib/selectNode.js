@@ -3,8 +3,26 @@ const AbortController = require('abort-controller');
 const thrift = require('thrift');
 const API = require('../gen-nodejs/API');
 const convert = require("./convert");
+const LS = require('./ls');
+const store = new LS('CREXT');
 
 function selectNode() {
+
+  $('.overlayNode').show();
+  $('.overlayNodeContent').html("<img src=\"../img/loader.svg\"><br /><p style=\"color:white;\">Selecting node...</p>");
+
+  let currentNet = store.getState() != undefined ? store.getState().n : 1;
+
+  let publicFile;
+  let localFile;
+
+  if(currentNet === 0) { // TestNet
+    publicFile = 'http://173.249.11.161/nodetestnet.json';
+    localFile = './node.json';
+  } else { // MainNet
+    publicFile = 'http://173.249.11.161/nodemainnet.json';
+    localFile = './nodemainnet.json';
+  }
 
   let activeNodes = new Array();
 
@@ -14,7 +32,7 @@ function selectNode() {
     let completeRes = 0;
 
   	const result = $.ajax({
-  		url: 'http://173.249.11.161/nodetestnet.json',
+  		url: publicFile,
       success: function(result) {
         for(let index in result) {
           var sendDate = (new Date()).getTime();
@@ -27,11 +45,28 @@ function selectNode() {
             if(completeRes === result.length) {
               syncState(activeNodes)
               .then(function(r) {
+                if(r === undefined) {
+                  global.nodeIP = undefined;
+                  chrome.storage.local.set({
+                    'ip': ''
+                  });
+                  chrome.runtime.sendMessage('update');
+                  $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
+                  if(currentNet === 0) {
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                  } else {
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
+                  }
+                } else {
                 chrome.storage.local.set({
             	 		'ip': r,
                   'port': 8081
             		});
+                chrome.runtime.sendMessage('update');
+                global.nodeIP = r;
+                $('.overlayNode').hide();
                 resolve(r);
+              }
               });
             }
           })
@@ -40,11 +75,28 @@ function selectNode() {
             if(completeRes === result.length) {
               syncState(activeNodes)
               .then(function(r) {
+                if(r === undefined) {
+                  global.nodeIP = undefined;
+                  chrome.storage.local.set({
+                    'ip': ''
+                  });
+                  chrome.runtime.sendMessage('update');
+                  $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
+                  if(currentNet === 0) {
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                  } else {
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
+                  }
+                } else {
                 chrome.storage.local.set({
             	 		'ip': r,
                   'port': 8081
             		});
+                chrome.runtime.sendMessage('update');
+                global.nodeIP = r;
+                $('.overlayNode').hide();
                 resolve(r);
+              }
               });
             }
           });
@@ -52,11 +104,11 @@ function selectNode() {
       },
       error: function() {
         const result = $.ajax({
-          url: './node.json',
+          url: localFile,
           success: function(result) {
             for(let index in result) {
               var sendDate = (new Date()).getTime();
-              fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 500)
+              fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
               .then(function(val) {
                 var receiveDate = (new Date()).getTime();
                 var responseTimeMs = receiveDate - sendDate;
@@ -65,11 +117,28 @@ function selectNode() {
                 if(completeRes === result.length) {
                   syncState(activeNodes)
                   .then(function(r) {
+                    if(r === undefined) {
+                      global.nodeIP = undefined;
+                      chrome.storage.local.set({
+                        'ip': ''
+                      });
+                      chrome.runtime.sendMessage('update');
+                      $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
+                      if(currentNet === 0) {
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                      } else {
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
+                      }
+                    } else {
                     chrome.storage.local.set({
                       'ip': r,
                       'port': 8081
                     });
+                    chrome.runtime.sendMessage('update');
+                    global.nodeIP = r;
+                    $('.overlayNode').hide();
                     resolve(r);
+                  }
                   });
                 }
               })
@@ -78,11 +147,28 @@ function selectNode() {
                 if(completeRes === result.length) {
                   syncState(activeNodes)
                   .then(function(r) {
+                    if(r === undefined) {
+                      global.nodeIP = undefined;
+                      chrome.storage.local.set({
+                        'ip': ''
+                      });
+                      chrome.runtime.sendMessage('update');
+                      $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
+                      if(currentNet === 0) {
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                      } else {
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
+                      }
+                    } else {
                     chrome.storage.local.set({
                       'ip': r,
                       'port': 8081
                     });
+                    chrome.runtime.sendMessage('update');
+                    global.nodeIP = r;
+                    $('.overlayNode').hide();
                     resolve(r);
+                  }
                   });
                 }
               });
@@ -179,7 +265,8 @@ async function syncState(selectedNodes) {
 
         if(complete === leng) {
           if(syncedNode.length == 0) {
-            alert('No node found');
+            //alert('No node found');
+            return undefined;
           } else {
             return syncedNode[0][0];
           }

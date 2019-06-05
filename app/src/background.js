@@ -9,8 +9,20 @@ const connect = require('./lib/connect');
 global.nodeIP;
 global.nodePORT;
 let keyPublic;
-let keyPrivate;
 let access;
+let blocked;
+
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log(details);
+	if (details.reason === 'install') {
+	} else if (details.reason === 'update') {
+		const thisVersion = chrome.runtime.getManifest().version;
+    if(thisVersion !== details.previousVersion) {
+  		const statusMsg = `CREXT updated from ${details.previousVersion} to ${thisVersion}`;
+  		console.info(statusMsg);
+    }
+	}
+});
 
 
 
@@ -20,17 +32,12 @@ window.onload = function(e) {
      global.nodeIP = result.ip;
      global.nodePORT = result.port;
      keyPublic = result.PublicKey;
-     keyPrivate = result.PrivateKey;
      access = result.access;
+     blocked = result.blocked;
 
      if(global.nodeIP === undefined) {
-			 var sendDate = (new Date()).getTime();
 			 selectNode()
 			 .then(function(r) {
-				 var receiveDate = (new Date()).getTime();
-				 var responseTimeMs = receiveDate - sendDate;
-				 console.log("background.js selected node: " + r);
-				 console.log("Took " + responseTimeMs + "ms to select node");
 				 global.nodeIP = r;
 				 global.nodePORT = 8081;
          chrome.storage.local.set({
@@ -68,23 +75,26 @@ window.onload = function(e) {
 
       } else if(message == 'Logout') {
         access = new Array();
+        blocked = new Array();
         global.nodeIP = '';
         global.nodePORT = '';
         keyPublic = '';
-        keyPrivate = '';
-      } else if(message == 'Login') {
+      } else if(message == 'Login' || message == 'update') {
         chrome.storage.local.get(function(result) {
            global.nodeIP = result.ip;
            global.nodePORT = result.port;
            keyPublic = result.PublicKey;
            access = result.access;
+           blocked = result.blocked;
          });
       } else if(message.CStype != null) {
+
+        // console.log(message);
 
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
         if(typeof keyPublic == 'undefined' || keyPublic == '') {
-          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "User not logged in"}};
+          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "User not logged in", id: message.data.id}};
           sendMSG(sender.tab.id, returnmsg);
         } else {
 
@@ -94,47 +104,85 @@ window.onload = function(e) {
               switch(message.CStype) {
                 case "TX":
                   if(keyPublic === message.data.target) {
-                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender"}};
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender", id: message.data.id}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  } else if(isNaN(message.data.fee)) {
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid fee", id: message.data.id}};
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
-                    PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
-                      setTimeout(
-                      function() {
-                        var port = chrome.runtime.connect({name: "sendData"});
-                        port.postMessage(contentMessage);
-                      }, 1000);
+                    if(!Object.prototype.hasOwnProperty.call(message.data, "amount")) {
+                      checkContract(message, sender)
+                      .then(
+                        function(r) {
+                          PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
+                            setTimeout(
+                            function() {
+                              var port = chrome.runtime.connect({name: "sendData"});
+                              port.postMessage(contentMessage);
+                            }, 1000);
+                      })
+                      .catch(function(r) { console.warn(r); });
+                    } else {
+                      message.data.amount = String(message.data.amount).replace(',', '.');
+                      if(isNaN(message.data.amount)) {
+                        returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
+                        sendMSG(sender.tab.id, returnmsg);
+                      } else {
+                        checkContract(message, sender)
+                        .then(
+                          function(r) {
+                            PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
+                              setTimeout(
+                              function() {
+                                var port = chrome.runtime.connect({name: "sendData"});
+                                port.postMessage(contentMessage);
+                              }, 1000);
+                        })
+                        .catch(function(r) { });
+                      }
+                    }
                   }
                   break;
                   case "balanceGet":
-                  nodeTest().then(function(r) {
-                    connect().WalletBalanceGet(bs58.decode(message.data.key), function(err, response) {
-                      let balance = response;
+                  let balanceKey;
+                  try {
+                    balanceKey = bs58.decode(message.data.key);
+                  } catch(e) {
+                    returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Invalid key"}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  }
 
-                    if(balance.status.message == 'Success') {
+                  if(balanceKey !== undefined) {
+                      nodeTest().then(function(r) {
+                        connect().WalletBalanceGet(balanceKey, function(err, response) {
+                          let balance = response;
 
-                      let fraction = convert(balance.balance.fraction.buffer);
-                      if (fraction == 0) {
-                          fraction = 0;
-                      }	else {
-                        if(fraction.toString().length != 18) {
-                          mLeadingZeros = 18 - fraction.toString().length;
-                          for(i=0;i<mLeadingZeros;i++) {
-                            fraction = "0" + fraction;
+                        if(balance.status.message == 'Success') {
+
+                          let fraction = convert(balance.balance.fraction.buffer);
+                          if (fraction == 0) {
+                              fraction = 0;
+                          }	else {
+                            if(fraction.toString().length != 18) {
+                              mLeadingZeros = 18 - fraction.toString().length;
+                              for(i=0;i<mLeadingZeros;i++) {
+                                fraction = "0" + fraction;
+                              }
+                            }
+                              fraction = "0." + fraction;
+                              fraction = (fraction * 1).toString().split(".")[1];
                           }
-                        }
-                          fraction = "0." + fraction;
-                          fraction = (fraction * 1).toString().split(".")[1];
-                      }
 
-                      totalBalance = balance.balance.integral + "." + fraction;
-                      returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: {integral: balance.balance.integral, fraction: fraction, balance: totalBalance}}};
-                      sendMSG(sender.tab.id, returnmsg);
-                    } else {
-                      returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: balance.status.message}};
-                      sendMSG(sender.tab.id, returnmsg);
-                    }
-                  });
-                });
+                          totalBalance = balance.balance.integral + "." + fraction;
+                          returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: {integral: balance.balance.integral, fraction: fraction, balance: totalBalance}}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        } else {
+                          returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: balance.status.message}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        }
+                      });
+                    });
+                  }
                   break;
                   case "getKey":
                     returnmsg = {CREXTreturn: "getKey", CSID: message.CSID, data:{success: true, id: message.data.id, result: {publicKey: keyPublic}}};
@@ -148,41 +196,50 @@ window.onload = function(e) {
                       returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Not found"}};
                       sendMSG(sender.tab.id, returnmsg);
                     } else {
-                      nodeTest().then(function(r) {
-                				connect().WalletDataGet(bs58.decode(message.data.key), function(err, response) {
-                          walletdata = response;
+                      let walletDataKey;
+                      try {
+                        walletDataKey = bs58.decode(message.data.key);
+                      } catch(e) {
+                        returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Invalid key"}};
+                        sendMSG(sender.tab.id, returnmsg);
+                      }
+                      if(walletDataKey !== undefined) {
+                        nodeTest().then(function(r) {
+                  				connect().WalletDataGet(walletDataKey, function(err, response) {
+                            walletdata = response;
 
-                          let fraction = convert(walletdata.walletData.balance.fraction.buffer);
-                          if (fraction == 0) {
-                			        fraction = 0;
-                					}	else {
-              							if(fraction.toString().length != 18) {
-              								mLeadingZeros = 18 - fraction.toString().length;
-              								for(i=0;i<mLeadingZeros;i++) {
-              									fraction = "0" + fraction;
-              								}
-              							}
-              						    fraction = "0." + fraction;
-              								fraction = (fraction * 1).toString().split(".")[1];
-                					}
+                            let fraction = convert(walletdata.walletData.balance.fraction.buffer);
+                            if (fraction == 0) {
+                  			        fraction = 0;
+                  					}	else {
+                							if(fraction.toString().length != 18) {
+                								mLeadingZeros = 18 - fraction.toString().length;
+                								for(i=0;i<mLeadingZeros;i++) {
+                									fraction = "0" + fraction;
+                								}
+                							}
+                						    fraction = "0." + fraction;
+                								fraction = (fraction * 1).toString().split(".")[1];
+                  					}
 
-                          let txid = convert(walletdata.walletData.lastTransactionId.buffer);
-                          let totalBalance = walletdata.walletData.balance.integral + "." + fraction;
+                            let txid = convert(walletdata.walletData.lastTransactionId.buffer);
+                            let totalBalance = walletdata.walletData.balance.integral + "." + fraction;
 
-                          if(walletdata.status.message == 'Success') {
-                            walletdatat = {
-                                "balance": {"integral": walletdata.walletData.balance.integral, "fraction": fraction, "balance": totalBalance},
-                                "lastTransactionId": txid,
-                                "walletId": walletdata.walletData.walletId
-                            };
-                            returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: walletdatat}};
-                            sendMSG(sender.tab.id, returnmsg);
-                          } else {
-                            returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: walletdata.status.message}};
-                            sendMSG(sender.tab.id, returnmsg);
-                          }
+                            if(walletdata.status.message == 'Success') {
+                              walletdatat = {
+                                  "balance": {"integral": walletdata.walletData.balance.integral, "fraction": fraction, "balance": totalBalance},
+                                  "lastTransactionId": txid,
+                                  "walletId": walletdata.walletData.walletId
+                              };
+                              returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: walletdatat}};
+                              sendMSG(sender.tab.id, returnmsg);
+                            } else {
+                              returnmsg = {CREXTreturn: "walletDataGet", CSID: message.CSID, data:{success: false, id: message.data.id, message: walletdata.status.message}};
+                              sendMSG(sender.tab.id, returnmsg);
+                            }
+                          });
                         });
-                      });
+                      }
                     }
                   break;
               }
@@ -191,6 +248,43 @@ window.onload = function(e) {
         }
       }
     });
+
+function checkContract(message, sender) {
+  return new Promise(async function(resolve, reject) {
+    if(Object.prototype.hasOwnProperty.call(message.data, "smart")) {
+      if((!Object.prototype.hasOwnProperty.call(message.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(message.data.smart, "method"))) {
+        await connect().SmartContractDataGet(bs58.decode(message.data.target), function(err, r) {
+          if(r.status.code === 1) {
+            returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target address is not a contract", id: message.data.id}};
+            sendMSG(sender.tab.id, returnmsg);
+            reject("Target address is not a contract");
+          } else {
+            let found = false;
+            let methodNum = 0;
+              for(var i = 0; i < r.methods.length; i++) {
+                  if (r.methods[i].name == message.data.smart.method) {
+                      found = true;
+                      methodNum = i;
+                      break;
+                  }
+              }
+            if(!found) {
+              returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Method not found", id: message.data.id}};
+              sendMSG(sender.tab.id, returnmsg);
+              reject("Method not found in contract");
+            } else {
+              resolve(true);
+            }
+          }
+        });
+      } else if(Object.prototype.hasOwnProperty.call(message.data.smart, "code")) { // new smart contract
+        resolve(true);
+      }
+    } else {
+      resolve(true);
+    }
+  });
+}
 
 function sendMSG(tab, msg) {
   setTimeout(function() {
@@ -216,7 +310,11 @@ function PopupCenter(url, title, w, h) {
 }
 
     function checkAccess(url, contentmessage = NULL, callback) {
-      if(access.includes(url)) {
+      if(blocked.includes(url)) {
+        returnmsg = {CREXTreturn: contentmessage.CStype, CSID: contentmessage.CSID, data:{success: false, message: "Access denied"}};
+        sendMSG(contentmessage.id, returnmsg);
+        callback(false);
+      } else if(access.includes(url)) {
         callback(true);
       } else {
         PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
@@ -243,6 +341,9 @@ function PopupCenter(url, title, w, h) {
               callback(true);
             } else if(val.CStype == 'confirmTX') {
               access.push(val.org);
+              callback(false);
+            } else if(val.CStype == 'blockPermanent') {
+              blocked.push(val.org);
               callback(false);
             }
           });

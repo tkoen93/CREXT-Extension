@@ -4,10 +4,19 @@ const key = require('./key');
 const connect = require('./connect');
 const nodeTest = require('./nodeTest');
 const CreateTransaction = require('./signature');
+const bs58 = require('bs58');
 
+const LS = require('./ls');
+
+const store = new LS('CREXT');
+
+let currentSelected;
 let maximumfee;
 
-function create(keyPublic) {
+function create() {
+
+  currentSelected = store.getState() === undefined ? '0' : store.getState().s;
+  global.keyPublic = key.exportPublic(currentSelected);
 
   $('input[type="text"]').css({"border" : "", "box-shadow" : ""});
   $('#tokeyError').hide();
@@ -31,7 +40,7 @@ function create(keyPublic) {
     maxfee = "0" + maxfee;
   }
 
-  if(to == keyPublic) {
+  if(to == global.keyPublic) {
     $('#tokey').css("border","2px solid red");
     $('#tokey').css("box-shadow","0 0 3px red");
   $('#tippytoKey').attr("data-tippy-content", "<p style=\"font-size:12px;\">You can't send a transaction to yourself</p>");
@@ -45,6 +54,16 @@ function create(keyPublic) {
   $('#tippytoKey').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid public key</p>");
   $('#tokeyError').show();
     cont = false;
+  }
+
+  try {
+    bs58.decode(to);
+  } catch(e) {
+    console.log(e);
+    $('#tokey').css("border","2px solid red");
+    $('#tokey').css("box-shadow","0 0 3px red");
+    $('#tippytoKey').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid public key</p>");
+    $('#tokeyError').show();
   }
 
   if(amount == '') {
@@ -135,17 +154,24 @@ async function send(n = 0) {
   let Trans = CreateTransaction({
     Amount: amount,
     Fee: maximumfee,
-    Source: await key.exportPublic(n),
-    PrivateKey: await key.exportPrivate(n),
+    Source: await key.exportPublic(currentSelected),
+    PrivateKey: await key.exportPrivate(currentSelected),
     Target: to
   }).then(function(r) {
+    console.log(r);
       if(r.Message != undefined) {
         console.error(r.Message);
+        $('#failButton').slideDown(250);
+        $('#txLoader').hide();
+        $('#failed').show();
+        $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.Message + "</div></div>");
       } else {
         nodeTest().then(function(nr) {
-          connect().TransactionFlow(r.Result, function(err, r) {
-            console.log(r);
-            if(r.status.code === 0) {
+          console.log(r.Result);
+          connect().TransactionFlow(r.Result, function(err, re) {
+            console.log(err);
+            console.log(re);
+            if(re.status.code === 0) {
               $('#completeButtons').slideDown(250);
               $('#txLoader').hide();
               $('#completed').show();
@@ -153,6 +179,7 @@ async function send(n = 0) {
               $('#failButton').slideDown(250);
               $('#txLoader').hide();
               $('#failed').show();
+              $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.status.message + "</div></div>");
             }
           });
         });

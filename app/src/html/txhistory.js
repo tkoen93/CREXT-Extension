@@ -16,7 +16,6 @@ function html() {
           </div>
           <div id="txPaging" style="margin-top:6px;"></div>
         </div>
-
         </div>
 	</div>`;
   return html;

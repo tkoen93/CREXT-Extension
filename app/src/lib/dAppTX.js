@@ -7,7 +7,12 @@ const connect = require('./connect');
 const key = require('./key');
 const CreateTransaction = require('./signature');
 const bs58 = require('bs58');
+const LS = require('./ls');
 
+const store = new LS('CREXT');
+const currentSelected = store.getState().s;
+
+let p;
 let n;
 let receivedMessage;
 let tabID;
@@ -25,7 +30,7 @@ CREXTdApp = {
     let amount = $('#amount').text();
     let fee = $('#fee').text();
 
-    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionfrom2').text(key.exportPublic(currentSelected));
     $('#transactionto2').text(to);
     $('#tosendto2').text(amount);
     $('#maxfeeto2').text(fee);
@@ -38,8 +43,8 @@ CREXTdApp = {
       var Trans = await CreateTransaction({
             Amount: amount,
             Fee: fee,
-            Source: key.exportPublic(n),
-            PrivateKey: key.exportPrivate(n),
+            Source: key.exportPublic(currentSelected),
+            PrivateKey: key.exportPrivate(currentSelected),
             Target: to,
         }).then(function(r) {
           console.log(r);
@@ -70,7 +75,7 @@ CREXTdApp = {
   },
   confirmdeploy: async function() {
 
-    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionfrom2').text(key.exportPublic(currentSelected));
     $('#maxfeeto2').text($('#fee').text());
 
     $('#confirmTXinfo').slideUp(250);
@@ -80,21 +85,21 @@ CREXTdApp = {
 
       var Trans = await CreateTransaction({
             Fee: receivedMessage.data.fee,
-            Source: key.exportPublic(n),
-            PrivateKey: key.exportPrivate(n),
+            Source: key.exportPublic(currentSelected),
+            PrivateKey: key.exportPrivate(currentSelected),
               SmartContract: {
-                  Code: receivedMessage.data.smart.code
+                  Code: receivedMessage.data.smart.code,
+                  forgetNewState: true
               }
         }).then(function(txres) {
           console.log(txres);
-          if(txres.error) {
+          if(txres.message !== null && txres.message !== undefined) {
             console.error(txres.message);
           } else {
               connect().TransactionFlow(txres.Result, function(err, r) {
                 let res = r;
                 console.log(r);
                 if(r.status.code === 0) {
-                  //transactionto2
                   $('#transactionto2').text(bs58.encode(Buffer.from(txres.Result.target)));
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
@@ -121,7 +126,7 @@ CREXTdApp = {
     let amount = $('#amount').text();
     let fee = $('#fee').text();
 
-    $('#transactionfrom2').text(key.exportPublic());
+    $('#transactionfrom2').text(key.exportPublic(currentSelected));
     $('#transactionto2').text(to);
     $('#tosendto2').text(amount);
     $('#maxfeeto2').text(fee);
@@ -135,12 +140,13 @@ CREXTdApp = {
       var Trans = await CreateTransaction({
             Amount: receivedMessage.data.amount,
             Fee: receivedMessage.data.fee,
-            Source: key.exportPublic(n),
-            PrivateKey: key.exportPrivate(n),
+            Source: key.exportPublic(currentSelected),
+            PrivateKey: key.exportPrivate(currentSelected),
             Target: receivedMessage.data.target,
               SmartContract: {
                   Method: receivedMessage.data.smart.method,
-                  Params: receivedMessage.data.smart.params
+                  Params: receivedMessage.data.smart.params,
+                  forgetNewState: true
               }
         }).then(function(r) {
           console.log(r);
@@ -202,6 +208,24 @@ CREXTdApp = {
   },
   closewindow: function() {
     window.close();
+  },
+  block: function() {
+
+    chrome.storage.local.get(function(result) {
+      blocked = result.blocked;
+      blocked.push(receivedMessage.data.org);
+      chrome.storage.local.set({
+        'blocked': blocked
+      });
+    });
+
+    returnmsg = {CREXTreturn: receivedMessage.data.CStype, CSID: receivedMessage.data.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.data.id}};
+  	chrome.tabs.sendMessage(tabID, returnmsg);
+    var port = chrome.runtime.connect({name: "returnAccess"});
+    port.postMessage({CStype: "blockPermanent", org: receivedMessage.data.org});
+    setTimeout(function() {
+      window.close();
+    }, 250);
   }
 }
 
@@ -228,6 +252,7 @@ async function content(page) {
 			});
       document.getElementById('cancel').addEventListener('click', CREXTdApp.cancel);
       document.getElementById('connect').addEventListener('click', CREXTdApp.connect);
+      document.getElementById('blockPermanent').addEventListener('click', CREXTdApp.block);
     break;
     case "deploytx":
       returnValue = await deploytx();
@@ -237,8 +262,12 @@ async function content(page) {
       document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
       feecs = Number(receivedMessage.data.fee).noExponents();
-      $('#from').text(key.exportPublic(n));
+      $('#from').text(key.exportPublic(currentSelected));
       $('#fee').text(feecs);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
     break;
     case "executetx":
     console.log(receivedMessage);
@@ -248,13 +277,20 @@ async function content(page) {
       document.getElementById('confirm').addEventListener('click', CREXTdApp.confirmexecute);
       document.getElementById('closewindow').addEventListener('click', CREXTdApp.closewindow);
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
+      if(!receivedMessage.data.amount) {
+        receivedMessage.data.amount = 0;
+      }
       amcs = Number(receivedMessage.data.amount).noExponents();
       feecs = Number(receivedMessage.data.fee).noExponents();
-      $('#from').text(key.exportPublic(n));
+      $('#from').text(key.exportPublic(currentSelected));
       $('#to').text(receivedMessage.data.target);
       $('#amount').text(amcs);
       $('#fee').text(feecs);
       $('#method').text(receivedMessage.data.smart.method);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
     break;
     case "normaltx":
       returnValue = await normaltx();
@@ -265,10 +301,14 @@ async function content(page) {
       document.getElementById('failMainPage').addEventListener('click', CREXTdApp.closewindow);
       amcs = Number(receivedMessage.data.amount).noExponents();
       feecs = Number(receivedMessage.data.fee).noExponents();
-      $('#from').text(key.exportPublic(n));
+      $('#from').text(key.exportPublic(currentSelected));
       $('#to').text(receivedMessage.data.target);
       $('#amount').text(amcs);
       $('#fee').text(feecs);
+      p = store.getState().p;
+      if(p !== undefined) {
+        $('#showPhising').text(p);
+      }
     break;
   }
 
@@ -307,7 +347,6 @@ function dAppTX(msg, n=0) {
       content("connectrequest");
     } else if (msg.CStype == "TX") {
       receivedMessage.data.fee = receivedMessage.data.fee.replace(/,/, '.');
-      let typetx;
       if(!Object.prototype.hasOwnProperty.call(msg.data, "smart")) {
         content("normaltx");
       } else if((!Object.prototype.hasOwnProperty.call(msg.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(msg.data.smart, "method"))) {

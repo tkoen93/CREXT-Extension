@@ -100,7 +100,6 @@ async function CreateTransaction(Obj)
             let ByteCode = await connect().SmartContractCompile(Obj.SmartContract.Code);
             if (ByteCode.status.code === 0) {
                 for (let i in ByteCode.byteCodeObjects) {
-                  console.log(ByteCode.byteCodeObjects[i].byteCode);
                     Target = concatTypedArrays(Target, ByteCode.byteCodeObjects[i].byteCode);
                 }
             }
@@ -187,24 +186,27 @@ async function CreateTransaction(Obj)
 
                     switch (val.K)
                     {
-                      /*  case "STRING":
-                            console.log(Buffer.from(ConvertCharToByte(val.V)));
+                        case "STRING":
                             UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 17]));
                             UserField = concatTypedArrays(UserField, NumbToByte(val.V.length, 4).reverse());
                             UserField = concatTypedArrays(UserField, Buffer.from(ConvertCharToByte(val.V)));
                             Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_string: val.V }));
                             UserField = concatTypedArrays(UserField, new Uint8Array(1));
-                        break;*/
-                        case "STRING":
-                            UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 17]));
-                            UserField = concatTypedArrays(UserField, GetBitArray(Obj.SmartContract.Params[i].V.length, 4).reverse());
-                            var ParamBytes = new Uint8Array(Obj.SmartContract.Params[i].V.length + 1);
-
-                            for (let j in Obj.SmartContract.Params[i].V) {
-                                ParamBytes[j] = Obj.SmartContract.Params[i].V[j].charCodeAt();
+                        break;
+                        case "INT":
+                            UserField = concatTypedArrays(UserField, new Uint8Array([8, 0, 9]));
+                            UserField = concatTypedArrays(UserField, NumbToByte(val.V, 4).reverse());
+                            Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_int: val.V }));
+                            UserField = concatTypedArrays(UserField, new Uint8Array(1));
+                        break;
+                        case "BOOL":
+                            UserField = concatTypedArrays(UserField, new Uint8Array([2, 0, 3]));
+                            UserField = concatTypedArrays(UserField, new Uint8Array(1));
+                            if (val.V) {
+                                UserField[UserField.length - 1] = 1;
                             }
-                            UserField = concatTypedArrays(UserField, ParamBytes);
-                            Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_string: Obj.SmartContract.Params[i].V }));
+                            Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_boolean: val.V }));
+                            UserField = concatTypedArrays(UserField, new Uint8Array(1));
                         break;
                     }
                 }
@@ -274,10 +276,8 @@ async function CreateTransaction(Obj)
             Hex += ArHex[Math.floor(PerStr[j] / 16)];
             Hex += ArHex[Math.floor(PerStr[j] % 16)];
         }
-        console.log(Hex);
 
         Trans.signature = Buffer.from(nacl.sign.detached(PerStr, Private));
-        console.log(Trans);
         ResObj.Result = Trans;
         return ResObj;
     }

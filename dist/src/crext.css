@@ -44,7 +44,7 @@ body::-webkit-scrollbar{display:none !important;}
     overflow-y: auto;
     transition: all 0.5s ease;
     width: 0;
-    z-index: 1000;
+    z-index: 5;
 }
 
 #sidebar-wrapper::-webkit-scrollbar {
@@ -98,7 +98,7 @@ body::-webkit-scrollbar{display:none !important;}
     top: 20px;
     width: 24px;
     right: 0;
-    z-index: 999;
+    z-index: 4;
 }
 
 .hamburger:hover,
@@ -175,6 +175,28 @@ body::-webkit-scrollbar{display:none !important;}
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.4);
     z-index: 1;
+}
+
+.overlayNode {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 6;
+}
+
+.overlayNodeContent {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align:center;
 }
 
 /* FOR left side */
@@ -299,6 +321,11 @@ p {
   display:inline;
 }
 
+p.small {
+  font-family: RobotoLight;
+  font-size: 12px;
+}
+
 p.error {
   font-family: Roboto;
   color: red;
@@ -381,6 +408,8 @@ a:active {
   background-color: #168FFA;
   color: #ECF2FF;
   border: 0px;
+  font-family:Roboto;
+  font-size:13px;
 }
 
 .createInput {
@@ -557,6 +586,8 @@ p.revoke {
   width: 435px;
   margin-top: -23px;
   margin-left: -10px;
+  overflow:hidden;
+  overflow-y:auto;
 }
 
 .confirmAccessPanel {
@@ -790,4 +821,150 @@ stroke-dashoffset: -100;
 100% {
 stroke-dashoffset: 900;
 }
+}
+
+ul.dropdown {
+  margin: 0;
+padding: 0;
+  display: none;
+  list-style-type:none;
+position: absolute;
+//background-color: #f9f9f9;
+background-color: rgba(255, 255, 255, 0.9);
+width: 397px;
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+z-index: 1;
+right:0;
+top:100%;
+max-height:320px;
+overflow:hidden;
+overflow-y:auto;
+}
+
+ul.dropdown li a {
+  list-style: none;
+  color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+}
+
+ul.dropdown li a:hover {background-color: #f1f1f1}
+
+ul.dropdownSelectNet {
+  margin: 0;
+  margin-right:15px;
+padding: 0;
+  display: none;
+  list-style-type:none;
+position: absolute;
+//background-color: #f9f9f9;
+background-color: rgba(255, 255, 255, 0.9);
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+z-index: 1;
+right:0;
+top:100%;
+max-height:320px;
+overflow:hidden;
+overflow-y:auto;
+}
+
+ul.dropdownSelectNet li a {
+  list-style: none;
+  color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+}
+
+ul.dropdownSelectNet li a:hover {background-color: #f1f1f1}
+
+.init {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+}
+
+#dropdownSelect::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+#dropdownSelect::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+#dropdownSelect::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+
+.strike {
+    display: block;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.strike > span {
+    position: relative;
+    display: inline-block;
+}
+
+.strike > span:before,
+.strike > span:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 9999px;
+    height: 1px;
+    background: #DDEBFA;
+}
+
+.strike > span:before {
+    right: 100%;
+    margin-right: 15px;
+}
+
+.strike > span:after {
+    left: 100%;
+    margin-left: 15px;
+}
+
+.settingsScroll::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+.settingsScroll::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+.settingsScroll::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+
+.divPhising {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 71px;
+}
+
+p.phising {
+  font-family: RobotoLight;
+  font-size: 12px;
 }

@@ -6,12 +6,15 @@ function html() {
           <div class="panel panel-default rounded80 txdapp" align="center">
             <!-- txinfo -->
             <div class="panel-body" id="confirmTXinfo">
-                <div class="form-group">
-                  <p class="header" style="margin-bottom:15px;">Confirm transaction</p>
-                  <hr />
+            <div class="divPhising" style="position:absolute;top:129px;left:330px;height:71px;width:125px;border-left: 1px solid #DDEBFA;">
+              <p class="phising" id="showPhising"></p>
+            </div>
+                <div class="form-group" style="width:310px;float:left;margin-left:-16px;">
+                  <p class="header" style="margin-bottom:15px;;">Confirm transaction</p>
                 </div>
+                <hr style="margin-top:54px;"/>
                 <div class="row">
-                  <div class="confirmTitle left30" style="margin-right:20px;">
+                  <div class="confirmTitle left30" style="margin-right:50px;">
                     FROM
                   </div>
                   <div class="confirmText left30" id="from" style="margin-top:10px;">
@@ -19,7 +22,7 @@ function html() {
                 </div>
                 <hr />
                 <div class="row">
-                  <div class="confirmTitle left30" style="margin-right:20px;">
+                  <div class="confirmTitle left30" style="margin-right:50px;">
                     TO
                   </div>
                   <div class="confirmText left30" id="to" style="margin-top:10px;">

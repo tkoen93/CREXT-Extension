@@ -10,7 +10,7 @@
   "browser_action": {
     "default_popup": "src/popup.html"
   },
-  "version": "0.0.4",
+  "version": "0.8.1",
   "short_name": "CREXT",
   "content_scripts": [
       {

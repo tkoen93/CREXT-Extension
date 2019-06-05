@@ -9,6 +9,8 @@ CREXT = {
     },
     sendTransaction: function(params) {
       if(checkTransaction(params)) {
+        params.fee = String(params.fee).replace(',', '.');
+        console.log(params);
         let identifier = genIdentifier(16);
         sendMsg(identifier, "TX", params);
         return returnPromise(identifier, "TX", 200);

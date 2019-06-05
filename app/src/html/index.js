@@ -3,20 +3,23 @@ function html() {
       <div class="logo" id="logoSmall"><img src='../img/crext.png' /></div>
         <div id="balance" align="center" class="balance">
           <div id="balanceresult"></div>
-          <div style="position:absolute;top:0px;left:290px;"><img src="../img/refresh.png" id="refreshBalance" alt="Refresh Balance" /></div>
+          <div style="position:absolute;top:-10px;left:300px;"><img src="../img/refresh.png" id="refreshBalance" alt="Refresh Balance" /></div>
         </div>
         <div class="keyLine row">
           <div class="pull-left" style="margin-left:20px;">Your public key</div>
-          <div class="pull-right" style="display:none;">
-            <a href="#" data-toggle="popover" data-content="Export unencrypted keyfile" data-placement="right" name="exportkeyfile" id="exportkeyfile" style="margin-right:20px;color:#8EE1F1;border-bottom: 1px solid rgba(142, 225, 241, 0.4);">
-                Export raw keyfile
+          <div class="pull-right" id="addwallet" style="display:none;">
+            <a href="#" name="addnewwallet" id="addnewwallet" style="margin-right:20px;color:#8EE1F1;border-bottom: 1px solid rgba(142, 225, 241, 0.4);">
+                Add wallet
             </a>
           </div>
         </div>
         <div class="form-group keyCopy">
           <div class="input-group" style="height:45px;margin-left:5px;">
             <a href="#" class="input-group-addon copyAddress" id="copy" style="width:40px;"><i class="far fa-clone fa-flip-vertical" style="color:#ECF2FF;"></i></a>
-            <span id="copyKey" name="copyKey" class="input-group-addon inputPublicKey" style="width:395px;text-align:center;padding:0px;"></span>
+            <span id="copyKey" name="copyKey" class="input-group-addon inputPublicKey" style="width:364px;text-align:center;padding:0px;"></span>
+            <a href="#" class="input-group-addon copyAddress" id="dropdownkey" style="width:20px;"><i class="fas fa-angle-double-down" style="color:#ECF2FF;"></i></a>
+          <ul class="dropdown" id="dropdownSelect">
+          </ul>
           </div>
         </div>
       <div class="panel panel-default rounded80 txpanel" align="center" id="initialTX">
@@ -110,22 +113,24 @@ function html() {
         <img src="../img/loader.svg" width="98" height="98">
         <hr />
         </div>
-        <div class="row">
-          <div class="confirmTitle">
-            RECEIVER'S ADDRESS
-          </div>
-          <div class="confirmText" id="transactionto2" style="margin-top:0px;">
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px;">
-          <div class="col-xs-6">
-            <div class="col-xs-12 confirmTitle left">
-              AMOUNT <p class="medium" style="font-size:12px;color:#5e6368;" id="tosendto2"></p> <p class="medium" style="font-size:12px;color:#5e6368;">CS</p>
+        <div id="sigError">
+          <div class="row">
+            <div class="confirmTitle">
+              RECEIVER'S ADDRESS
+            </div>
+            <div class="confirmText" id="transactionto2" style="margin-top:0px;">
             </div>
           </div>
-          <div class="col-xs-6">
-            <div class="col-xs-12 confirmTitle left">
-              MAX CS FEE <p class="medium" style="font-size:12px;color:#5e6368;" id="maxfeeto2"></p> <p class="medium" style="font-size:12px;color:#5e6368;">CS</p>
+          <div class="row" style="margin-top:10px;">
+            <div class="col-xs-6">
+              <div class="col-xs-12 confirmTitle left">
+                AMOUNT <p class="medium" style="font-size:12px;color:#5e6368;" id="tosendto2"></p> <p class="medium" style="font-size:12px;color:#5e6368;">CS</p>
+              </div>
+            </div>
+            <div class="col-xs-6">
+              <div class="col-xs-12 confirmTitle left">
+                MAX CS FEE <p class="medium" style="font-size:12px;color:#5e6368;" id="maxfeeto2"></p> <p class="medium" style="font-size:12px;color:#5e6368;">CS</p>
+              </div>
             </div>
           </div>
         </div>

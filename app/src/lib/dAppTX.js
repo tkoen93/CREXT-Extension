@@ -93,7 +93,7 @@ CREXTdApp = {
               }
         }).then(function(txres) {
           console.log(txres);
-          if(txres.message !== null) {
+          if(txres.message !== null && txres.message !== undefined) {
             console.error(txres.message);
           } else {
               connect().TransactionFlow(txres.Result, function(err, r) {

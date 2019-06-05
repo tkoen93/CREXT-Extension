@@ -277,6 +277,8 @@ function checkContract(message, sender) {
             }
           }
         });
+      } else if(Object.prototype.hasOwnProperty.call(message.data.smart, "code")) { // new smart contract
+        resolve(true);
       }
     } else {
       resolve(true);

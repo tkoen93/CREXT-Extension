@@ -32,8 +32,11 @@ function menu(n) {
   					<li>
   						&nbsp;
   					</li>
-  					<li id="logout" class="closeItem">
-  							<button type="button" name="logout" id="logout" class="btn btn-danger" style="width:120px;"><p>Logout</p></button>
+            <li style="text-align:center;">
+  							<button type="button" name="lockCrextModal" id="lockCrextModal" class="btn btn-warning" style="width:120px;"><p><i class="fas fa-lock"></i> Lock</p></button>
+  					</li>
+  					<li id="logout" style="text-align:center;margin-top:5px;">
+  							<button type="button" name="logout" id="logout" class="btn btn-danger" style="width:120px;"><p><i class="fas fa-sign-out-alt"></i> Logout</p></button>
   					</li>
   			</ul>
   			<p class="navfooter">
@@ -49,7 +52,28 @@ function menu(n) {
   </button>
   			<div class="container" id="container">
   			</div><!-- /.container -->
-  	</div><!-- /#page-content-wrapper -->`;
+  	</div><!-- /#page-content-wrapper -->
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="closeModal">&times;</span>
+          <h3>Logout</h3>
+        </div>
+        <div class="modal-body">
+          <p>Logging out of CREXT will destroy all data. You'll need your phrase to get access to your wallet.</p>
+        </div>
+        <div class="modal-footer" style="text-align:center;">
+          <button type="button" name="goBackModal" id="goBackModal" class="btn btn-success" style="width:100px;"><p><i class="fas fa-undo-alt"></i> Go back</p></button>
+          <button type="button" name="lockCrextModal" id="lockCrextModal" class="btn btn-warning" style="width:100px;"><p><i class="fas fa-lock"></i> Lock</p></button>
+          <button type="button" name="logoutModal" id="logoutModal" class="btn btn-danger" style="width:100px;"><p><i class="fas fa-sign-out-alt"></i> Logout</p></button>
+        </div>
+      </div>
+
+    </div>`;
 
     document.getElementById('wrapper').insertAdjacentHTML('beforeend', menuHTML);
 

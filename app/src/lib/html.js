@@ -39,6 +39,7 @@ let verifyArray = new Array();
 let seed;
 let msgInject = undefined;
 let t = undefined;
+let modal;
 
 chrome.runtime.onConnect.addListener(function(port) {
   console.assert(port.name == "sendData");
@@ -61,6 +62,10 @@ CREXT = {
 			document.getElementById('openaccount').addEventListener('click', CREXT.openaccount);
 			document.getElementById('txhistory').addEventListener('click', CREXT.txhistory);
       document.getElementById('settings').addEventListener('click', CREXT.settings);
+      document.getElementById('goBackModal').addEventListener('click', CREXT.goBackModal);
+      document.getElementById('lockCrextModal').addEventListener('click', CREXT.lockCrextModal);
+      document.getElementById('logoutModal').addEventListener('click', CREXT.logoutModal);
+      modal = document.getElementById("myModal");
 
 			let url_string = window.location.href;
 			let url = new URL(url_string);
@@ -369,7 +374,16 @@ CREXT = {
         $('#curPhising').text(phisingCode);
         $('#mesPhising').text('Code succesfully changed!');
       }
-    }
+    },
+    goBackModal: function() {
+        $('#myModal').hide();
+    },
+    lockCrextModal: function() {
+      chrome.storage.local.set({'loginTime': 0});
+      chrome.runtime.sendMessage('update');
+      window.location.reload();
+    },
+    logoutModal: function() {}
 }
 
 async function content(page) {
@@ -635,6 +649,22 @@ $(document).on('click', '#selectNet', function(event){
       });
     }
 });
+
+$(document).on('click', '#logout', function(event){
+  $('#myModal').show();
+});
+
+// When the user clicks on <span> (x), close the modal
+$(document).on('click', '.closeModal', function(event){
+  $('#myModal').hide();
+});
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    $('#myModal').hide();
+  }
+}
 
 
 module.exports = {

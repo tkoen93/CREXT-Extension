@@ -56,7 +56,7 @@ function checkAndContinue(data) {
     }
 }
 
-CREXT = {
+let CREXT = {
 		start: function() {
 			menu();
 			document.getElementById('openaccount').addEventListener('click', CREXT.openaccount);
@@ -72,8 +72,8 @@ CREXT = {
 			t = url.searchParams.get("t");
 
 			chrome.storage.local.get(function(result) {
-				loginTime = result.loginTime;
-				timeNow = new Date().getTime();
+				let loginTime = result.loginTime;
+				let timeNow = new Date().getTime();
 				global.keyPublic = result.PublicKey;
 
 				if(((timeNow-loginTime > 1800000) || result.encryption == '') && global.keyPublic != '') {
@@ -391,6 +391,8 @@ async function content(page) {
   $("#ext").slideUp(250);
   document.getElementById('container').innerHTML = "";
 
+  let returnValue;
+
   switch(page) {
     case "main":
     	$('#menu').hide();
@@ -459,10 +461,10 @@ async function content(page) {
 			returnValue = await mnemonicverify();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
 			document.getElementById('verify').addEventListener('click', CREXT.verify);
-			w1 = randomNo(1,3);
-			w2 = randomNo(4,6);
-			w3 = randomNo(7,9);
-			w4 = randomNo(10,12);
+			let w1 = randomNo(1,3);
+			let w2 = randomNo(4,6);
+			let w3 = randomNo(7,9);
+			let w4 = randomNo(10,12);
 			verifyArray.push((w1-1), (w2-1), (w3-1), (w4-1));
 			$("#w1").attr("placeholder","Word " + w1);
 			$("#w2").attr("placeholder","Word " + w2);
@@ -528,7 +530,7 @@ async function content(page) {
         if(r.access.length === 0) {
           $('#accessList').append('<li class="list-group-item">No approved websites found</li>');
         } else {
-          for(i=0; i<r.access.length; i++) {
+          for(let i=0; i<r.access.length; i++) {
             $('#accessList').append('<li class="list-group-item" id="access' + i + '"><span class="badgeDelete" id="removeAccess" data-content="' + r.access[i] + '|' + i + '"><i class="far fa-trash-alt"></i></span>' + r.access[i] + '</li>');
           }
         }
@@ -536,7 +538,7 @@ async function content(page) {
         if(r.blocked.length === 0) {
           $('#blockedList').append('<li class="list-group-item">No blocked websites found</li>');
         } else {
-          for(i=0; i<r.blocked.length; i++) {
+          for(let i=0; i<r.blocked.length; i++) {
             $('#blockedList').append('<li class="list-group-item" id="blocked' + i + '"><span class="badgeDelete" id="removeBlocked" data-content="' + r.blocked[i] + '|' + i + '"><i class="far fa-trash-alt"></i></span>' + r.blocked[i] + '</li>');
           }
         }

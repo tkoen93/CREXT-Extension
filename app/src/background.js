@@ -15,6 +15,7 @@ let blocked;
 chrome.runtime.onInstalled.addListener((details) => {
   console.log(details);
 	if (details.reason === 'install') {
+    console.log("install message");
 	} else if (details.reason === 'update') {
 		const thisVersion = chrome.runtime.getManifest().version;
     if(thisVersion !== details.previousVersion) {
@@ -62,9 +63,9 @@ window.onload = function(e) {
         });
 
         chrome.storage.local.get(function(result) {
-  				loginTime = result.loginTime;
+  				let loginTime = result.loginTime;
           if(loginTime > 1) {
-  				    timeNow = new Date().getTime();
+  				    let timeNow = new Date().getTime();
   				    if((timeNow-loginTime > 1800000) || result.encryption == '') {
   					     chrome.storage.local.set({
   						      'encryption': ''
@@ -98,7 +99,7 @@ window.onload = function(e) {
           sendMSG(sender.tab.id, returnmsg);
         } else {
 
-          if(checkAccess(message.org, contentMessage, function(r) {
+          checkAccess(message.org, contentMessage, function(r) {
             if(r) {
 
               switch(message.CStype) {
@@ -164,8 +165,8 @@ window.onload = function(e) {
                               fraction = 0;
                           }	else {
                             if(fraction.toString().length != 18) {
-                              mLeadingZeros = 18 - fraction.toString().length;
-                              for(i=0;i<mLeadingZeros;i++) {
+                              let mLeadingZeros = 18 - fraction.toString().length;
+                              for(let i=0;i<mLeadingZeros;i++) {
                                 fraction = "0" + fraction;
                               }
                             }
@@ -173,7 +174,7 @@ window.onload = function(e) {
                               fraction = (fraction * 1).toString().split(".")[1];
                           }
 
-                          totalBalance = balance.balance.integral + "." + fraction;
+                          let totalBalance = balance.balance.integral + "." + fraction;
                           returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: {integral: balance.balance.integral, fraction: fraction, balance: totalBalance}}};
                           sendMSG(sender.tab.id, returnmsg);
                         } else {
@@ -213,8 +214,8 @@ window.onload = function(e) {
                   			        fraction = 0;
                   					}	else {
                 							if(fraction.toString().length != 18) {
-                								mLeadingZeros = 18 - fraction.toString().length;
-                								for(i=0;i<mLeadingZeros;i++) {
+                								let mLeadingZeros = 18 - fraction.toString().length;
+                								for(let i=0;i<mLeadingZeros;i++) {
                 									fraction = "0" + fraction;
                 								}
                 							}
@@ -226,7 +227,7 @@ window.onload = function(e) {
                             let totalBalance = walletdata.walletData.balance.integral + "." + fraction;
 
                             if(walletdata.status.message == 'Success') {
-                              walletdatat = {
+                              let walletdatat = {
                                   "balance": {"integral": walletdata.walletData.balance.integral, "fraction": fraction, "balance": totalBalance},
                                   "lastTransactionId": txid,
                                   "walletId": walletdata.walletData.walletId
@@ -244,12 +245,13 @@ window.onload = function(e) {
                   break;
               }
             }
-          }));
+          });
         }
       }
     });
 
 function checkContract(message, sender) {
+  let returnmsg;
   return new Promise(async function(resolve, reject) {
     if(Object.prototype.hasOwnProperty.call(message.data, "smart")) {
       if((!Object.prototype.hasOwnProperty.call(message.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(message.data.smart, "method"))) {
@@ -260,11 +262,11 @@ function checkContract(message, sender) {
             reject("Target address is not a contract");
           } else {
             let found = false;
-            let methodNum = 0;
+          //  let methodNum = 0;
               for(var i = 0; i < r.methods.length; i++) {
                   if (r.methods[i].name == message.data.smart.method) {
                       found = true;
-                      methodNum = i;
+                    //  methodNum = i;
                       break;
                   }
               }
@@ -309,7 +311,8 @@ function PopupCenter(url, title, w, h) {
     if (window.focus) newWindow.focus();
 }
 
-    function checkAccess(url, contentmessage = NULL, callback) {
+    function checkAccess(url, contentmessage, callback) {
+      let returnmsg;
       if(blocked.includes(url)) {
         returnmsg = {CREXTreturn: contentmessage.CStype, CSID: contentmessage.CSID, data:{success: false, message: "Access denied"}};
         sendMSG(contentmessage.id, returnmsg);

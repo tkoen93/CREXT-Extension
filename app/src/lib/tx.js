@@ -24,12 +24,12 @@ function create() {
   $('#maxfeeError').hide();
 
   let regexp = /^\d+(\.\d{1,18})?$/;
-  cont = true;
+  let cont = true;
 
-  to = $('#tokey').val();
-  amount = $('#tosend').val();
+  let to = $('#tokey').val();
+  let amount = $('#tosend').val();
   amount = amount.replace(/,/, '.');
-  maxfee = $('#maxfee').val();
+  let maxfee = $('#maxfee').val();
   maxfee = maxfee.replace(/,/, '.');
 
   if(amount.charAt(0) == '.') {
@@ -151,7 +151,7 @@ async function send(n = 0) {
     $('#txerror').show();
   }
 
-  let Trans = CreateTransaction({
+  CreateTransaction({
     Amount: amount,
     Fee: maximumfee,
     Source: await key.exportPublic(currentSelected),

@@ -18,8 +18,9 @@ let receivedMessage;
 let tabID;
 let feecs;
 let amcs;
+let returnmsg;
 
-CREXTdApp = {
+let CREXTdApp = {
   reject: function() {
   	returnmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, message: "Transaction rejected by user", id: receivedMessage.data.id}};
   	chrome.tabs.sendMessage(tabID, returnmsg);
@@ -40,7 +41,7 @@ CREXTdApp = {
       $('#confirmedTX').slideDown(250);
   });
 
-      var Trans = await CreateTransaction({
+      await CreateTransaction({
             Amount: amount,
             Fee: fee,
             Source: key.exportPublic(currentSelected),
@@ -83,7 +84,7 @@ CREXTdApp = {
       $('#confirmedTX').slideDown(250);
   });
 
-      var Trans = await CreateTransaction({
+      await CreateTransaction({
             Fee: receivedMessage.data.fee,
             Source: key.exportPublic(currentSelected),
             PrivateKey: key.exportPrivate(currentSelected),
@@ -137,7 +138,7 @@ CREXTdApp = {
       $('#confirmedTX').slideDown(250);
   });
 
-      var Trans = await CreateTransaction({
+      await CreateTransaction({
             Amount: receivedMessage.data.amount,
             Fee: receivedMessage.data.fee,
             Source: key.exportPublic(currentSelected),
@@ -179,7 +180,7 @@ CREXTdApp = {
     $("#connect").attr("disabled", true);
 
     chrome.storage.local.get(function(result) {
-      access = result.access;
+      let access = result.access;
       access.push(receivedMessage.data.org);
       chrome.storage.local.set({
         'access': access
@@ -187,15 +188,16 @@ CREXTdApp = {
     });
 
   //	if(typeof receivedMessage.data.amount === 'undefined') {
+  let port;
   if(!Object.prototype.hasOwnProperty.call(receivedMessage.data.data, "fee")) {
-  		var port = chrome.runtime.connect({name: "returnAccess"});
+  		port = chrome.runtime.connect({name: "returnAccess"});
   		port.postMessage({CStype: "confirm", org: receivedMessage.data.org});
   		setTimeout(function() {
   			window.close();
   		}, 250);
   	} else {
 
-  		var port = chrome.runtime.connect({name: "returnAccess"});
+  		port = chrome.runtime.connect({name: "returnAccess"});
   		port.postMessage({CStype: "confirmTX", org: receivedMessage.data.org});
 
   			dAppTX(receivedMessage.data);
@@ -212,7 +214,7 @@ CREXTdApp = {
   block: function() {
 
     chrome.storage.local.get(function(result) {
-      blocked = result.blocked;
+      let blocked = result.blocked;
       blocked.push(receivedMessage.data.org);
       chrome.storage.local.set({
         'blocked': blocked
@@ -234,6 +236,8 @@ async function content(page) {
   $("#ext").slideUp(250);
   $('#menu').hide();
   document.getElementById('container').innerHTML = "";
+
+  let returnValue;
 
   switch(page) {
     case "connectrequest":
@@ -337,10 +341,7 @@ Number.prototype.noExponents= function(){
 function dAppTX(msg, n=0) {
 
   console.log(msg);
-
-  n=n;
 		tabID = msg.id;
-
     receivedMessage = msg;
 
     if(msg.CStype == "confirm") {

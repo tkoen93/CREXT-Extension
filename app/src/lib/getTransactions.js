@@ -11,6 +11,7 @@ const LS = require('./ls');
 const store = new LS('CREXT');
 
 let keyPublic;
+let account;
 
 
 Number.prototype.noExponents= function(){
@@ -135,12 +136,7 @@ $.ajax({
           arrow: true,
           arrowType: 'round',
         });
-      },
-      error: function(xhr, status, error){
-         var errorMessage = xhr.status + ': ' + xhr.statusText
-//         alert('Error - ' + errorMessage);
-         $('#showtx').append("<tr><td>No transactions history found for this wallet</td></tr>");
-       }
+      }
 
 
       });
@@ -148,13 +144,11 @@ $.ajax({
 }
 
 $(document).on('click', '#copyTX', function(event){
-		let copyKey = $(this).attr("data-content");
 		let $temp = $("<input>");
 	  $("body").append($temp);
 	  $temp.val($(this).attr("data-content")).select();
 	  document.execCommand("copy");
 	  $temp.remove();
-
 		$('#copyAddressSpan').html("Address copied to clipboard");
 		showCopyAlert();
 });
@@ -167,7 +161,7 @@ function showCopyAlert() { // Show result for a few seconds before message disap
 
 $(document).on('click', '#selectPage', function(event) {
 	let selectedPage = $(this).attr("page");
-	let start = (selectedPage-1) * 7;
+//	let start = (selectedPage-1) * 7;
 //	getTransactions(keyPublic, start, 7);
 	getTransactions(keyPublic, selectedPage, 7);
 });

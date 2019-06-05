@@ -24,6 +24,11 @@ Number.prototype.noExponents= function(){
 }
 
 function walletBalance(key) { // Function to show balance of public key.
+
+/*  fetch('test.txt')
+  .then(response => response.text())
+  .then(text => console.log(text))*/
+
 $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">');
     nodeTest().then(function(r) {
       connect().WalletBalanceGet(bs58.decode(key), function(err, response) {
@@ -34,8 +39,8 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
               fraction = '00';
           }	else {
             if(fraction.toString().length != 18) {
-              mLeadingZeros = 18 - fraction.toString().length;
-              for(i=0;i<mLeadingZeros;i++) {
+              let mLeadingZeros = 18 - fraction.toString().length;
+              for(let i=0;i<mLeadingZeros;i++) {
                 fraction = "0" + fraction;
               }
             }
@@ -43,7 +48,7 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
               fraction = Number(fraction*1).noExponents().toString().split(".")[1].substring(0,2);
           }
 
-          totalBalance = response.balance.integral + "." + fraction;
+          let totalBalance = response.balance.integral + "." + fraction;
 
           let integral = response.balance.integral.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
@@ -51,7 +56,7 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
           $.ajax({
             url: 'https://api.coinmarketcap.com/v1/ticker/credits/?ref=widget&convert=ETH',
             success: function(res) {
-              data = res[0];
+              let data = res[0];
 
               let totalValue = totalBalance * data.price_usd;
               totalValue = totalValue.toFixed(2);

@@ -13,7 +13,7 @@ maxPages = Number(maxPages);
       $('#txPaging').html("<p class=\"pull-left\" style=\"position:fixed;left:42px;\"><a href=\"#\" class=\"pageNumberActive\" id=\"selectPage\" page=\"" + (pageNumber-1) + "\"><i class=\"fas fa-arrow-left\"></i></a></p>");
     }
 
-    for(i=0;i<maxPages;i++) {
+    for(let i=0;i<maxPages;i++) {
       if(pageNumber == (i+1)) {
         $('#txPaging').append("<a href=\"#\" class=\"pageNumberActive\" id=\"selectPage\" page=\"" + (i+1) + "\">" + (i+1) + "</a>");
       } else {

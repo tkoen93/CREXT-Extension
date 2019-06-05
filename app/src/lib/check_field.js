@@ -10,11 +10,9 @@ function check_field()
 
 	if(pass1!= '' && pass1.length < 8) {
 		$('#pass1error').text('Password not long enough');
-		cont = false;
 	} else {
 		if(pass2!= '' && pass1 != pass2) {
 			$('#pass2error').text('Password don\'t match');
-			cont = false;
 		} else {
 			$('#pass2error').empty();
 			cont = true;

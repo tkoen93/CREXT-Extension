@@ -423,7 +423,7 @@ async function CreateTransaction(Obj)
     var v = new Uint32Array(16)
     var m = new Uint32Array(16)
     function blake2sCompress(ctx, last) {
-        var i = 0
+        var i;
         for (i = 0; i < 8; i++) {
             v[i] = ctx.h[i]
             v[i + 8] = BLAKE2S_IV[i]
@@ -516,9 +516,8 @@ async function CreateTransaction(Obj)
     }
 
     function Fee(v) {
-        let s = v > 0 ? 0 : 1;
         v = Math.abs(v);
-        exp = v === 0 ? 0 : Math.log10(v);
+        let exp = v === 0 ? 0 : Math.log10(v);
         exp = Math.floor(exp >= 0 ? exp + 0.5 : exp - 0.5);
         v /= Math.pow(10, exp);
         if (v >= 1) {

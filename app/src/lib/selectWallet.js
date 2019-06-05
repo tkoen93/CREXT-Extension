@@ -72,8 +72,8 @@ async function addWallet(n) {
         fraction = '00';
     }	else {
       if(fraction.toString().length != 18) {
-        mLeadingZeros = 18 - fraction.toString().length;
-        for(i=0;i<mLeadingZeros;i++) {
+        let mLeadingZeros = 18 - fraction.toString().length;
+        for(let i=0;i<mLeadingZeros;i++) {
           fraction = "0" + fraction;
         }
       }

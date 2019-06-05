@@ -6,7 +6,7 @@ function html() {
           <div style="position:absolute;top:-10px;left:300px;"><img src="../img/refresh.png" id="refreshBalance" alt="Refresh Balance" /></div>
         </div>
         <div class="keyLine row">
-          <div class="pull-left" style="margin-left:20px;">Your public key</div>
+          <div class="pull-left" style="margin-left:20px;"><p class="RobotoMedium">Your public key</p></div>
           <div class="pull-right" id="addwallet" style="display:none;">
             <a href="#" name="addnewwallet" id="addnewwallet" style="margin-right:20px;color:#8EE1F1;border-bottom: 1px solid rgba(142, 225, 241, 0.4);">
                 Add wallet
@@ -16,7 +16,7 @@ function html() {
         <div class="form-group keyCopy">
           <div class="input-group" style="height:45px;margin-left:5px;">
             <a href="#" class="input-group-addon copyAddress" id="copy" style="width:40px;"><i class="far fa-clone fa-flip-vertical" style="color:#ECF2FF;"></i></a>
-            <span id="copyKey" name="copyKey" class="input-group-addon inputPublicKey" style="width:364px;text-align:center;padding:0px;"></span>
+            <span class="input-group-addon inputPublicKey" style="width:364px;text-align:center;padding:0px;"><p id="copyKey"></p></span>
             <a href="#" class="input-group-addon copyAddress" id="dropdownkey" style="width:20px;"><i class="fas fa-angle-double-down" style="color:#ECF2FF;"></i></a>
           <ul class="dropdown" id="dropdownSelect">
           </ul>

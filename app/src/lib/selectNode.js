@@ -31,12 +31,12 @@ function selectNode() {
     let fetchResult;
     let completeRes = 0;
 
-  	const result = $.ajax({
+  	$.ajax({
   		url: publicFile,
       success: function(result) {
         for(let index in result) {
           var sendDate = (new Date()).getTime();
-          fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
+          fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
           .then(function(val) {
             var receiveDate = (new Date()).getTime();
             var responseTimeMs = receiveDate - sendDate;
@@ -103,12 +103,12 @@ function selectNode() {
         }
       },
       error: function() {
-        const result = $.ajax({
+        $.ajax({
           url: localFile,
           success: function(result) {
             for(let index in result) {
               var sendDate = (new Date()).getTime();
-              fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
+              fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
               .then(function(val) {
                 var receiveDate = (new Date()).getTime();
                 var responseTimeMs = receiveDate - sendDate;
@@ -183,7 +183,7 @@ function selectNode() {
 async function fetchAsync(url, abortTime) {
   const controller = new AbortController();
 
-  const timeout = setTimeout(
+  setTimeout(
   	() => { controller.abort(); },
   	abortTime,
   );
@@ -212,7 +212,7 @@ async function syncState(selectedNodes) {
   let len = selectedNodes.length;
   let highestRound = 0;
 
-  for(i=0;i<len;i++) {
+  for(let i=0;i<len;i++) {
 
     let ipNode = selectedNodes[i][0];
     let responseTime = selectedNodes[i][1];

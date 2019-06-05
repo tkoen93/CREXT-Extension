@@ -7,7 +7,7 @@ class LS {
         const newStorage = {
           version: 1,
           a: 1,
-          s: 0,
+          s: "0",
           n: 1,
           c: 0
         };

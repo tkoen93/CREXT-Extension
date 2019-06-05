@@ -51,7 +51,8 @@ async function selectWallet() {
   }
 
   for(let i = totalWallets-1; i > -1; i--) {
-    let response = await addWallet(i);
+    let requestWallet = i.toString();
+    let response = await addWallet(requestWallet);
 
     html = response + html;
 

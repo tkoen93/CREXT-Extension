@@ -33,7 +33,7 @@ function menu(n) {
   						&nbsp;
   					</li>
             <li style="text-align:center;">
-  							<button type="button" name="lockCrextModal" id="lockCrextModal" class="btn btn-warning" style="width:120px;"><p><i class="fas fa-lock"></i> Lock</p></button>
+  							<button type="button" name="lockCrext" id="lockCrext" class="btn btn-warning" style="width:120px;"><p><i class="fas fa-lock"></i> Lock</p></button>
   					</li>
   					<li id="logout" style="text-align:center;margin-top:5px;">
   							<button type="button" name="logout" id="logout" class="btn btn-danger" style="width:120px;"><p><i class="fas fa-sign-out-alt"></i> Logout</p></button>

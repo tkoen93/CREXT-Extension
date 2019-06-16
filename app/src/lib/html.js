@@ -28,6 +28,7 @@ const dAppTX = require('./dAppTX');
 const selectNode = require('./selectNode');
 const sw = require('./selectWallet');
 const LS = require('./ls');
+const tokens = require('./tokens');
 
 const store = new LS('CREXT');
 let currentSelected = store.getState().s;
@@ -63,6 +64,7 @@ let CREXT = {
 			document.getElementById('txhistory').addEventListener('click', CREXT.txhistory);
       document.getElementById('settings').addEventListener('click', CREXT.settings);
       document.getElementById('goBackModal').addEventListener('click', CREXT.goBackModal);
+      document.getElementById('lockCrext').addEventListener('click', CREXT.lockCrextModal);
       document.getElementById('lockCrextModal').addEventListener('click', CREXT.lockCrextModal);
       document.getElementById('logoutModal').addEventListener('click', CREXT.logoutModal);
       modal = document.getElementById("myModal");
@@ -376,12 +378,16 @@ let CREXT = {
       }
     },
     goBackModal: function() {
-        $('#myModal').hide();
+        $('#myModal').fadeOut(250);
     },
     lockCrextModal: function() {
       chrome.storage.local.set({'loginTime': 0});
       chrome.runtime.sendMessage('update');
-      window.location.reload();
+      $('#myModal').fadeOut(250);
+      $('#overlay').hide();
+      $('#wrapper').removeClass('toggled');
+      content("unlock");
+      //window.location.reload();
     },
     logoutModal: function() {}
 }
@@ -653,18 +659,18 @@ $(document).on('click', '#selectNet', function(event){
 });
 
 $(document).on('click', '#logout', function(event){
-  $('#myModal').show();
+  $('#myModal').fadeIn(250);
 });
 
 // When the user clicks on <span> (x), close the modal
 $(document).on('click', '.closeModal', function(event){
-  $('#myModal').hide();
+  $('#myModal').fadeOut(250);
 });
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
-    $('#myModal').hide();
+    $('#myModal').fadeOut(250);
   }
 }
 

@@ -4,14 +4,19 @@ class LS {
 
     if (typeof(Storage) !== "undefined") {
       if(localStorage.getItem(init) === null) {
-        const newStorage = {
-          version: 1,
-          a: 1,
-          s: "0",
-          n: 1,
-          c: 0
-        };
-        localStorage.setItem(init, JSON.stringify(newStorage));
+        if(init === "CREXT") {
+          const newStorage = {
+            version: 1,
+            a: 1,
+            s: "0",
+            n: 1,
+            c: 0
+          };
+          localStorage.setItem(init, JSON.stringify(newStorage));
+        } else {
+          const newStorage = {};
+          localStorage.setItem(init, JSON.stringify(newStorage));
+        }
       } else {
         this._storageKey = init;
         this._getState = window.localStorage.getItem(init);

@@ -8,6 +8,7 @@ const key = require('./key');
 const CreateTransaction = require('./signature');
 const bs58 = require('bs58');
 const LS = require('./ls');
+const contractResult = require('./contractResult');
 
 const store = new LS('CREXT');
 const currentSelected = store.getState().s;
@@ -147,7 +148,7 @@ let CREXTdApp = {
               SmartContract: {
                   Method: receivedMessage.data.smart.method,
                   Params: receivedMessage.data.smart.params,
-                  forgetNewState: true
+                  NewState: false
               }
         }).then(function(r) {
           console.log(r);
@@ -161,7 +162,7 @@ let CREXTdApp = {
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#completed').show();
-                  let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
+                  let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:{roundNum: res.roundNum, smart_contract_result: contractResult(res), status:{code: res.status.code, message: res.status.message}}, id: receivedMessage.data.id}};
                   chrome.tabs.sendMessage(tabID, retmsg);
                   console.log('tx send');
                 } else {

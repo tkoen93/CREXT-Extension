@@ -28,7 +28,6 @@ function selectNode() {
 
   return new Promise(function(resolve, reject) {
 
-    let fetchResult;
     let completeRes = 0;
 
   	$.ajax({

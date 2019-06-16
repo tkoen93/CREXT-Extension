@@ -30,20 +30,20 @@ function html() {
           <hr style="margin-top:25px;"/>
         </div>
         <div class="form-group" style="margin-top:-5px;">
-             <input type="text" id="tokey" name="tokey" class="form-control createInput" placeholder="RECEIVER'S ADDRESS" style="height:50px;width:395px;margin-left:-1px;" required />
+             <input type="text" id="tokey" name="tokey" class="form-control createInput" tabindex="1" placeholder="RECEIVER'S ADDRESS" style="height:50px;width:395px;margin-left:-1px;" required />
              <div id="tokeyError" style="display:none;position:absolute;top:340px;left:390px;">
                <p class="txerrortippy" id="tippytoKey" data-tippy-content=""><i class="fas fa-question-circle fa-2x" style="color:red;"></i></p>
              </div>
         </div>
         <div class="form-group" style="margin-top:20px;">
           <div style="float:left;width:187.5px;margin-left:4px;">
-            <input type="text" id="tosend" name="tosend" class="form-control" placeholder="AMOUNT" style="height:50px;" required />
+            <input type="text" id="tosend" name="tosend" class="form-control" tabindex="2" placeholder="AMOUNT" style="height:50px;" required />
             <div id="tosendError" style="display:none;position:absolute;top:410px;left:187px;">
               <p class="txerrortippy" id="tippytoSend" data-tippy-content=""><i class="fas fa-question-circle fa-2x" style="color:red;"></i></p>
             </div>
           </div>
           <div style="float:left;width:187.5px;margin-left:20px;">
-            <input type="text" id="maxfee" name="maxfee" class="form-control" placeholder="MAX FEE (IN CS)" style="height:50px;" required />
+            <input type="text" id="maxfee" name="maxfee" class="form-control" tabindex="3" placeholder="MAX FEE (IN CS)" style="height:50px;" required />
             <div id="maxfeeError" style="display:none;position:absolute;top:410px;left:390px;">
               <p class="txerrortippy" id="tippymaxfee" data-tippy-content=""><i class="fas fa-question-circle fa-2x" style="color:red;"></i></p>
             </div>

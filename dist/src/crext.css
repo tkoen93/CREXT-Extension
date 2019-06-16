@@ -668,8 +668,8 @@ a.pageNumber:active {
   font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 14px;
   color: #A8BED4;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 a.pageNumberActive,
@@ -679,8 +679,8 @@ a.pageNumberActive:active {
   font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 14px;
   color: #464D54;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .check {

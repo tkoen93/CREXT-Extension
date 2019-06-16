@@ -5,6 +5,8 @@ const selectNode = require('./lib/selectNode');
 const nodeTest = require('./lib/nodeTest');
 const convert = require('./lib/convert');
 const connect = require('./lib/connect');
+const contractState = require('./lib/contractState');
+const checkContract = require('./lib/checkContract');
 
 global.nodeIP;
 global.nodePORT;
@@ -122,7 +124,10 @@ window.onload = function(e) {
                               port.postMessage(contentMessage);
                             }, 1000);
                       })
-                      .catch(function(r) { console.warn(r); });
+                      .catch(function(r) {
+                        returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
+                        sendMSG(sender.tab.id, returnmsg);
+                      });
                     } else {
                       message.data.amount = String(message.data.amount).replace(',', '.');
                       if(isNaN(message.data.amount)) {
@@ -139,7 +144,10 @@ window.onload = function(e) {
                                 port.postMessage(contentMessage);
                               }, 1000);
                         })
-                        .catch(function(r) { });
+                        .catch(function(r) {
+                          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        });
                       }
                     }
                   }
@@ -243,50 +251,28 @@ window.onload = function(e) {
                       }
                     }
                   break;
+                  case "contractState":
+                  let messageState = {CStype: message.CStype, CSID: message.CSID, data: {target: message.data.target, smart: {method: message.data.method}}};
+                  checkContract(messageState, sender).then(function(r) {
+                      contractState(message).then(function(contractStateValue) {
+                        let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: true, result: contractStateValue, id: message.data.id}};
+                        sendMSG(sender.tab.id, retmsg);
+                      })
+                      .catch(function(r) {
+                        let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: false, id: message.data.id}};
+                        sendMSG(sender.tab.id, retmsg);
+                      });
+                  }).catch(function(r) {
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  });
+                  break;
               }
             }
           });
         }
       }
     });
-
-function checkContract(message, sender) {
-  let returnmsg;
-  return new Promise(async function(resolve, reject) {
-    if(Object.prototype.hasOwnProperty.call(message.data, "smart")) {
-      if((!Object.prototype.hasOwnProperty.call(message.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(message.data.smart, "method"))) {
-        await connect().SmartContractDataGet(bs58.decode(message.data.target), function(err, r) {
-          if(r.status.code === 1) {
-            returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target address is not a contract", id: message.data.id}};
-            sendMSG(sender.tab.id, returnmsg);
-            reject("Target address is not a contract");
-          } else {
-            let found = false;
-          //  let methodNum = 0;
-              for(var i = 0; i < r.methods.length; i++) {
-                  if (r.methods[i].name == message.data.smart.method) {
-                      found = true;
-                    //  methodNum = i;
-                      break;
-                  }
-              }
-            if(!found) {
-              returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Method not found", id: message.data.id}};
-              sendMSG(sender.tab.id, returnmsg);
-              reject("Method not found in contract");
-            } else {
-              resolve(true);
-            }
-          }
-        });
-      } else if(Object.prototype.hasOwnProperty.call(message.data.smart, "code")) { // new smart contract
-        resolve(true);
-      }
-    } else {
-      resolve(true);
-    }
-  });
-}
 
 function sendMSG(tab, msg) {
   setTimeout(function() {

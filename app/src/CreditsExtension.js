@@ -20,6 +20,11 @@
         }
 
       },
+      contractState: function(params) {
+        let identifier = genIdentifier(16);
+        sendMsg(identifier, "contractState", params);
+        return returnPromise(identifier, "contractState", 100);
+      },
       balanceGet: function(params) {
         let identifier = genIdentifier(16);
         sendMsg(identifier, "balanceGet", params);

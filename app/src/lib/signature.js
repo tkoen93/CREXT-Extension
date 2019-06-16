@@ -3,12 +3,28 @@ const GEN_TYPES = require("../gen-nodejs/general_types");
 const connect = require('./connect');
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
+const LS = require('./ls');
+const store = new LS('CREXT');
+const key = require('./key');
 
 
 module.exports = CreateTransaction;
 
 async function CreateTransaction(Obj)
     {
+
+      let currentSelected = store.getState() === undefined ? '0' : store.getState().s;
+
+      if(Obj.PrivateKey === undefined) {
+        Obj.PrivateKey = Buffer.from(await key.exportPrivate(currentSelected));
+      }
+
+      if(Obj.Source === undefined) {
+        Obj.Source = Buffer.from(await key.exportPublic(currentSelected, 1));
+      }
+
+      console.log(Obj.Source);
+
         let DefObj = {
             Source: "",
             Target: "",
@@ -88,8 +104,9 @@ async function CreateTransaction(Obj)
         let TRes = await connect().WalletTransactionsCountGet(Trans.source);
         if (TRes.status.code === 0) {
             Trans.id = TRes.lastTransactionInnerId + 1;
-        }
-        else {
+        } else if(TRes.status.code === 3) {
+          Trans.id = 1;
+        } else {
             ResObj.Message = TRes.status.message;
             return ResObj;
         }

@@ -146,19 +146,11 @@ async function send(n = 0) {
   let amount = $('#tosend').val();
 
 
-  if(!cont) { // Show error if one of the checks failed.
-    $('#txerror').addClass("alert alert-danger");
-    $('#txerror').show();
-  }
-
   CreateTransaction({
     Amount: amount,
     Fee: maximumfee,
-    Source: await key.exportPublic(currentSelected),
-    PrivateKey: await key.exportPrivate(currentSelected),
     Target: to
   }).then(function(r) {
-    console.log(r);
       if(r.Message != undefined) {
         console.error(r.Message);
         $('#failButton').slideDown(250);
@@ -167,10 +159,7 @@ async function send(n = 0) {
         $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.Message + "</div></div>");
       } else {
         nodeTest().then(function(nr) {
-          console.log(r.Result);
           connect().TransactionFlow(r.Result, function(err, re) {
-            console.log(err);
-            console.log(re);
             if(re.status.code === 0) {
               $('#completeButtons').slideDown(250);
               $('#txLoader').hide();

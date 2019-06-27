@@ -92,7 +92,6 @@ window.onload = function(e) {
          });
       } else if(message.CStype != null) {
 
-        // console.log(message);
 
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
@@ -103,8 +102,13 @@ window.onload = function(e) {
 
           checkAccess(message.org, contentMessage, function(r) {
             if(r) {
-
               switch(message.CStype) {
+                case "version":
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: true, result: {version: chrome.runtime.getManifest().version}}};
+                    setTimeout(function() {
+                      chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                    }, 150);
+                break;
                 case "TX":
                   if(keyPublic === message.data.target) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender", id: message.data.id}};

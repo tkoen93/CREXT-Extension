@@ -1,6 +1,12 @@
 (function () {
   window.CREXT = {
 
+      version: function() {
+        let identifier = genIdentifier(16);
+        params = {i: 0};
+        sendMsg(identifier, "version", params);
+        return returnPromise(identifier, "version", 10);
+      },
       getKey: function(params) {
         let identifier = genIdentifier(16);
         if(params == null)
@@ -67,11 +73,6 @@
       let fee = params.fee;
       fee = fee.replace(/,/, '.');
       return (fee == '' || regexp.test(fee) != true) ? false : true;
-      /*if(fee == '' || regexp.test(fee) != true) {
-        return false;
-      } else {
-        return true;
-      }*/
     }
   }
 

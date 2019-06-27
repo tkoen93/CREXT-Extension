@@ -19,7 +19,7 @@ function selectNode() {
   if(currentNet === 0) { // TestNet
     publicFile = 'http://173.249.11.161/nodetestnet.json';
     localFile = './node.json';
-  } else { // MainNet
+  } else { // CreditsNetwork
     publicFile = 'http://173.249.11.161/nodemainnet.json';
     localFile = './nodemainnet.json';
   }
@@ -52,7 +52,7 @@ function selectNode() {
                   chrome.runtime.sendMessage('update');
                   $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                   if(currentNet === 0) {
-                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                   } else {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                   }
@@ -82,7 +82,7 @@ function selectNode() {
                   chrome.runtime.sendMessage('update');
                   $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                   if(currentNet === 0) {
-                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                   } else {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                   }
@@ -124,7 +124,7 @@ function selectNode() {
                       chrome.runtime.sendMessage('update');
                       $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                       if(currentNet === 0) {
-                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                       } else {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                       }
@@ -154,7 +154,7 @@ function selectNode() {
                       chrome.runtime.sendMessage('update');
                       $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                       if(currentNet === 0) {
-                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                       } else {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                       }

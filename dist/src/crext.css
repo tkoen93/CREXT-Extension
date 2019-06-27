@@ -293,11 +293,6 @@ body::-webkit-scrollbar{display:none !important;}
   text-align: center;
 }
 
-.label {
-  min-width: 40px !important;
-  display: inline-block !important
-}
-
 .rounded80 {
   background-color: #F7FCFE;
   border-radius:.80rem!important;
@@ -494,6 +489,12 @@ p.header {
   color: #4d8dd9;
 }
 
+p.headerSmall {
+  font-size:16px;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
+  color: #4d8dd9;
+}
+
 p.complete {
   font-size:14px;
   font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
@@ -545,6 +546,8 @@ p.revoke {
   position: relative;
   top: -5px;
   margin-left:8px;
+  min-width: 40px !important;
+  display: inline-block !important
 }
 
 .tchange {
@@ -807,7 +810,7 @@ position: absolute;
 background-color: rgba(255, 255, 255, 0.9);
 width: 397px;
 box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-z-index: 1;
+z-index: 0;
 right:0;
 top:100%;
 max-height:320px;
@@ -953,7 +956,7 @@ p.phising {
     padding: 3px 7px;
     font-size: 12px;
     font-weight: 700;
-    line-height: 20;
+
     color: #fff;
     text-align: center;
     white-space: nowrap;

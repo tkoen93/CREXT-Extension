@@ -23,7 +23,17 @@ function html() {
               <a href="#" class="list-group-item" id="openSetting" data-content="blockedData"><span class="badge" id="blockedBadge"><i class="fas fa-angle-down"></i></span>Blocked websites</a>
               <li class="list-group-item" id="blockedData" style="display:none"><ul class="list-group" id="blockedList"></ul></li>
               <a href="#" class="list-group-item" id="openSetting" data-content="ctokens"><span class="badge" id="ctokensBadge"><i class="fas fa-angle-down"></i></span>Tokens</a>
-              <li class="list-group-item" id="ctokens" style="display:none">Tokens</li>
+              <li class="list-group-item" id="ctokens" style="display:none">
+              <div id="mesTokenContract"></div>
+              <div class="input-group">
+               <input type="text" id="addNewToken" class="form-control" placeholder="Contract address" style="z-index:0;">
+               <span class="input-group-btn">
+                 <button class="btn btn-default" type="button" id="addToken" style="z-index:0;">Add</button>
+               </span>
+              </div>
+              <div>&nbsp;</div>
+              <ul class="list-group" id="tokenList"></ul>
+              </li>
             </ul>
         </div>
         </div>

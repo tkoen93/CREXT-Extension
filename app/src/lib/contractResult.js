@@ -1,3 +1,5 @@
+const convert = require('./convert');
+
 function contractResult(res) {
 
   let returnmessage;
@@ -39,7 +41,7 @@ function contractResult(res) {
         returnmessage = res.smart_contract_result.v_list;
     }
     if (res.smart_contract_result.v_long !== null) {
-        returnmessage = res.smart_contract_result.v_long;
+        returnmessage = convert(res.smart_contract_result.v_long.buffer);
     }
     if (res.smart_contract_result.v_long_box !== null) {
         returnmessage = res.smart_contract_result.v_int_long;

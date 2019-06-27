@@ -25,14 +25,10 @@ Number.prototype.noExponents= function(){
 
 function walletBalance(key) { // Function to show balance of public key.
 
-/*  fetch('test.txt')
-  .then(response => response.text())
-  .then(text => console.log(text))*/
 
 $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">');
     nodeTest().then(function(r) {
       connect().WalletBalanceGet(bs58.decode(key), function(err, response) {
-        console.log(response);
           let fraction = convert(response.balance.fraction.buffer);
 
           if (fraction === 0) {

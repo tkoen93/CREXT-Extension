@@ -3,7 +3,7 @@ const contractResult = require('./contractResult');
 const CreateTransaction = require('./signature');
 const nacl = require('tweetnacl');
 
-function contractState(params) {
+async function contractState(params) {
   return new Promise(function(resolve, reject) {
     let keyPair = nacl.sign.keyPair();
     CreateTransaction({

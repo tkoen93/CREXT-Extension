@@ -52,8 +52,6 @@ $.ajax({
   dataType: 'json',
   data: { id : key, page: start, limit: amount },
   success: function(r) {
-    console.log(r);
-
       //  let total_tx = 99; // Fixed amount as total_trxns_count always returns 0
 
       let total_tx = r.txCount;

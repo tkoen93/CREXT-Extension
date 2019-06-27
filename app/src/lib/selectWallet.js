@@ -112,10 +112,6 @@ $(document).on('click', '#selectWallet', function(event){
       $('#addwallet').fadeOut(250);
       $('ul.dropdown').slideUp(500);
       $('#dropdownkey').html('<i class="fas fa-angle-double-down" style="color:#ECF2FF;"></i>');
-
-    /*setTimeout(function() {
-      location.reload();
-    },250);*/
   });
 
 module.exports = selectWallet;

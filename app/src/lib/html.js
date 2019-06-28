@@ -24,6 +24,7 @@ const walletBalance = require('./walletBalance');
 const key = require('./key');
 const copy = require('./copy');
 const tx = require('./tx');
+const tokentx = require('./tokentx');
 const getTransactions = require('./getTransactions');
 const dAppTX = require('./dAppTX');
 const selectNode = require('./selectNode');
@@ -312,6 +313,15 @@ let CREXT = {
 		resetTX: function() {
 			content("index");
 		},
+    createTokenTX: function() {
+			tokentx.create();
+		},
+		sendTokenTX: function() {
+			tokentx.send(0);
+		},
+		resetTokenTX: function() {
+			content("tokensIndex");
+		},
 		unlock: function() {
 			let unlockPass = sha512($('#unlockpass').val());
 			let initiate = 0;
@@ -351,7 +361,7 @@ let CREXT = {
     addMnemonic: function () {
       let totalWallets = store.getState().a + 1;
       currentSelected = store.getState().a;
-      store.putState({a: totalWallets, s: currentSelected});
+      store.putState({a: totalWallets, s: currentSelected.toString()});
       content("index");
     },
     addPrivate: function () {
@@ -616,6 +626,11 @@ async function content(page) {
       $('#selectedNetTop').show();
       returnValue = await tokensIndex();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
+      document.getElementById('createTX').addEventListener('click', CREXT.createTokenTX);
+			document.getElementById('sendTX').addEventListener('click', CREXT.sendTokenTX);
+			document.getElementById('resetTX').addEventListener('click', CREXT.resetTokenTX);
+			document.getElementById('mainPage').addEventListener('click', CREXT.resetTokenTX);
+			document.getElementById('failMainPage').addEventListener('click', CREXT.resetTokenTX);
     break;
   }
 

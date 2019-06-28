@@ -51,10 +51,10 @@ function selectToken(data, network) {
           contractState(params)
           .then(function(r) {
             if(dataJSON.hasOwnProperty(key)) {
-              let addHTML = `<li id="selectToken" style="text-align: right" data-address="`+key+`" data-balance="` +Number(r).noExponents()+ `" data-ticker="` +value+ `" data-img="` + dataJSON[key]["icon"] + `"><a href="#"><div class="pull-left"><img width="35" height="35" src="` + dataJSON[key]["icon"] + `" /></div><div><p class="small">` + key + `<br />` + Number(r).noExponents() + ` ` + value + `</p></div></a></li>`;
+              let addHTML = `<li id="selectToken" style="text-align: right" data-address="`+key+`" data-balance="` +Number(r).noExponents()+ `" data-ticker="` +value+ `" data-img="` + dataJSON[key]["icon"] + `"><a href="#"><div class="pull-left"><img width="35" height="35" src="` + dataJSON[key]["icon"] + `" /></div><div><p class="small">` + key + `<br />` + balanceWhiteSpace(Number(r).noExponents()) + ` ` + value + `</p></div></a></li>`;
               html = html + addHTML;
             } else {
-              let addHTML = `<li id="selectToken" style="text-align: right" data-address="`+key+`" data-balance="` +Number(r).noExponents()+ `" data-ticker="` +value+ `" data-img="../img/tokenimg.png"><a href="#"><div class="pull-left"><img width="35" height="35" src="../img/tokenimg.png" /></div><div><p class="small">` + key + `<br />` + Number(r).noExponents() + ` ` + value + `</p></div></a></li>`;
+              let addHTML = `<li id="selectToken" style="text-align: right" data-address="`+key+`" data-balance="` +Number(r).noExponents()+ `" data-ticker="` +value+ `" data-img="../img/tokenimg.png"><a href="#"><div class="pull-left"><img width="35" height="35" src="../img/tokenimg.png" /></div><div><p class="small">` + key + `<br />` + balanceWhiteSpace(Number(r).noExponents()) + ` ` + value + `</p></div></a></li>`;
               html = html + addHTML;
             }
 
@@ -78,7 +78,7 @@ function selectToken(data, network) {
         let params = {data: {target: key, method: "balanceOf", params: [{ K: "STRING", V: global.keyPublic}]}};
         contractState(params)
         .then(function(r) {
-          let addHTML = `<li id="selectToken" style="text-align: right" data-address="`+key+`" data-balance="` +Number(r).noExponents()+ `" data-ticker="` +value+ `" data-img="../img/tokenimg.png"><a href="#"><div class="pull-left"><img width="35" height="35" src="../img/tokenimg.png" /></div><div><p class="small">` + key + `<br />` + Number(r).noExponents() + ` ` + value + `</p></div></a></li>`;
+          let addHTML = `<li id="selectToken" style="text-align: right" data-address="`+key+`" data-balance="` +Number(r).noExponents()+ `" data-ticker="` +value+ `" data-img="../img/tokenimg.png"><a href="#"><div class="pull-left"><img width="35" height="35" src="../img/tokenimg.png" /></div><div><p class="small">` + key + `<br />` + balanceWhiteSpace(Number(r).noExponents()) + ` ` + value + `</p></div></a></li>`;
           html = html + addHTML;
           i++;
           if(i === Object.size(data)) {
@@ -88,6 +88,15 @@ function selectToken(data, network) {
         .catch(r => console.warn(r));
       }
     }
+  }
+}
+
+function balanceWhiteSpace(balance) {
+  let showBalance = balance.split(".");
+  if(showBalance.length > 1) {
+    return showBalance[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "." + showBalance[1];
+  } else {
+    return balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
 }
 
@@ -116,15 +125,37 @@ function checkContract(address) {
 }
 
 $(document).on('click', '#selectToken', function(event){
+    $('input[type="text"]').css({"border" : "", "box-shadow" : ""});
+    $('#tokeyError').hide();
+    $('#tosendError').hide();
+    $('#maxfeeError').hide();
 		let tokenAddress = $(this).attr("data-address");
     let balance = $(this).attr("data-balance");
+    $('input[name="balance"]').val(balance);
     let ticker = $(this).attr("data-ticker");
     let img = $(this).attr("data-img");
 
-    $('#tokenInformation').html(`<div class="pull-left" style="margin-top:-18px;"><img width="35" height="35" src="` + img + `" /></div><div style="margin-top:-10px;"><p class="small" style="font-size:14px;">Balance: ` + Number(balance).noExponents() + ` ` + ticker + `</p></div>`);
+
+    let params = {data: {target: tokenAddress, method: "getDecimal"}};
+    contractState(params)
+    .then(function(r) {
+      $('input[name="decimal"]').val(r);
+      $('input[name="ticker"]').val(ticker);
+      $('input[name="hidTokenAddress"]').val(tokenAddress);
+    })
+    .catch(r => console.warn(r));
+
+    let showBalance = balance.split(".");
+    if(showBalance.length > 1) {
+      balance = showBalance[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "." + showBalance[1];
+    } else {
+      balance = balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    $('#tokenInformation').html(`<div class="pull-left" style="margin-top:-18px;"><img width="35" height="35" src="` + img + `" /></div><div style="margin-top:-10px;"><p class="small" style="font-size:14px;" id="selectedTokenBalance">Balance: ` + balance + ` ` + ticker + `</p></div>`);
     $("input").prop("disabled", false);
     $("button").prop("disabled", false);
-  	$('#selectedToken').text(tokenAddress);
+  	$('#selectedTokenAddress').text(tokenAddress);
     $('ul.dropdown').slideUp(500);
     $('#dropdownToken').html('<i class="fas fa-angle-double-down" style="color:#ECF2FF;"></i>');
 });

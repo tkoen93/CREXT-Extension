@@ -1,5 +1,11 @@
 const convert = require('./convert');
 
+/**
+ * Returns the actual result instead of an object
+ * @param {object} res - Contract exeuction result received from node
+ * @returns {returnmessage} - Returns only the returnmessage instead of an object
+ */
+
 function contractResult(res) {
 
   let returnmessage;

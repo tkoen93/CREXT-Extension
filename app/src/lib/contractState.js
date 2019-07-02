@@ -3,8 +3,14 @@ const contractResult = require('./contractResult');
 const CreateTransaction = require('./signature');
 const nacl = require('tweetnacl');
 
+/**
+ * @param {object} params - Object with required parameters
+ * @returns {promise} - Returns either the requested value (resolve) or a failed message (reject)
+ */
+
 async function contractState(params) {
   return new Promise(function(resolve, reject) {
+    // Generate a random keypair to sign this request, no balance needed as NewState is set to true
     let keyPair = nacl.sign.keyPair();
     CreateTransaction({
           Fee: "0.1",

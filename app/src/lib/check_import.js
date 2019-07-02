@@ -1,5 +1,10 @@
 const $ = require('jquery');
 
+/**
+ * Check if the form meets the requirements to be able to continue
+ * @returns {boolean} whether or not the user can continue the process
+ */
+
 function check_field()
 {
 	var seed=$('#seedphrase').val();

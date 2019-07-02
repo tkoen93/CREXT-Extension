@@ -9,6 +9,11 @@ chrome.storage.local.get(function(result) {
   port = result.port;
 });
 
+/**
+ * Connect to a node via apache thrift
+ * @returns {client} returns API
+ */
+
 function Connect() {
 
 let options = {

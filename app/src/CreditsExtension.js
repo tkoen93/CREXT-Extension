@@ -17,14 +17,12 @@
       sendTransaction: function(params) {
         if(checkTransaction(params)) {
           params.fee = String(params.fee).replace(',', '.');
-          console.log(params);
           let identifier = genIdentifier(16);
           sendMsg(identifier, "TX", params);
           return returnPromise(identifier, "TX", 200);
         } else {
-          throw "One or multiple parameters is incorrect or missing!";
+          return {success:false, result: "One or multiple parameters is incorrect or missing!", id: params.id};
         }
-
       },
       contractState: function(params) {
         let identifier = genIdentifier(16);
@@ -65,7 +63,6 @@
   }
 
   function checkTransaction(params) {
-
     if(!Object.prototype.hasOwnProperty.call(params, "fee")) {
       return false;
     } else {
@@ -79,7 +76,6 @@
   function genIdentifier(length) {
     let text = "";
     let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
     for (let i = 0; i < length; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
 

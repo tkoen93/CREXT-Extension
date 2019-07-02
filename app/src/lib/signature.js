@@ -111,10 +111,10 @@ async function CreateTransaction(Obj) {
         if (Obj.SmartContract !== undefined && Obj.SmartContract.Code !== undefined) {
             let Target = Trans.source;
             Target = concatTypedArrays(Target, NumbToByte(Trans.id, 6));
-            let ByteCode = Obj._connect.SmartContractCompile(Obj.SmartContract.Code);
+            let ByteCode = await connect().SmartContractCompile(Obj.SmartContract.Code);
             if (ByteCode.status.code === 0) {
                 for (let i in ByteCode.byteCodeObjects) {
-                    Target = concatTypedArrays(Target, ConvertCharToByte(ByteCode.byteCodeObjects[i].byteCode));
+                    Target = concatTypedArrays(Target, ByteCode.byteCodeObjects[i].byteCode);
                 }
             }
             else {
@@ -270,7 +270,7 @@ async function CreateTransaction(Obj) {
 
                         UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 2]));
                         UserField = concatTypedArrays(UserField, NumbToByte(val.byteCode.length, 4).reverse());
-                        UserField = concatTypedArrays(UserField, ConvertCharToByte(val.byteCode));
+                        UserField = concatTypedArrays(UserField, val.byteCode);
                         Trans.smartContract.smartContractDeploy.byteCodeObjects.push(new GEN_TYPES.ByteCodeObject({
                             name: val.name,
                             byteCode: val.byteCode

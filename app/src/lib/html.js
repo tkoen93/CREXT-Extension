@@ -411,7 +411,7 @@ let CREXT = {
       localStorage.clear();
       chrome.storage.local.clear();
       chrome.runtime.sendMessage('update');
-      content("main");
+      document.location.reload();
     },
     tokensIndex: function () {
       content("tokensIndex");

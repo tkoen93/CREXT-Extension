@@ -99,7 +99,6 @@ window.onload = function(e) {
           returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "User not logged in", id: message.data.id}};
           sendMSG(sender.tab.id, returnmsg);
         } else {
-
           checkAccess(message.org, contentMessage, function(r) {
             if(r) {
               switch(message.CStype) {
@@ -118,9 +117,12 @@ window.onload = function(e) {
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
                     if(!Object.prototype.hasOwnProperty.call(message.data, "amount")) {
-                      checkContract(message, sender)
+                      checkContract(message)
                       .then(
                         function(r) {
+                          if(r !== true) {
+                            contentMessage.data.smart.params = r;
+                          }
                           PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                             setTimeout(
                             function() {
@@ -138,9 +140,12 @@ window.onload = function(e) {
                         returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
                         sendMSG(sender.tab.id, returnmsg);
                       } else {
-                        checkContract(message, sender)
+                        checkContract(message)
                         .then(
                           function(r) {
+                            if(r !== true) {
+                              contentMessage.data.smart.params = r;
+                            }
                             PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                               setTimeout(
                               function() {
@@ -256,8 +261,11 @@ window.onload = function(e) {
                     }
                   break;
                   case "contractState":
-                  let messageState = {CStype: message.CStype, CSID: message.CSID, data: {target: message.data.target, smart: {method: message.data.method}}};
-                  checkContract(messageState, sender).then(function(r) {
+                  let messageState = {CStype: message.CStype, CSID: message.CSID, data: {target: message.data.target, smart: {method: message.data.method, params: message.data.params}}};
+                  checkContract(messageState).then(function(r) {
+                    if(r !== true) {
+                      message.data.params = r;
+                    }
                       contractState(message).then(function(contractStateValue) {
                         let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: true, result: contractStateValue, id: message.data.id}};
                         sendMSG(sender.tab.id, retmsg);

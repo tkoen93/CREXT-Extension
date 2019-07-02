@@ -406,7 +406,13 @@ let CREXT = {
       $('#wrapper').removeClass('toggled');
       content("unlock");
     },
-    logoutModal: function () {},
+    logoutModal: function () {
+      ls.removeAll();
+      localStorage.clear();
+      chrome.storage.local.clear();
+      chrome.runtime.sendMessage('update');
+      content("main");
+    },
     tokensIndex: function () {
       content("tokensIndex");
     },

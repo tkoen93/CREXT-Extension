@@ -23,7 +23,7 @@ function html() {
             <polyline points="1 9 7 14 15 4"></polyline>
           </svg>
         </label>
-        <label for="cbx" style="font-weight: normal"><p>I have read and agree to the <a href="https://crext.io/terms.html">Terms of Use</a></p></label>
+        <label for="cbx" style="font-weight: normal"><p>I have read and agree to the <a href="https://crext.io/terms.html" target="_blank">Terms of Use</a></p></label>
       </div>
       <div class="form-group">
         <button type="button" name="createvault" id="createvault" class="btn btn-block btn-huge btn-tx btn-lg" style="width:207.5px;"><p class="medium" style="font-size:14px;">NEXT</p></button>

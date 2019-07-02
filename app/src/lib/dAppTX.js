@@ -46,6 +46,7 @@ let CREXTdApp = {
             Amount: amount,
             Fee: fee,
             Target: to,
+            UserData: receivedMessage.data.UserData
         }).then(function(r) {
           if(r.error) {
             console.error(r.message);
@@ -84,7 +85,8 @@ let CREXTdApp = {
             SmartContract: {
                   Code: receivedMessage.data.smart.code,
                   forgetNewState: true
-              }
+              },
+              UserData: receivedMessage.data.UserData
         }).then(function(txres) {
           if(txres.message !== null && txres.message !== undefined) {
             console.error(txres.message);
@@ -135,7 +137,8 @@ let CREXTdApp = {
                   Method: receivedMessage.data.smart.method,
                   Params: receivedMessage.data.smart.params,
                   NewState: false
-              }
+              },
+              UserData: receivedMessage.data.UserData
         }).then(function(r) {
           if(r.error) {
             console.error(r.message);

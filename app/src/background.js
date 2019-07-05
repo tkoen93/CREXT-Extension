@@ -268,15 +268,21 @@ window.onload = function(e) {
                     }
                       contractState(message).then(function(contractStateValue) {
                         let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: true, result: contractStateValue, id: message.data.id}};
-                        sendMSG(sender.tab.id, retmsg);
+                        setTimeout(function() {
+                          chrome.tabs.sendMessage(sender.tab.id, retmsg);
+                        }, 150);
                       })
                       .catch(function(r) {
                         let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: false, id: message.data.id}};
-                        sendMSG(sender.tab.id, retmsg);
+                        setTimeout(function() {
+                          chrome.tabs.sendMessage(sender.tab.id, retmsg);
+                        }, 150);
                       });
                   }).catch(function(r) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
-                    sendMSG(sender.tab.id, returnmsg);
+                    setTimeout(function() {
+                      chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                    }, 150);
                   });
                   break;
               }

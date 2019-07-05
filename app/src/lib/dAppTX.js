@@ -9,6 +9,7 @@ const CreateTransaction = require('./signature');
 const bs58 = require('bs58');
 const LS = require('./ls');
 const contractResult = require('./contractResult');
+const checkContract = require('./checkContract');
 
 const store = new LS('CREXT');
 const currentSelected = store.getState().s;
@@ -179,13 +180,25 @@ let CREXTdApp = {
   		port.postMessage({CStype: "confirm", org: receivedMessage.org});
   		setTimeout(function() {
   			window.close();
-  		}, 250);
+  		}, 500);
   	} else {
 
   		port = chrome.runtime.connect({name: "returnAccess"});
   		port.postMessage({CStype: "confirmTX", org: receivedMessage.org});
 
-  			dAppTX(receivedMessage);
+      checkContract(receivedMessage)
+      .then(
+        function(r) {
+          if(r !== true) {
+            receivedMessage.data.smart.params = r;
+          }
+          dAppTX(receivedMessage);
+      })
+      .catch(function(r) {
+        returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: r, id: receivedMessage.data.id}};
+        chrome.tabs.sendMessage(receivedMessage.id, returnmsg);
+        window.close();
+      });
   	}
   },
   cancel: function() {

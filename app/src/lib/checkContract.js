@@ -43,7 +43,7 @@ function checkContract(message) {
                             for(let p = 0; p < r.methods[i].arguments.length; p++) {
                               /**
                                * Convert params to be used in signature.js
-                               * @param {K: "STRING",V: "Value"}
+                               * @param {K: "STRING", V: "Value"}
                                */
                               switch(r.methods[i].arguments[p].type) {
                                 case "boolean":

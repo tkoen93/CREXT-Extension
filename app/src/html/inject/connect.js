@@ -16,7 +16,7 @@ function html() {
             </div>
           </div>
           <div class="row">
-            <p class="warning">This website will be able to see your public data </p>
+            <p class="warning">This website will be able to access public data through CREXT.</p>
           </div>
           <div class="row warningMessage">
             <p>This connection request aims to protect you from malicious websites.

@@ -59,7 +59,7 @@ function create() {
   try {
     bs58.decode(to);
   } catch(e) {
-    console.log(e);
+    cont = false;
     $('#tokey').css("border","2px solid red");
     $('#tokey').css("box-shadow","0 0 3px red");
     $('#tippytoKey').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid public key</p>");
@@ -138,8 +138,6 @@ async function send(n = 0) {
   $('#confirmTXinfo').slideUp(250);
   $("#confirmButtons").slideUp(250, function () {
     $('#confirmedTX').slideDown(250);
-/*    $('#completeButtons').slideDown(250);
-    $('#completed').slideDown(1000);*/
 });
 
   let to = $('#tokey').val();

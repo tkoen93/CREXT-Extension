@@ -49,8 +49,6 @@ function create() {
   let balance = $('#balance').val();
   target = $('#hidTokenAddress').val();
 
-  console.log(target);
-
   let regexp = /^\d+(\.\d{1,18})?$/;
   let cont = true;
 
@@ -87,7 +85,7 @@ function create() {
   try {
     bs58.decode(to);
   } catch(e) {
-    console.log(e);
+    cont = false;
     $('#tokey').css("border","2px solid red");
     $('#tokey').css("box-shadow","0 0 3px red");
     $('#tippytoKey').attr("data-tippy-content", "<p style=\"font-size:12px;\">Please enter a valid public key</p>");
@@ -191,7 +189,6 @@ async function send(n = 0) {
         ]
     }
   }).then(function(r) {
-    console.log(r);
       if(r.Message != undefined) {
         console.error(r.Message);
         $('#failButton').slideDown(250);
@@ -201,7 +198,6 @@ async function send(n = 0) {
       } else {
         nodeTest().then(function(nr) {
           connect().TransactionFlow(r.Result, function(err, re) {
-            console.log(re);
             if(re.status.code === 0) {
               $('#completeButtons').slideDown(250);
               $('#txLoader').hide();

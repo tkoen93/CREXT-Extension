@@ -9,7 +9,7 @@ function html() {
 						<hr />
 					</div>
 						<div class="form-group" style="margin-top:20px;">
-							<p style="color:#5e6368;">CREXT is a browser extension for the <a href="https://credits.com">Credits</a> blockchain.<br />
+							<p style="color:#5e6368;">CREXT is a browser extension for the <a href="https://credits.com" target="_blank">Credits</a> blockchain.<br />
 							CREXT is an easy way to store your Credits and <i>tokens</i> online. Easy dApp connection.<br />
 							Press the button below to start setting up your wallet!</p>
 						</div>

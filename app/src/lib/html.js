@@ -9,6 +9,7 @@ const unlock = require("../html/unlock");
 const txhistory = require('../html/txhistory');
 const inject = require('../html/inject');
 const settings = require('../html/settings');
+const tokensIndex = require('../html/tokens');
 const $ = require('jquery');
 const menu = require('./menu');
 const check_field = require('./check_field');
@@ -23,11 +24,14 @@ const walletBalance = require('./walletBalance');
 const key = require('./key');
 const copy = require('./copy');
 const tx = require('./tx');
+const tokentx = require('./tokentx');
 const getTransactions = require('./getTransactions');
 const dAppTX = require('./dAppTX');
 const selectNode = require('./selectNode');
 const sw = require('./selectWallet');
+const tokens = require('./selectToken');
 const LS = require('./ls');
+const contractState = require('./contractState');
 
 const store = new LS('CREXT');
 let currentSelected = store.getState().s;
@@ -40,6 +44,7 @@ let seed;
 let msgInject = undefined;
 let t = undefined;
 let modal;
+let latestPage;
 
 chrome.runtime.onConnect.addListener(function(port) {
   console.assert(port.name == "sendData");
@@ -56,13 +61,15 @@ function checkAndContinue(data) {
     }
 }
 
-CREXT = {
+let CREXT = {
 		start: function() {
 			menu();
 			document.getElementById('openaccount').addEventListener('click', CREXT.openaccount);
 			document.getElementById('txhistory').addEventListener('click', CREXT.txhistory);
       document.getElementById('settings').addEventListener('click', CREXT.settings);
+      document.getElementById('tokensIndex').addEventListener('click', CREXT.tokensIndex);
       document.getElementById('goBackModal').addEventListener('click', CREXT.goBackModal);
+      document.getElementById('lockCrext').addEventListener('click', CREXT.lockCrextModal);
       document.getElementById('lockCrextModal').addEventListener('click', CREXT.lockCrextModal);
       document.getElementById('logoutModal').addEventListener('click', CREXT.logoutModal);
       modal = document.getElementById("myModal");
@@ -72,8 +79,8 @@ CREXT = {
 			t = url.searchParams.get("t");
 
 			chrome.storage.local.get(function(result) {
-				loginTime = result.loginTime;
-				timeNow = new Date().getTime();
+				let loginTime = result.loginTime;
+				let timeNow = new Date().getTime();
 				global.keyPublic = result.PublicKey;
 
 				if(((timeNow-loginTime > 1800000) || result.encryption == '') && global.keyPublic != '') {
@@ -181,6 +188,10 @@ CREXT = {
 				ls.removeAll();
 	      ls.set('version', 1);
 				ls.set('initiate', 2);
+        let tokens0 = {};
+        let tokens1 = {};
+        let tokensLS = {0: tokens0, 1: tokens1};
+        ls.set('tokens', tokensLS);
         bseed.custom = new Array();
 				ls.set('seed', bseed);
 				chrome.runtime.sendMessage('Login');
@@ -302,6 +313,15 @@ CREXT = {
 		resetTX: function() {
 			content("index");
 		},
+    createTokenTX: function() {
+			tokentx.create();
+		},
+		sendTokenTX: function() {
+			tokentx.send(0);
+		},
+		resetTokenTX: function() {
+			content("tokensIndex");
+		},
 		unlock: function() {
 			let unlockPass = sha512($('#unlockpass').val());
 			let initiate = 0;
@@ -341,7 +361,7 @@ CREXT = {
     addMnemonic: function () {
       let totalWallets = store.getState().a + 1;
       currentSelected = store.getState().a;
-      store.putState({a: totalWallets, s: currentSelected});
+      store.putState({a: totalWallets, s: currentSelected.toString()});
       content("index");
     },
     addPrivate: function () {
@@ -375,25 +395,75 @@ CREXT = {
         $('#mesPhising').text('Code succesfully changed!');
       }
     },
-    goBackModal: function() {
-        $('#myModal').hide();
+    goBackModal: function () {
+        $('#myModal').fadeOut(250);
     },
-    lockCrextModal: function() {
+    lockCrextModal: function () {
       chrome.storage.local.set({'loginTime': 0});
       chrome.runtime.sendMessage('update');
-      window.location.reload();
+      $('#myModal').fadeOut(250);
+      $('#overlay').hide();
+      $('#wrapper').removeClass('toggled');
+      content("unlock");
     },
-    logoutModal: function() {}
+    logoutModal: function () {
+      ls.removeAll();
+      localStorage.clear();
+      chrome.storage.local.clear();
+      chrome.runtime.sendMessage('update');
+      document.location.reload();
+    },
+    tokensIndex: function () {
+      content("tokensIndex");
+    },
+    addToken: function () {
+      $('#mesTokenContract').empty();
+      let tokenAddress = $('#addNewToken').val();
+      if(tokenAddress.length < 43 || tokenAddress.length > 45) {
+        $('#mesTokenContract').text("Incorrect length!");
+      } else {
+        let tokenContractAddress;
+        try {
+          tokenContractAddress = bs58.decode(tokenAddress);
+        } catch(e) {
+          $('#mesTokenContract').text("Invalid token contract address!");
+        }
+        if(tokenContractAddress !== undefined) {
+          tokens.checkContract(tokenContractAddress)
+          .then(function(r) {
+            let params = {data: {target: tokenContractAddress, method: "getSymbol"}};
+            contractState(params)
+            .then(function(r) {
+              let tokenStorage = ls.get('tokens');
+              let currentNet = store.getState().n;
+              tokenStorage[currentNet][tokenAddress] = r;
+              ls.set('tokens', tokenStorage);
+              $('#mesTokenContract').text("Succesfully added " + r);
+              $('#addNewToken').val('');
+              showTokens(tokenStorage, currentNet);
+            })
+            .catch(r => console.warn(r));
+          })
+          .catch(r => $('#mesTokenContract').text(r));
+        }
+      }
+    }
 }
 
 async function content(page) {
 
+  latestPage = page;
+
   $("#ext").slideUp(250);
   document.getElementById('container').innerHTML = "";
+
+  let returnValue;
+  let currentNet = store.getState().n;
 
   switch(page) {
     case "main":
     	$('#menu').hide();
+      $('#selectedNetTop').hide();
       returnValue = await main();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('importwallet').addEventListener('click', CREXT.importwallet);
@@ -401,6 +471,7 @@ async function content(page) {
     break;
 		case "importwallet":
 			$('#menu').hide();
+      $('#selectedNetTop').hide();
 			returnValue = await importwallet();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
 			document.getElementById('importvault').addEventListener('click', CREXT.importvault);
@@ -411,6 +482,7 @@ async function content(page) {
 		break;
     case "mnemonicpass":
     	$('#menu').hide();
+      $('#selectedNetTop').hide();
       returnValue = await mnemonicpass();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       $("#createvault").prop( "disabled", true);
@@ -419,6 +491,7 @@ async function content(page) {
     break;
     case "mnemonicphrase":
 		  $('#menu').hide();
+      $('#selectedNetTop').hide();
       returnValue = await mnemonicphrase();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
 			document.getElementById('verifyseed').addEventListener('click', CREXT.continuePhrase);
@@ -446,6 +519,7 @@ async function content(page) {
     break;
     case "unlock":
       $('#menu').hide();
+      $('#selectedNetTop').hide();
       returnValue = await unlock();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       p = store.getState().p;
@@ -456,13 +530,14 @@ async function content(page) {
     break;
 		case "mnemonicverify":
 		  $('#menu').hide();
+      $('#selectedNetTop').hide();
 			returnValue = await mnemonicverify();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
 			document.getElementById('verify').addEventListener('click', CREXT.verify);
-			w1 = randomNo(1,3);
-			w2 = randomNo(4,6);
-			w3 = randomNo(7,9);
-			w4 = randomNo(10,12);
+			let w1 = randomNo(1,3);
+			let w2 = randomNo(4,6);
+			let w3 = randomNo(7,9);
+			let w4 = randomNo(10,12);
 			verifyArray.push((w1-1), (w2-1), (w3-1), (w4-1));
 			$("#w1").attr("placeholder","Word " + w1);
 			$("#w2").attr("placeholder","Word " + w2);
@@ -471,8 +546,9 @@ async function content(page) {
 		break;
 		case "index":
       currentSelected = store.getState().s;
-      let currentNet = store.getState().n;
+      currentNet = store.getState().n;
 			$('#menu').show();
+      $('#selectedNetTop').show();
 			returnValue = await index();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       global.keyPublic = key.exportPublic(currentSelected);
@@ -490,24 +566,29 @@ async function content(page) {
 			document.getElementById('failMainPage').addEventListener('click', CREXT.resetTX);
       document.getElementById('addnewwallet').addEventListener('click', CREXT.addWallet);
       if(currentNet === 1) {
-        $('#selectedNet').text("MainNet");
+        $('#selectedNet').text("CreditsNetwork");
+        $('#selectedNetTop').text("CreditsNetwork");
       } else {
         $('#selectedNet').text("TestNet");
+        $('#selectedNetTop').text("TestNet");
       }
 		break;
 		case "txhistory":
 			$('#menu').show();
+      $('#selectedNetTop').show();
 			returnValue = await txhistory();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
 			getTransactions(global.keyPublic, 1, 7); // set page to 1 when using monitor as source, 0 when node
 		break;
 		case "inject":
 			$('#menu').hide();
+      $('#selectedNetTop').hide();
 			returnValue = await inject();
 			document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
 		break;
     case "addWallet":
       $('#menu').show();
+      $('#selectedNetTop').show();
       returnValue = await addWallet();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('addMnemonic').addEventListener('click', CREXT.addMnemonic);
@@ -515,11 +596,12 @@ async function content(page) {
     break;
     case "settings":
     	$('#menu').show();
+      $('#selectedNetTop').show();
       returnValue = await settings();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       p = store.getState().p;
       if(p === undefined) {
-        $('#curPhising').text("No code set");
+        $('#curPhising').text("No anti-phising code set");
       } else {
         $('#curPhising').text(p);
       }
@@ -528,7 +610,7 @@ async function content(page) {
         if(r.access.length === 0) {
           $('#accessList').append('<li class="list-group-item">No approved websites found</li>');
         } else {
-          for(i=0; i<r.access.length; i++) {
+          for(let i=0; i<r.access.length; i++) {
             $('#accessList').append('<li class="list-group-item" id="access' + i + '"><span class="badgeDelete" id="removeAccess" data-content="' + r.access[i] + '|' + i + '"><i class="far fa-trash-alt"></i></span>' + r.access[i] + '</li>');
           }
         }
@@ -536,11 +618,25 @@ async function content(page) {
         if(r.blocked.length === 0) {
           $('#blockedList').append('<li class="list-group-item">No blocked websites found</li>');
         } else {
-          for(i=0; i<r.blocked.length; i++) {
+          for(let i=0; i<r.blocked.length; i++) {
             $('#blockedList').append('<li class="list-group-item" id="blocked' + i + '"><span class="badgeDelete" id="removeBlocked" data-content="' + r.blocked[i] + '|' + i + '"><i class="far fa-trash-alt"></i></span>' + r.blocked[i] + '</li>');
           }
         }
       });
+      let tokenData = ls.get('tokens');
+      showTokens(tokenData, currentNet);
+      document.getElementById('addToken').addEventListener('click', CREXT.addToken);
+    break;
+    case "tokensIndex":
+      $('#menu').show();
+      $('#selectedNetTop').show();
+      returnValue = await tokensIndex();
+      document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
+      document.getElementById('createTX').addEventListener('click', CREXT.createTokenTX);
+			document.getElementById('sendTX').addEventListener('click', CREXT.sendTokenTX);
+			document.getElementById('resetTX').addEventListener('click', CREXT.resetTokenTX);
+			document.getElementById('mainPage').addEventListener('click', CREXT.resetTokenTX);
+			document.getElementById('failMainPage').addEventListener('click', CREXT.resetTokenTX);
     break;
   }
 
@@ -548,8 +644,27 @@ async function content(page) {
 
 }
 
+function showTokens(tokenData, currentNet) {
+  $('#tokenList').empty();
+  if(Object.size(tokenData[currentNet]) === 0) {
+    $('#tokenList').append('<li class="list-group-item">No tokens added</li>');
+  } else {
+    for (const [key, value] of Object.entries(tokenData[currentNet])) {
+      $('#tokenList').append('<li class="list-group-item" id="removeTok"><span class="badgeDelete" id="removeToken" data-content="' + key + '"><i class="far fa-trash-alt"></i></span>' + value + '</li>');
+    }
+  }
+}
+
 function randomNo(x,y){
   return Math.floor(Math.random() * ((y-x)+1) + x);
+}
+
+Object.size = function(obj) {
+  var size = 0, key;
+  for (key in obj) {
+    if (obj.hasOwnProperty(key)) size++;
+  }
+  return size;
 }
 
 $(document).on('click', '#getstarted', function(event){
@@ -559,7 +674,7 @@ $(document).on('click', '#getstarted', function(event){
 });
 });
 
-$(document).on('click', '#dropdownnet', async function(event){
+$(document).on('click', '#dropdownnet', function(event){
         if($('ul.dropdownSelectNet').is(':visible')) {
           $('ul.dropdownSelectNet').slideUp(500);
         } else {
@@ -567,7 +682,7 @@ $(document).on('click', '#dropdownnet', async function(event){
         }
     });
 
-$(document).on('click', '#openSetting', async function(event){
+$(document).on('click', '#openSetting', function(event){
   let set = $(this).attr("data-content");
   if($('#' + set).is(':visible')) {
     $('#' + set).slideUp(250);
@@ -575,11 +690,10 @@ $(document).on('click', '#openSetting', async function(event){
   } else {
     $('#' + set).slideDown(250);
     $('#' + set + 'Badge').html('<i class="fas fa-angle-up"></i>');
-    sw();
   }
 });
 
-$(document).on('click', '#removeAccess', async function(event){
+$(document).on('click', '#removeAccess', function(event){
   let removeURL = $(this).attr("data-content").split("|")[0];
   let removeID = $(this).attr("data-content").split("|")[1];
   chrome.storage.local.get(['access'], function(r) {
@@ -595,7 +709,16 @@ $(document).on('click', '#removeAccess', async function(event){
   });
 });
 
-$(document).on('click', '#removeBlocked', async function(event){
+$(document).on('click', '#removeToken', function(event){
+  let removeTokenAddress = $(this).attr("data-content");
+  let tokenStorage = ls.get('tokens');
+  let currentNet = store.getState().n;
+  delete tokenStorage[currentNet][removeTokenAddress];
+  ls.set('tokens', tokenStorage);
+  showTokens(tokenStorage, currentNet);
+});
+
+$(document).on('click', '#removeBlocked', function(event){
   let removeURL = $(this).attr("data-content").split("|")[0];
   let removeID = $(this).attr("data-content").split("|")[1];
   chrome.storage.local.get(['blocked'], function(r) {
@@ -617,7 +740,7 @@ function arrayRemove(arr, value) {
    });
 }
 
-$(document).on('click', '#dropdownkey', async function(event){
+$(document).on('click', '#dropdownkey', function(event){
         if($('ul.dropdown').is(':visible')) {
           $('#addwallet').fadeOut(250);
           $('ul.dropdown').slideUp(500);
@@ -631,38 +754,54 @@ $(document).on('click', '#dropdownkey', async function(event){
         }
     });
 
+$(document).on('click', '#dropdownToken', function(event){
+        if($('ul.dropdown').is(':visible')) {
+          $('ul.dropdown').slideUp(500);
+          $('#dropdownToken').html('<i class="fas fa-angle-double-down" style="color:#ECF2FF;"></i>');
+        } else {
+          $('#dropdownSelectToken').html('<li style="text-align: center"><img src="../img/loader.svg" style="width:80px;height:80px;"></li>');
+          $('ul.dropdown').slideDown(500);
+          $('#dropdownToken').html('<i class="fas fa-angle-double-up" style="color:#ECF2FF;"></i>');
+          let tokenData = ls.get('tokens');
+          currentNet = store.getState().n;
+          tokens.selectToken(tokenData[currentNet], currentNet);
+        }
+    });
+
 $(document).on('click', '#selectNet', function(event){
     let net = $(this).attr("data-content");
-    if(net === "MainNet") {
-      $('#selectedNet').text("MainNet");
+    if(net === "CreditsNetwork") {
+      $('#selectedNet').text("CreditsNetwork");
+      $('#selectedNetTop').text("CreditsNetwork");
       store.putState({n: 1});
       selectNode().then(
         function(val) {
-          walletBalance(global.keyPublic);
+          content(latestPage);
       });
     } else {
       $('#selectedNet').text("TestNet");
+      $('#selectedNetTop').text("TestNet");
       store.putState({n: 0});
       selectNode().then(
         function(val) {
-          walletBalance(global.keyPublic);
+          content(latestPage);
       });
     }
 });
 
 $(document).on('click', '#logout', function(event){
-  $('#myModal').show();
+  $('#myModal').fadeIn(250);
 });
 
 // When the user clicks on <span> (x), close the modal
 $(document).on('click', '.closeModal', function(event){
-  $('#myModal').hide();
+  $('#myModal').fadeOut(250);
 });
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
-    $('#myModal').hide();
+    $('#myModal').fadeOut(250);
   }
 }
 

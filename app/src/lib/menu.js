@@ -3,6 +3,7 @@ function menu(n) {
     document.getElementById('wrapper').innerHTML = '';
 
     let menuHTML = `<div class="overlay" id="overlay"></div><div class="overlayNode" id="overlayNode"><div class="overlayNodeContent"></div></div>
+    <span id="selectedNetTop" style="display:none;position:absolute;top:28px;left:70px;" class="label label-primary"></span>
 
   	<!-- Sidebar -->
   	<nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
@@ -13,15 +14,15 @@ function menu(n) {
   							</a>
                 <div class="pull-right" style="margin-top:6px;margin-right:6px;" id="dropdownnet"><a href="#"><p id="selectedNet"></p> <i class="fas fa-caret-down"></i></a>
               <ul class="dropdownSelectNet">
-              <li id="selectNet" data-content="MainNet"><a href="#">MainNet</a></li>
+              <li id="selectNet" data-content="CreditsNetwork"><a href="#">CreditsNetwork</a></li>
               <li id="selectNet" data-content="TestNet"><a href="#">TestNet</a></li>
               </ul></div>
   					</li>
   					<li id="openaccount" class="closeItem" style="margin-top:40px;">
   							<a href="#"><p>Account</p></a>
   					</li>
-  					<li id="tokens" class="closeItem">
-  							<a href="#"><p style="text-decoration:line-through;">Tokens</p></a>
+  					<li id="tokensIndex" class="closeItem">
+  							<a href="#"><p>Tokens</p></a>
   					</li>
   					<li id="txhistory" class="closeItem">
   							<a href="#"><p>TX history</p></a>
@@ -33,7 +34,7 @@ function menu(n) {
   						&nbsp;
   					</li>
             <li style="text-align:center;">
-  							<button type="button" name="lockCrextModal" id="lockCrextModal" class="btn btn-warning" style="width:120px;"><p><i class="fas fa-lock"></i> Lock</p></button>
+  							<button type="button" name="lockCrext" id="lockCrext" class="btn btn-warning" style="width:120px;"><p><i class="fas fa-lock"></i> Lock</p></button>
   					</li>
   					<li id="logout" style="text-align:center;margin-top:5px;">
   							<button type="button" name="logout" id="logout" class="btn btn-danger" style="width:120px;"><p><i class="fas fa-sign-out-alt"></i> Logout</p></button>

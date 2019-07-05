@@ -72,8 +72,8 @@ async function addWallet(n) {
         fraction = '00';
     }	else {
       if(fraction.toString().length != 18) {
-        mLeadingZeros = 18 - fraction.toString().length;
-        for(i=0;i<mLeadingZeros;i++) {
+        let mLeadingZeros = 18 - fraction.toString().length;
+        for(let i=0;i<mLeadingZeros;i++) {
           fraction = "0" + fraction;
         }
       }
@@ -112,10 +112,6 @@ $(document).on('click', '#selectWallet', function(event){
       $('#addwallet').fadeOut(250);
       $('ul.dropdown').slideUp(500);
       $('#dropdownkey').html('<i class="fas fa-angle-double-down" style="color:#ECF2FF;"></i>');
-
-    /*setTimeout(function() {
-      location.reload();
-    },250);*/
   });
 
 module.exports = selectWallet;

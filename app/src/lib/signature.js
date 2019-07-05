@@ -3,12 +3,25 @@ const GEN_TYPES = require("../gen-nodejs/general_types");
 const connect = require('./connect');
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
+const LS = require('./ls');
+const store = new LS('CREXT');
+const key = require('./key');
 
 
 module.exports = CreateTransaction;
 
-async function CreateTransaction(Obj)
-    {
+async function CreateTransaction(Obj) {
+
+  let currentSelected = store.getState() === undefined ? '0' : store.getState().s;
+
+  if(Obj.PrivateKey === undefined) {
+    Obj.PrivateKey = Buffer.from(await key.exportPrivate(currentSelected));
+  }
+
+  if(Obj.Source === undefined) {
+    Obj.Source = Buffer.from(await key.exportPublic(currentSelected, 1));
+  }
+
         let DefObj = {
             Source: "",
             Target: "",
@@ -16,13 +29,14 @@ async function CreateTransaction(Obj)
             Amount: "0.0",
             Fee: "0.9",
             SmartContract: undefined,
-            TransactionObj: undefined
+            TransactionObj: undefined,
+            UserData: undefined
         };
 
         let DefSmart = {
             Params: undefined,
             Method: undefined,
-            Сode: undefined,
+            Code: undefined,
             NewState: false
         };
 
@@ -40,14 +54,13 @@ async function CreateTransaction(Obj)
             Result: null
         };
 
-        for (let i in DefObj){
-            if (Obj[i] === undefined)
-            {
+        for (let i in DefObj) {
+            if (Obj[i] === undefined) {
                 Obj[i] = DefObj[i];
             }
         }
 
-        if (Obj.SmartContract !== undefined){
+        if (Obj.SmartContract !== undefined) {
             for (let i in DefSmart) {
                 if (Obj.SmartContract[i] === undefined) {
                     Obj.SmartContract[i] = DefSmart[i];
@@ -67,7 +80,7 @@ async function CreateTransaction(Obj)
             Trans = Obj.TransactionObj;
         }
 
-        let Source = CheckStrTransaction(Obj.Source,"Source");
+        let Source = CheckStrTransaction(Obj.Source, "Source");
         if (Source.R === undefined) {
             ResObj.Message = Source.M;
             return ResObj;
@@ -88,8 +101,9 @@ async function CreateTransaction(Obj)
         let TRes = await connect().WalletTransactionsCountGet(Trans.source);
         if (TRes.status.code === 0) {
             Trans.id = TRes.lastTransactionInnerId + 1;
-        }
-        else {
+        } else if(TRes.status.code === 3) {
+          Trans.id = 1;
+        } else {
             ResObj.Message = TRes.status.message;
             return ResObj;
         }
@@ -108,7 +122,7 @@ async function CreateTransaction(Obj)
                 return ResObj;
             }
 
-            Trans.target = await Buffer.from(blake2s(Target));
+            Trans.target = Buffer.from(blake2s(Target));
         }
         else {
             let Target = CheckStrTransaction(Obj.Target, "Target");
@@ -121,18 +135,17 @@ async function CreateTransaction(Obj)
             }
         }
 
-        Trans.amount = new API_TYPES.Amount({
+        Trans.amount = new GEN_TYPES.Amount({
             integral: Math.trunc(Obj.Amount),
             fraction: 0
         });
-        if (Obj.Amount.split(".").length > 1)
-        {
-            Trans.amount.fraction = Number("0." + Obj.Amount.split(".")[1]) *  Math.pow(10, 18);
+        if (Obj.Amount.split(".").length > 1) {
+            Trans.amount.fraction = Number("0." + Obj.Amount.split(".")[1]) * Math.pow(10, 18);
         }
 
         let F = Fee(Obj.Fee);
         let FE = NumbToBits(F.exp);
-        while (FE.length < 5){
+        while (FE.length < 5) {
             FE = "0" + FE;
         }
         let FM = NumbToBits(F.man);
@@ -154,10 +167,10 @@ async function CreateTransaction(Obj)
         PerStr = concatTypedArrays(PerStr, NumbToByte(Trans.fee.commission, 2));
         PerStr = concatTypedArrays(PerStr, new Uint8Array([1]));
 
-        if (Obj.SmartContract === undefined) {
+        if (Obj.SmartContract === undefined && Obj.UserData === undefined) {
             PerStr = concatTypedArrays(PerStr, new Uint8Array(1));
         }
-        else {
+        else if (Obj.SmartContract !== undefined) {
             PerStr = concatTypedArrays(PerStr, new Uint8Array([1]));
 
             let UserField = new Uint8Array();
@@ -184,8 +197,7 @@ async function CreateTransaction(Obj)
                 for (let i in Obj.SmartContract.Params) {
                     let val = Obj.SmartContract.Params[i];
 
-                    switch (val.K)
-                    {
+                    switch (val.K) {
                         case "STRING":
                             UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 17]));
                             UserField = concatTypedArrays(UserField, NumbToByte(val.V.length, 4).reverse());
@@ -208,6 +220,16 @@ async function CreateTransaction(Obj)
                             Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_boolean: val.V }));
                             UserField = concatTypedArrays(UserField, new Uint8Array(1));
                         break;
+            						case "DOUBLE":
+              							UserField = concatTypedArrays(UserField, new Uint8Array([4, 0, 15]));
+              							let Buf = new ArrayBuffer(8);
+              							let UB = new Uint8Array(Buf);
+              							let N = new Float64Array(Buf);
+              							N[0] = val.V;
+              							UserField = concatTypedArrays(UserField, UB.reverse());
+              							UserField = concatTypedArrays(UserField, new Uint8Array(1));
+                            Trans.smartContract.params.push(new GEN_TYPES.Variant({ v_double: val.V }));
+            						break;
                     }
                 }
             }
@@ -253,9 +275,8 @@ async function CreateTransaction(Obj)
                             name: val.name,
                             byteCode: val.byteCode
                         }));
+                        UserField = concatTypedArrays(UserField, new Uint8Array(1));
                     }
-
-                    UserField = concatTypedArrays(UserField, new Uint8Array(1));
                 }
                 else {
                     ResObj.Message = ByteCode.Status.Message;
@@ -269,6 +290,15 @@ async function CreateTransaction(Obj)
             PerStr = concatTypedArrays(PerStr, NumbToByte(UserField.length, 4));
             PerStr = Buffer.from(concatTypedArrays(PerStr, UserField));
         }
+        else if (Obj.UserData !== undefined)
+        {
+            let UserField = concatTypedArrays(new Uint8Array([1]), NumbToByte(Obj.UserData.length,4));
+            UserField = concatTypedArrays(UserField, ConvertCharToByte(Obj.UserData));
+            PerStr = Buffer.from(concatTypedArrays(PerStr, UserField));
+            Trans.userFields = Buffer.from(ConvertCharToByte(Obj.UserData));
+        }
+
+
 
         var ArHex = "0123456789ABCDEF";
         var Hex = "";
@@ -276,8 +306,10 @@ async function CreateTransaction(Obj)
             Hex += ArHex[Math.floor(PerStr[j] / 16)];
             Hex += ArHex[Math.floor(PerStr[j] % 16)];
         }
+    //    console.log(Hex);
 
         Trans.signature = Buffer.from(nacl.sign.detached(PerStr, Private));
+  //      console.log(Trans);
         ResObj.Result = Trans;
         return ResObj;
     }
@@ -352,7 +384,7 @@ async function CreateTransaction(Obj)
             if (i === 0) {
                 break;
             }
-            i -=1;
+            i -= 1;
         }
 
         return Byts;
@@ -361,7 +393,7 @@ async function CreateTransaction(Obj)
     function BitsToNumb(Bits) {
         let numb = 0;
         let mnoj = 1;
-        for (var i = Bits.length-1; i > 0; i -= 1) {
+        for (var i = Bits.length - 1; i > 0; i -= 1) {
             if (Bits[i] !== 0) {
                 numb += mnoj * Bits[i];
             }
@@ -526,7 +558,7 @@ async function CreateTransaction(Obj)
             ++exp;
         }
         v = Number((v * 1024).toFixed(0));
-        return { exp: exp + 18, man: v === 1024? 1023: v };
+        return { exp: exp + 18, man: v === 1024 ? 1023 : v };
     }
 
     function NumbToByte(numb, CountByte) {
@@ -559,3 +591,17 @@ async function CreateTransaction(Obj)
         }
         return InnerId;
     }
+
+    function Connect() {
+        var transport = new Thrift.Transport("http://" + Url + ":" + Port + "/thrift/service/Api/");
+        var protocol = new Thrift.Protocol(transport);
+        return new APIClient(protocol);
+    }
+
+	function CommissionToNumb(c){
+		let sign = c >> 15;
+		let m = c & 0x3FF;
+		let f = (c >> 10) & 0x1F;
+		let v1024 = 1.0 / 1024;
+		return (sign != 0 ? -1 : 1) * m * v1024 * Math.pow(10, f - 18);
+	}

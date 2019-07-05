@@ -184,7 +184,7 @@ class Keypair {
    * @returns {Keypair}
    */
   static fromRawEd25519Seed(rawSeed) {
-    return new this({ type: 'ed25519', secretKey: rawSeed });
+    return new Keypair({ type: 'ed25519', secretKey: rawSeed });
   }
 
   /**

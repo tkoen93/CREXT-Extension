@@ -23,5 +23,5 @@ window.addEventListener("message", function(event) {
 }, false);
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
-  window.postMessage(message, window);
+  postMessage(message, window.location.origin);
 });

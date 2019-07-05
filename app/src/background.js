@@ -5,6 +5,8 @@ const selectNode = require('./lib/selectNode');
 const nodeTest = require('./lib/nodeTest');
 const convert = require('./lib/convert');
 const connect = require('./lib/connect');
+const contractState = require('./lib/contractState');
+const checkContract = require('./lib/checkContract');
 
 global.nodeIP;
 global.nodePORT;
@@ -15,6 +17,7 @@ let blocked;
 chrome.runtime.onInstalled.addListener((details) => {
   console.log(details);
 	if (details.reason === 'install') {
+    console.log("install message");
 	} else if (details.reason === 'update') {
 		const thisVersion = chrome.runtime.getManifest().version;
     if(thisVersion !== details.previousVersion) {
@@ -62,9 +65,9 @@ window.onload = function(e) {
         });
 
         chrome.storage.local.get(function(result) {
-  				loginTime = result.loginTime;
+  				let loginTime = result.loginTime;
           if(loginTime > 1) {
-  				    timeNow = new Date().getTime();
+  				    let timeNow = new Date().getTime();
   				    if((timeNow-loginTime > 1800000) || result.encryption == '') {
   					     chrome.storage.local.set({
   						      'encryption': ''
@@ -89,7 +92,6 @@ window.onload = function(e) {
          });
       } else if(message.CStype != null) {
 
-        // console.log(message);
 
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
@@ -97,11 +99,15 @@ window.onload = function(e) {
           returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "User not logged in", id: message.data.id}};
           sendMSG(sender.tab.id, returnmsg);
         } else {
-
-          if(checkAccess(message.org, contentMessage, function(r) {
+          checkAccess(message.org, contentMessage, function(r) {
             if(r) {
-
               switch(message.CStype) {
+                case "version":
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: true, result: {version: chrome.runtime.getManifest().version}}};
+                    setTimeout(function() {
+                      chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                    }, 150);
+                break;
                 case "TX":
                   if(keyPublic === message.data.target) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target is equal to sender", id: message.data.id}};
@@ -111,9 +117,12 @@ window.onload = function(e) {
                     sendMSG(sender.tab.id, returnmsg);
                   } else {
                     if(!Object.prototype.hasOwnProperty.call(message.data, "amount")) {
-                      checkContract(message, sender)
+                      checkContract(message)
                       .then(
                         function(r) {
+                          if(r !== true) {
+                            contentMessage.data.smart.params = r;
+                          }
                           PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                             setTimeout(
                             function() {
@@ -121,16 +130,22 @@ window.onload = function(e) {
                               port.postMessage(contentMessage);
                             }, 1000);
                       })
-                      .catch(function(r) { console.warn(r); });
+                      .catch(function(r) {
+                        returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
+                        sendMSG(sender.tab.id, returnmsg);
+                      });
                     } else {
                       message.data.amount = String(message.data.amount).replace(',', '.');
                       if(isNaN(message.data.amount)) {
                         returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Invalid amount", id: message.data.id}};
                         sendMSG(sender.tab.id, returnmsg);
                       } else {
-                        checkContract(message, sender)
+                        checkContract(message)
                         .then(
                           function(r) {
+                            if(r !== true) {
+                              contentMessage.data.smart.params = r;
+                            }
                             PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                               setTimeout(
                               function() {
@@ -138,7 +153,10 @@ window.onload = function(e) {
                                 port.postMessage(contentMessage);
                               }, 1000);
                         })
-                        .catch(function(r) { });
+                        .catch(function(r) {
+                          returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
+                          sendMSG(sender.tab.id, returnmsg);
+                        });
                       }
                     }
                   }
@@ -164,8 +182,8 @@ window.onload = function(e) {
                               fraction = 0;
                           }	else {
                             if(fraction.toString().length != 18) {
-                              mLeadingZeros = 18 - fraction.toString().length;
-                              for(i=0;i<mLeadingZeros;i++) {
+                              let mLeadingZeros = 18 - fraction.toString().length;
+                              for(let i=0;i<mLeadingZeros;i++) {
                                 fraction = "0" + fraction;
                               }
                             }
@@ -173,7 +191,7 @@ window.onload = function(e) {
                               fraction = (fraction * 1).toString().split(".")[1];
                           }
 
-                          totalBalance = balance.balance.integral + "." + fraction;
+                          let totalBalance = balance.balance.integral + "." + fraction;
                           returnmsg = {CREXTreturn: "balanceGet", CSID: message.CSID, data:{success: true, id: message.data.id, result: {integral: balance.balance.integral, fraction: fraction, balance: totalBalance}}};
                           sendMSG(sender.tab.id, returnmsg);
                         } else {
@@ -213,8 +231,8 @@ window.onload = function(e) {
                   			        fraction = 0;
                   					}	else {
                 							if(fraction.toString().length != 18) {
-                								mLeadingZeros = 18 - fraction.toString().length;
-                								for(i=0;i<mLeadingZeros;i++) {
+                								let mLeadingZeros = 18 - fraction.toString().length;
+                								for(let i=0;i<mLeadingZeros;i++) {
                 									fraction = "0" + fraction;
                 								}
                 							}
@@ -226,7 +244,7 @@ window.onload = function(e) {
                             let totalBalance = walletdata.walletData.balance.integral + "." + fraction;
 
                             if(walletdata.status.message == 'Success') {
-                              walletdatat = {
+                              let walletdatat = {
                                   "balance": {"integral": walletdata.walletData.balance.integral, "fraction": fraction, "balance": totalBalance},
                                   "lastTransactionId": txid,
                                   "walletId": walletdata.walletData.walletId
@@ -242,49 +260,37 @@ window.onload = function(e) {
                       }
                     }
                   break;
+                  case "contractState":
+                  let messageState = {CStype: message.CStype, CSID: message.CSID, data: {target: message.data.target, smart: {method: message.data.method, params: message.data.params}}};
+                  checkContract(messageState).then(function(r) {
+                    if(r !== true) {
+                      message.data.params = r;
+                    }
+                      contractState(message).then(function(contractStateValue) {
+                        let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: true, result: contractStateValue, id: message.data.id}};
+                        setTimeout(function() {
+                          chrome.tabs.sendMessage(sender.tab.id, retmsg);
+                        }, 150);
+                      })
+                      .catch(function(r) {
+                        let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: false, id: message.data.id}};
+                        setTimeout(function() {
+                          chrome.tabs.sendMessage(sender.tab.id, retmsg);
+                        }, 150);
+                      });
+                  }).catch(function(r) {
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
+                    setTimeout(function() {
+                      chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                    }, 150);
+                  });
+                  break;
               }
             }
-          }));
+          });
         }
       }
     });
-
-function checkContract(message, sender) {
-  return new Promise(async function(resolve, reject) {
-    if(Object.prototype.hasOwnProperty.call(message.data, "smart")) {
-      if((!Object.prototype.hasOwnProperty.call(message.data.smart, "code")) && (Object.prototype.hasOwnProperty.call(message.data.smart, "method"))) {
-        await connect().SmartContractDataGet(bs58.decode(message.data.target), function(err, r) {
-          if(r.status.code === 1) {
-            returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Target address is not a contract", id: message.data.id}};
-            sendMSG(sender.tab.id, returnmsg);
-            reject("Target address is not a contract");
-          } else {
-            let found = false;
-            let methodNum = 0;
-              for(var i = 0; i < r.methods.length; i++) {
-                  if (r.methods[i].name == message.data.smart.method) {
-                      found = true;
-                      methodNum = i;
-                      break;
-                  }
-              }
-            if(!found) {
-              returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: "Method not found", id: message.data.id}};
-              sendMSG(sender.tab.id, returnmsg);
-              reject("Method not found in contract");
-            } else {
-              resolve(true);
-            }
-          }
-        });
-      } else if(Object.prototype.hasOwnProperty.call(message.data.smart, "code")) { // new smart contract
-        resolve(true);
-      }
-    } else {
-      resolve(true);
-    }
-  });
-}
 
 function sendMSG(tab, msg) {
   setTimeout(function() {
@@ -309,7 +315,8 @@ function PopupCenter(url, title, w, h) {
     if (window.focus) newWindow.focus();
 }
 
-    function checkAccess(url, contentmessage = NULL, callback) {
+    function checkAccess(url, contentmessage, callback) {
+      let returnmsg;
       if(blocked.includes(url)) {
         returnmsg = {CREXTreturn: contentmessage.CStype, CSID: contentmessage.CSID, data:{success: false, message: "Access denied"}};
         sendMSG(contentmessage.id, returnmsg);

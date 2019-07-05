@@ -16,6 +16,7 @@ body {
       width: 475px;
       height: 600px;
     overflow: auto;
+    font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 body::-webkit-scrollbar{display:none !important;}
@@ -120,7 +121,7 @@ body::-webkit-scrollbar{display:none !important;}
     width: 100px;
 }
 
-.hamburger.open-nav:hover before {
+.hamburger.open-nav:hover::before {
     -webkit-transform: translate3d(-100px, 0, 0);
     -webkit-transition: all 0.35s ease-in-out;
     display: block;
@@ -243,7 +244,7 @@ body::-webkit-scrollbar{display:none !important;}
   display: table-cell;
   vertical-align: middle;
   text-align: center;
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #91aecd;
   font-size: 12px;
 }
@@ -260,7 +261,7 @@ body::-webkit-scrollbar{display:none !important;}
   display: table-cell;
   vertical-align: middle;
   text-align: center;
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #555e67;
   font-size: 14px;
 }
@@ -274,7 +275,7 @@ body::-webkit-scrollbar{display:none !important;}
   display: table-cell;
   vertical-align: middle;
   text-align: center;
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #555e67;
   font-size: 12px;
   padding-left: 50px;
@@ -292,22 +293,6 @@ body::-webkit-scrollbar{display:none !important;}
   text-align: center;
 }
 
-#drop_zone {
-border: 1px dashed #91aecd;
--moz-border-radius: 5px;
--webkit-border-radius: 5px;
-border-radius: 5px;
-padding: 20px;
-text-align: center;
-font: 12pt bold 'RobotoMedium';
-color: #cad8e5;
-}
-
-.label {
-  min-width: 40px !important;
-  display: inline-block !important
-}
-
 .rounded80 {
   background-color: #F7FCFE;
   border-radius:.80rem!important;
@@ -317,30 +302,30 @@ color: #cad8e5;
 }
 
 p {
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   display:inline;
 }
 
 p.small {
-  font-family: RobotoLight;
+  font-family: RobotoLight, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 12px;
 }
 
 p.error {
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: red;
 }
 
 p.bold {
-  font-family: RobotoBold;
+  font-family: RobotoBold, Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 p.light {
-  font-family: RobotoLight;
+  font-family: RobotoLight, Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 p.medium {
-  font-family: RobotoMedium;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 .confirmsize {
@@ -348,11 +333,11 @@ p.medium {
 }
 
 p.mediumi {
-  font-family: RobotoMediumI;
+  font-family: RobotoMediumI, Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 p.black {
-  font-family: RobotoBlack;
+  font-family: RobotoBlack, Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 p.shadow {
@@ -368,7 +353,6 @@ p.shadow {
 
 .keyLine {
   margin-bottom: 12px;
-  font-family: RobotoMedium;
   font-size: 12px;
   color:#f0f5fd;
 }
@@ -387,14 +371,17 @@ hr {
   width: 100%;
   color: gray;
   text-align: center;
-  font-family: Roboto;
+}
+
+a {
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
 }
 
 a,
 a:hover,
-a:active,
 a:focus,
 a:active {
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: black;
   text-decoration: none;
 }
@@ -408,7 +395,6 @@ a:active {
   background-color: #168FFA;
   color: #ECF2FF;
   border: 0px;
-  font-family:Roboto;
   font-size:13px;
 }
 
@@ -416,23 +402,14 @@ a:active {
   width: 404px;
 }
 
-.btn-astext {
-    background:none;
-    border:none;
-    margin:0;
-    padding:0;
-    cursor: pointer;
-    font-family: RobotoItalic;
-}
-
 .btn-genkey {
   border: 1px solid #16bf56;
   background-color: #ffffff;
   color: #16bf56;
-  align: center;
+  text-align: center;
   height: 60px;
   font-size:14px;
-  font-family:RobotoMedium;
+  font-family:RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   text-decoration:none;
   margin-left:6px;
 }
@@ -442,13 +419,8 @@ a:active {
 }
 
 .btn-tx {
-  /*border-radius:.4rem!important;
-  background-color: #18C359;
-  color: white;
-  align: center;
-  height: 60px;*/
   font-size:14px;
-  font-family:RobotoMedium;
+  font-family:RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   height: 60px;
   text-decoration:none;
   display:inline-block;
@@ -480,7 +452,7 @@ a:active {
 
 .btn-resettx {
   font-size:14px;
-  font-family:RobotoMedium;
+  font-family:RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   height: 60px;
   text-decoration:none;
   display:inline-block;
@@ -513,39 +485,45 @@ a:active {
 
 p.header {
   font-size:24px;
-  font-family: RobotoMedium;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
+  color: #4d8dd9;
+}
+
+p.headerSmall {
+  font-size:16px;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #4d8dd9;
 }
 
 p.complete {
   font-size:14px;
-  font-family: RobotoMedium;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #1ec45d;
 }
 
 p.failed {
   font-size:14px;
-  font-family: RobotoMedium;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #ec4652;
 }
 
 p.txSent {
   font-size:12px;
-  font-family: RobotoMedium;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #F55454;
   margin-left:12px;
 }
 
 p.txReceived {
   font-size:12px;
-  font-family: RobotoMedium;
+  font-family: RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #15BE55;
   margin-left:12px;
 }
 
 p.txHisr {
   font-size: 12px;
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #464d54;
 }
 
@@ -553,13 +531,13 @@ p.warning {
   position:relative;
   top:5px;
   font-size: 14px;
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #ea5151;
 }
 
 p.revoke {
   font-size:12px;
-  font-family: RobotoItalic;
+  font-family: RobotoItalic, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #91aecd;
 }
 
@@ -568,6 +546,8 @@ p.revoke {
   position: relative;
   top: -5px;
   margin-left:8px;
+  min-width: 40px !important;
+  display: inline-block !important
 }
 
 .tchange {
@@ -611,13 +591,13 @@ p.revoke {
 }
 
 .confirmTitle {
-  font-family: RobotoBold;
+  font-family:RobotoBold, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 12px;
   color: #a8bed4;
 }
 
 .confirmText {
-  font-family: Roboto;
+  font-family:Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 14px;
   color: #878c90;
 }
@@ -651,7 +631,7 @@ tr.txhistitle {
 }
 
 input[type=text], textarea {
-  font-family: RobotoBold;
+  font-family:RobotoBold, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   color: #a8bed4;
   font-size: 14px;
   border: 1px solid rgba(221, 235, 250, 0.5);
@@ -677,7 +657,7 @@ input[type=text], textarea {
 }
 
 .btn-file {
-  font-family: RobotoMedium;
+  font-family:RobotoMedium, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 12px;
   background-color: #e4f0fc;
   color: #91aecd;
@@ -686,26 +666,24 @@ input[type=text], textarea {
 
 a.pageNumber,
 a.pageNumber:hover,
-a.pageNumber:active,
 a.pageNumber:focus,
 a.pageNumber:active {
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 14px;
   color: #A8BED4;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 a.pageNumberActive,
 a.pageNumberActive:hover,
-a.pageNumberActive:active,
 a.pageNumberActive:focus,
 a.pageNumberActive:active {
-  font-family: Roboto;
+  font-family: Roboto, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 14px;
   color: #464D54;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .check {
@@ -829,11 +807,10 @@ padding: 0;
   display: none;
   list-style-type:none;
 position: absolute;
-//background-color: #f9f9f9;
 background-color: rgba(255, 255, 255, 0.9);
 width: 397px;
 box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-z-index: 1;
+z-index: 0;
 right:0;
 top:100%;
 max-height:320px;
@@ -858,7 +835,6 @@ padding: 0;
   display: none;
   list-style-type:none;
 position: absolute;
-//background-color: #f9f9f9;
 background-color: rgba(255, 255, 255, 0.9);
 box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 z-index: 1;
@@ -886,20 +862,23 @@ ul.dropdownSelectNet li a:hover {background-color: #f1f1f1}
   transform: translate(-50%, -50%);
 }
 
-#dropdownSelect::-webkit-scrollbar-track
+#dropdownSelect::-webkit-scrollbar-track,
+#dropdownSelectToken::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	border-radius: 10px;
 	background-color: #F5F5F5;
 }
 
-#dropdownSelect::-webkit-scrollbar
+#dropdownSelect::-webkit-scrollbar,
+#dropdownSelectToken::-webkit-scrollbar
 {
 	width: 6px;
 	background-color: #F5F5F5;
 }
 
-#dropdownSelect::-webkit-scrollbar-thumb
+#dropdownSelect::-webkit-scrollbar-thumb,
+#dropdownSelectToken::-webkit-scrollbar-thumb
 {
 	border-radius: 10px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
@@ -965,7 +944,7 @@ ul.dropdownSelectNet li a:hover {background-color: #f1f1f1}
 }
 
 p.phising {
-  font-family: RobotoLight;
+  font-family: RobotoLight, Helvetica, Arial, Verdana, Tahoma, sans-serif;
   font-size: 12px;
 }
 
@@ -980,7 +959,7 @@ p.phising {
     padding: 3px 7px;
     font-size: 12px;
     font-weight: 700;
-    line-height: 20;
+
     color: #fff;
     text-align: center;
     white-space: nowrap;

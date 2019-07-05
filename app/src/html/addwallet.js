@@ -13,7 +13,7 @@ function html() {
       <div class="strike">
         <span>OR</span>
       </div>
-      <div class="form-group" style="margin-top:20px;"><p style="color:#5e6368;">Add wallet with plain private key. (Not recommended!)</p></div>
+      <div class="form-group" style="margin-top:20px;"><p style="color:#5e6368;">Add wallet with unencrypted private key. (Not recommended!)</p></div>
       <div class="form-group">
         <input type="text" id="addWalletPrivate" name="addWalletPrivate" class="form-control" placeholder="PRIVATE KEY" style="height:40px;width:395px;margin-left:-1px;" required />
         <p class="error" id="addWalletPrivateError"></p>

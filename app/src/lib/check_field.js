@@ -1,5 +1,10 @@
 const $ = require('jquery');
 
+/**
+ * Check if the form meets the requirements to be able to continue
+ * @returns {boolean} whether or not the user can continue the process
+ */
+
 function check_field()
 {
 	var pass1=$("#pass1").val();
@@ -10,11 +15,9 @@ function check_field()
 
 	if(pass1!= '' && pass1.length < 8) {
 		$('#pass1error').text('Password not long enough');
-		cont = false;
 	} else {
 		if(pass2!= '' && pass1 != pass2) {
 			$('#pass2error').text('Password don\'t match');
-			cont = false;
 		} else {
 			$('#pass2error').empty();
 			cont = true;

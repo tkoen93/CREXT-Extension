@@ -166,6 +166,76 @@ object.prototype.write = function(output) {
   return;
 };
 
+var Amount = module.exports.Amount = function(args) {
+  this.integral = 0;
+  this.fraction = 0;
+  if (args) {
+    if (args.integral !== undefined && args.integral !== null) {
+      this.integral = args.integral;
+    } else {
+      throw new Thrift.TProtocolException(Thrift.TProtocolExceptionType.UNKNOWN, 'Required field integral is unset!');
+    }
+    if (args.fraction !== undefined && args.fraction !== null) {
+      this.fraction = args.fraction;
+    } else {
+      throw new Thrift.TProtocolException(Thrift.TProtocolExceptionType.UNKNOWN, 'Required field fraction is unset!');
+    }
+  }
+};
+Amount.prototype = {};
+Amount.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+      if (ftype == Thrift.Type.I32) {
+        this.integral = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 2:
+      if (ftype == Thrift.Type.I64) {
+        this.fraction = input.readI64();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Amount.prototype.write = function(output) {
+  output.writeStructBegin('Amount');
+  if (this.integral !== null && this.integral !== undefined) {
+    output.writeFieldBegin('integral', Thrift.Type.I32, 1);
+    output.writeI32(this.integral);
+    output.writeFieldEnd();
+  }
+  if (this.fraction !== null && this.fraction !== undefined) {
+    output.writeFieldBegin('fraction', Thrift.Type.I64, 2);
+    output.writeI64(this.fraction);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
 var Variant = module.exports.Variant = function(args) {
   this.v_null = null;
   this.v_void = null;
@@ -189,6 +259,9 @@ var Variant = module.exports.Variant = function(args) {
   this.v_list = null;
   this.v_set = null;
   this.v_map = null;
+  this.v_big_decimal = null;
+  this.v_amount = null;
+  this.v_byte_array = null;
   if (args) {
     if (args.v_null !== undefined && args.v_null !== null) {
       this.v_null = args.v_null;
@@ -255,6 +328,15 @@ var Variant = module.exports.Variant = function(args) {
     }
     if (args.v_map !== undefined && args.v_map !== null) {
       this.v_map = Thrift.copyMap(args.v_map, [null]);
+    }
+    if (args.v_big_decimal !== undefined && args.v_big_decimal !== null) {
+      this.v_big_decimal = args.v_big_decimal;
+    }
+    if (args.v_amount !== undefined && args.v_amount !== null) {
+      this.v_amount = new ttypes.Amount(args.v_amount);
+    }
+    if (args.v_byte_array !== undefined && args.v_byte_array !== null) {
+      this.v_byte_array = args.v_byte_array;
     }
   }
 };
@@ -488,6 +570,28 @@ Variant.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 23:
+      if (ftype == Thrift.Type.STRING) {
+        this.v_big_decimal = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 24:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.v_amount = new ttypes.Amount();
+        this.v_amount.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 25:
+      if (ftype == Thrift.Type.STRING) {
+        this.v_byte_array = input.readBinary();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -644,6 +748,21 @@ Variant.prototype.write = function(output) {
       }
     }
     output.writeMapEnd();
+    output.writeFieldEnd();
+  }
+  if (this.v_big_decimal !== null && this.v_big_decimal !== undefined) {
+    output.writeFieldBegin('v_big_decimal', Thrift.Type.STRING, 23);
+    output.writeString(this.v_big_decimal);
+    output.writeFieldEnd();
+  }
+  if (this.v_amount !== null && this.v_amount !== undefined) {
+    output.writeFieldBegin('v_amount', Thrift.Type.STRUCT, 24);
+    this.v_amount.write(output);
+    output.writeFieldEnd();
+  }
+  if (this.v_byte_array !== null && this.v_byte_array !== undefined) {
+    output.writeFieldBegin('v_byte_array', Thrift.Type.STRING, 25);
+    output.writeBinary(this.v_byte_array);
     output.writeFieldEnd();
   }
   output.writeFieldStop();

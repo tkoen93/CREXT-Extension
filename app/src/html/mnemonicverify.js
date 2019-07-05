@@ -8,7 +8,7 @@ function html() {
         <hr style="margin-top:25px;"/>
       </div>
       <div class="form-group" style="margin-top:20px;">
-        <p align="left">Please enter the requested phrase for verification</p>
+        <p align="left">Please enter the requested words for verification</p>
       </div>
       <div class="form-group">
         <div style="float:left;width:187.5px;margin-left:4px;">

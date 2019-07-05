@@ -8,6 +8,8 @@ const key = require('./key');
 const CreateTransaction = require('./signature');
 const bs58 = require('bs58');
 const LS = require('./ls');
+const contractResult = require('./contractResult');
+const checkContract = require('./checkContract');
 
 const store = new LS('CREXT');
 const currentSelected = store.getState().s;
@@ -18,8 +20,9 @@ let receivedMessage;
 let tabID;
 let feecs;
 let amcs;
+let returnmsg;
 
-CREXTdApp = {
+let CREXTdApp = {
   reject: function() {
   	returnmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, message: "Transaction rejected by user", id: receivedMessage.data.id}};
   	chrome.tabs.sendMessage(tabID, returnmsg);
@@ -40,34 +43,29 @@ CREXTdApp = {
       $('#confirmedTX').slideDown(250);
   });
 
-      var Trans = await CreateTransaction({
+      await CreateTransaction({
             Amount: amount,
             Fee: fee,
-            Source: key.exportPublic(currentSelected),
-            PrivateKey: key.exportPrivate(currentSelected),
             Target: to,
+            UserData: receivedMessage.data.UserData
         }).then(function(r) {
-          console.log(r);
           if(r.error) {
             console.error(r.message);
           } else {
               connect().TransactionFlow(r.Result, function(err, r) {
                 let res = r;
-                console.log(r);
                 if(r.status.code === 0) {
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#completed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
                   chrome.tabs.sendMessage(tabID, retmsg);
-                  console.log('tx send');
                 } else {
                   $('#failButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#failed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, result:res}};
                   chrome.tabs.sendMessage(tabID, retmsg);
-                  console.log('error');
                 }
               });
           }
@@ -83,22 +81,19 @@ CREXTdApp = {
       $('#confirmedTX').slideDown(250);
   });
 
-      var Trans = await CreateTransaction({
+      await CreateTransaction({
             Fee: receivedMessage.data.fee,
-            Source: key.exportPublic(currentSelected),
-            PrivateKey: key.exportPrivate(currentSelected),
-              SmartContract: {
+            SmartContract: {
                   Code: receivedMessage.data.smart.code,
                   forgetNewState: true
-              }
+              },
+              UserData: receivedMessage.data.UserData
         }).then(function(txres) {
-          console.log(txres);
           if(txres.message !== null && txres.message !== undefined) {
             console.error(txres.message);
           } else {
               connect().TransactionFlow(txres.Result, function(err, r) {
                 let res = r;
-                console.log(r);
                 if(r.status.code === 0) {
                   $('#transactionto2').text(bs58.encode(Buffer.from(txres.Result.target)));
                   $('#closeButton').slideDown(250);
@@ -107,14 +102,12 @@ CREXTdApp = {
                   res.contractAddress = bs58.encode(Buffer.from(txres.Result.target));
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
                   chrome.tabs.sendMessage(tabID, retmsg);
-                  console.log('tx send');
                 } else {
                   $('#failButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#failed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, result:res}};
                   chrome.tabs.sendMessage(tabID, retmsg);
-                  console.log('error');
                 }
               });
           }
@@ -137,39 +130,34 @@ CREXTdApp = {
       $('#confirmedTX').slideDown(250);
   });
 
-      var Trans = await CreateTransaction({
+      await CreateTransaction({
             Amount: receivedMessage.data.amount,
             Fee: receivedMessage.data.fee,
-            Source: key.exportPublic(currentSelected),
-            PrivateKey: key.exportPrivate(currentSelected),
             Target: receivedMessage.data.target,
               SmartContract: {
                   Method: receivedMessage.data.smart.method,
                   Params: receivedMessage.data.smart.params,
-                  forgetNewState: true
-              }
+                  NewState: false
+              },
+              UserData: receivedMessage.data.UserData
         }).then(function(r) {
-          console.log(r);
           if(r.error) {
             console.error(r.message);
           } else {
               connect().TransactionFlow(r.Result, function(err, r) {
                 let res = r;
-                console.log(r);
                 if(r.status.code === 0) {
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#completed').show();
-                  let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
+                  let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:{roundNum: res.roundNum, smart_contract_result: contractResult(res), status:{code: res.status.code, message: res.status.message}}, id: receivedMessage.data.id}};
                   chrome.tabs.sendMessage(tabID, retmsg);
-                  console.log('tx send');
                 } else {
                   $('#failButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#failed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, result:res}};
                   chrome.tabs.sendMessage(tabID, retmsg);
-                  console.log('error');
                 }
               });
           }
@@ -179,30 +167,42 @@ CREXTdApp = {
     $("#connect").attr("disabled", true);
 
     chrome.storage.local.get(function(result) {
-      access = result.access;
-      access.push(receivedMessage.data.org);
+      let access = result.access;
+      access.push(receivedMessage.org);
       chrome.storage.local.set({
         'access': access
       });
     });
 
-  //	if(typeof receivedMessage.data.amount === 'undefined') {
-  if(!Object.prototype.hasOwnProperty.call(receivedMessage.data.data, "fee")) {
-  		var port = chrome.runtime.connect({name: "returnAccess"});
-  		port.postMessage({CStype: "confirm", org: receivedMessage.data.org});
+  let port;
+  if(!Object.prototype.hasOwnProperty.call(receivedMessage.data, "fee")) {
+  		port = chrome.runtime.connect({name: "returnAccess"});
+  		port.postMessage({CStype: "confirm", org: receivedMessage.org});
   		setTimeout(function() {
   			window.close();
-  		}, 250);
+  		}, 500);
   	} else {
 
-  		var port = chrome.runtime.connect({name: "returnAccess"});
-  		port.postMessage({CStype: "confirmTX", org: receivedMessage.data.org});
+  		port = chrome.runtime.connect({name: "returnAccess"});
+  		port.postMessage({CStype: "confirmTX", org: receivedMessage.org});
 
-  			dAppTX(receivedMessage.data);
+      checkContract(receivedMessage)
+      .then(
+        function(r) {
+          if(r !== true) {
+            receivedMessage.data.smart.params = r;
+          }
+          dAppTX(receivedMessage);
+      })
+      .catch(function(r) {
+        returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: r, id: receivedMessage.data.id}};
+        chrome.tabs.sendMessage(receivedMessage.id, returnmsg);
+        window.close();
+      });
   	}
   },
   cancel: function() {
-    returnmsg = {CREXTreturn: receivedMessage.data.CStype, CSID: receivedMessage.data.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.data.id}};
+    returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.id}};
   	chrome.tabs.sendMessage(tabID, returnmsg);
   	window.close();
   },
@@ -212,17 +212,17 @@ CREXTdApp = {
   block: function() {
 
     chrome.storage.local.get(function(result) {
-      blocked = result.blocked;
-      blocked.push(receivedMessage.data.org);
+      let blocked = result.blocked;
+      blocked.push(receivedMessage.org);
       chrome.storage.local.set({
         'blocked': blocked
       });
     });
 
-    returnmsg = {CREXTreturn: receivedMessage.data.CStype, CSID: receivedMessage.data.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.data.id}};
+    returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.id}};
   	chrome.tabs.sendMessage(tabID, returnmsg);
     var port = chrome.runtime.connect({name: "returnAccess"});
-    port.postMessage({CStype: "blockPermanent", org: receivedMessage.data.org});
+    port.postMessage({CStype: "blockPermanent", org: receivedMessage.org});
     setTimeout(function() {
       window.close();
     }, 250);
@@ -235,14 +235,15 @@ async function content(page) {
   $('#menu').hide();
   document.getElementById('container').innerHTML = "";
 
+  let returnValue;
+
   switch(page) {
     case "connectrequest":
-      console.log(receivedMessage);
       returnValue = await connectrequest();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
-      $("#siteAddress").html("<p>"+receivedMessage.data.org+"</p>");
+      $("#siteAddress").html("<p>"+receivedMessage.org+"</p>");
 			$('#connectButtons').slideDown(250);
-			let imgUrl = receivedMessage.data.org + "/logo.png";
+			let imgUrl = receivedMessage.org + "/logo.png";
 			imageExists(imgUrl, function(exists) {
 				if(exists) {
 					$('#logo').html("<img src=" + imgUrl + " width='70' height='70'>");
@@ -270,7 +271,6 @@ async function content(page) {
       }
     break;
     case "executetx":
-    console.log(receivedMessage);
       returnValue = await executetx();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
       document.getElementById('reject').addEventListener('click', CREXTdApp.reject);
@@ -336,15 +336,12 @@ Number.prototype.noExponents= function(){
 
 function dAppTX(msg, n=0) {
 
-  console.log(msg);
-
-  n=n;
 		tabID = msg.id;
-
     receivedMessage = msg;
 
     if(msg.CStype == "confirm") {
       content("connectrequest");
+      receivedMessage = msg.data;
     } else if (msg.CStype == "TX") {
       receivedMessage.data.fee = receivedMessage.data.fee.replace(/,/, '.');
       if(!Object.prototype.hasOwnProperty.call(msg.data, "smart")) {

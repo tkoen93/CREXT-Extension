@@ -48,7 +48,7 @@ function nodeTest() {
   );
 
   return new Promise(function(resolve, reject) {
-  const promise = fetch(
+  fetch(
     "http://"+ip+":"+port+"/thrift/service/Api",
     {
       headers: {"Content-Type":"application/x-thrift"},

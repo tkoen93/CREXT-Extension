@@ -19,7 +19,7 @@ function selectNode() {
   if(currentNet === 0) { // TestNet
     publicFile = 'http://173.249.11.161/nodetestnet.json';
     localFile = './node.json';
-  } else { // MainNet
+  } else { // CreditsNetwork
     publicFile = 'http://173.249.11.161/nodemainnet.json';
     localFile = './nodemainnet.json';
   }
@@ -28,15 +28,14 @@ function selectNode() {
 
   return new Promise(function(resolve, reject) {
 
-    let fetchResult;
     let completeRes = 0;
 
-  	const result = $.ajax({
+  	$.ajax({
   		url: publicFile,
       success: function(result) {
         for(let index in result) {
           var sendDate = (new Date()).getTime();
-          fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
+          fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
           .then(function(val) {
             var receiveDate = (new Date()).getTime();
             var responseTimeMs = receiveDate - sendDate;
@@ -53,7 +52,7 @@ function selectNode() {
                   chrome.runtime.sendMessage('update');
                   $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                   if(currentNet === 0) {
-                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                   } else {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                   }
@@ -83,7 +82,7 @@ function selectNode() {
                   chrome.runtime.sendMessage('update');
                   $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                   if(currentNet === 0) {
-                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                    $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                   } else {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                   }
@@ -103,12 +102,12 @@ function selectNode() {
         }
       },
       error: function() {
-        const result = $.ajax({
+        $.ajax({
           url: localFile,
           success: function(result) {
             for(let index in result) {
               var sendDate = (new Date()).getTime();
-              fetchResult = fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
+              fetchAsync("http://"+result[index].ip+":8081/thrift/service/Api", 1000)
               .then(function(val) {
                 var receiveDate = (new Date()).getTime();
                 var responseTimeMs = receiveDate - sendDate;
@@ -125,7 +124,7 @@ function selectNode() {
                       chrome.runtime.sendMessage('update');
                       $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                       if(currentNet === 0) {
-                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                       } else {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                       }
@@ -155,7 +154,7 @@ function selectNode() {
                       chrome.runtime.sendMessage('update');
                       $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                       if(currentNet === 0) {
-                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="MainNet">Switch to <a href="#" style="color:white;text-decoration:underline;">MainNet</a></p>');
+                        $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
                       } else {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                       }
@@ -183,7 +182,7 @@ function selectNode() {
 async function fetchAsync(url, abortTime) {
   const controller = new AbortController();
 
-  const timeout = setTimeout(
+  setTimeout(
   	() => { controller.abort(); },
   	abortTime,
   );
@@ -212,7 +211,7 @@ async function syncState(selectedNodes) {
   let len = selectedNodes.length;
   let highestRound = 0;
 
-  for(i=0;i<len;i++) {
+  for(let i=0;i<len;i++) {
 
     let ipNode = selectedNodes[i][0];
     let responseTime = selectedNodes[i][1];

@@ -1,12 +1,7 @@
 {
   "name": "crext",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "CREXT Credits Wallet Extension",
-  "main": "src/app.js",
-  "scripts": {
-    "build": "browserify src/app.js -o src/scripts.js",
-    "watch": "browserify src/app.js -o src/scripts.js"
-  },
   "keywords": [
     "CREXT",
     "Credits",

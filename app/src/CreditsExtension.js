@@ -38,6 +38,12 @@
         let identifier = genIdentifier(16);
         sendMsg(identifier, "walletDataGet", params);
         return returnPromise(identifier, "walletDataGet", 100);
+      },
+      network: function() {
+        let identifier = genIdentifier(16);
+        params = {i: 0};
+        sendMsg(identifier, "network", params);
+        return returnPromise(identifier, "network", 10);
       }
 
   }

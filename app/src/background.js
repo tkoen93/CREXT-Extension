@@ -7,6 +7,7 @@ const convert = require('./lib/convert');
 const connect = require('./lib/connect');
 const contractState = require('./lib/contractState');
 const checkContract = require('./lib/checkContract');
+const LS = require('./lib/ls');
 
 global.nodeIP;
 global.nodePORT;
@@ -284,6 +285,14 @@ window.onload = function(e) {
                       chrome.tabs.sendMessage(sender.tab.id, returnmsg);
                     }, 150);
                   });
+                  break;
+                  case "network":
+                    let store = new LS('CREXT');
+                    let currentNet = store.getState().n;
+                    returnmsg = {CREXTreturn: "network", CSID: message.CSID, data:{success: true, id: message.data.id, result: currentNet}};
+                      setTimeout(function() {
+                        chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                      }, 150);
                   break;
               }
             }

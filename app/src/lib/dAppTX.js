@@ -241,7 +241,7 @@ async function content(page) {
     case "connectrequest":
       returnValue = await connectrequest();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
-      $("#siteAddress").html("<p>"+receivedMessage.org+"</p>");
+      $("#siteAddress").text(receivedMessage.org);
 			$('#connectButtons').slideDown(250);
 			let imgUrl = receivedMessage.org + "/logo.png";
 			imageExists(imgUrl, function(exists) {

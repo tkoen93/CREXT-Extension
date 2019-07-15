@@ -341,10 +341,7 @@ let CREXT = {
 
 				$("#loader").html('<img src="../img/loader.svg">');
 				if(t !== undefined && msgInject !== undefined) { //Received inject MSG
-			//		content("inject");
-			//		setTimeout(function(){
 						dAppTX(msgInject);
-				//	}, 500);
 				} else {
 					content("index");
 				}

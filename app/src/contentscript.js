@@ -2,7 +2,7 @@
  * Only inject CreditsExtension.js when a website uses https.
  */
 
-if (location.protocol === 'https:') {
+if (location.protocol === 'https:' && location.hostname !== 'localhost') {
   chrome.runtime.sendMessage('Inject');
 }
 
@@ -11,7 +11,7 @@ window.addEventListener("message", function(event) {
   if (event.source != window)
     return;
 
-  if(location.protocol !== 'https:')
+  if(location.protocol !== 'https:' && location.hostname !== 'localhost')
     return;
 
   if(typeof event.data.CStype != 'undefined') {

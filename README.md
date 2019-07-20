@@ -14,3 +14,6 @@
 
 ## Usage of crext.zip
 - In case building the exentsion yourself isn't possible for whatever reason, you can use crext.zip.
+
+## Developer documentation (CREXT API)
+[https://crext.io/api](https://crext.io/api)

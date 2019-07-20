@@ -444,6 +444,12 @@ let CREXT = {
           .catch(r => $('#mesTokenContract').text(r));
         }
       }
+    },
+    checkMonitor: function () {
+      let currentNet = store.getState() != undefined ? store.getState().n : 1;
+      let monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet-r4_2/' : 'https://monitor.credits.com/CreditsNetwork/';
+
+      window.open(monitorUrl);
     }
 }
 
@@ -562,6 +568,7 @@ async function content(page) {
 			document.getElementById('mainPage').addEventListener('click', CREXT.resetTX);
 			document.getElementById('failMainPage').addEventListener('click', CREXT.resetTX);
       document.getElementById('addnewwallet').addEventListener('click', CREXT.addWallet);
+      document.getElementById('checkMonitor').addEventListener('click', CREXT.checkMonitor);
       if(currentNet === 1) {
         $('#selectedNet').text("CreditsNetwork");
         $('#selectedNetTop').text("CreditsNetwork");
@@ -634,6 +641,7 @@ async function content(page) {
 			document.getElementById('resetTX').addEventListener('click', CREXT.resetTokenTX);
 			document.getElementById('mainPage').addEventListener('click', CREXT.resetTokenTX);
 			document.getElementById('failMainPage').addEventListener('click', CREXT.resetTokenTX);
+      document.getElementById('checkMonitor').addEventListener('click', CREXT.checkMonitor);
     break;
   }
 

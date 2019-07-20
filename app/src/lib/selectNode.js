@@ -17,10 +17,10 @@ function selectNode() {
   let localFile;
 
   if(currentNet === 0) { // TestNet
-    publicFile = 'http://173.249.11.161/nodetestnet.json';
+    publicFile = 'http://173.249.11.161/nodetestnet.json?nocache=' + (new Date()).getTime();
     localFile = './node.json';
   } else { // CreditsNetwork
-    publicFile = 'http://173.249.11.161/nodemainnet.json';
+    publicFile = 'http://173.249.11.161/nodemainnet.json?nocache=' + (new Date()).getTime();
     localFile = './nodemainnet.json';
   }
 

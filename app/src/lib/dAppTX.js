@@ -1,3 +1,4 @@
+const extension = require('extensionizer');
 const connectrequest = require("../html/inject/connect");
 const deploytx = require("../html/inject/deploy");
 const executetx = require("../html/inject/execute");
@@ -25,7 +26,7 @@ let returnmsg;
 let CREXTdApp = {
   reject: function() {
   	returnmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, message: "Transaction rejected by user", id: receivedMessage.data.id}};
-  	chrome.tabs.sendMessage(tabID, returnmsg);
+  	extension.tabs.sendMessage(tabID, returnmsg);
   	window.close();
   },
   confirmnormal: async function() {
@@ -59,13 +60,13 @@ let CREXTdApp = {
                   $('#txLoader').hide();
                   $('#completed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
-                  chrome.tabs.sendMessage(tabID, retmsg);
+                  extension.tabs.sendMessage(tabID, retmsg);
                 } else {
                   $('#failButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#failed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, result:res}};
-                  chrome.tabs.sendMessage(tabID, retmsg);
+                  extension.tabs.sendMessage(tabID, retmsg);
                 }
               });
           }
@@ -101,13 +102,13 @@ let CREXTdApp = {
                   $('#completed').show();
                   res.contractAddress = bs58.encode(Buffer.from(txres.Result.target));
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:res, id: receivedMessage.data.id}};
-                  chrome.tabs.sendMessage(tabID, retmsg);
+                  extension.tabs.sendMessage(tabID, retmsg);
                 } else {
                   $('#failButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#failed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, result:res}};
-                  chrome.tabs.sendMessage(tabID, retmsg);
+                  extension.tabs.sendMessage(tabID, retmsg);
                 }
               });
           }
@@ -151,13 +152,13 @@ let CREXTdApp = {
                   $('#txLoader').hide();
                   $('#completed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:{roundNum: res.roundNum, smart_contract_result: contractResult(res), status:{code: res.status.code, message: res.status.message}}, id: receivedMessage.data.id}};
-                  chrome.tabs.sendMessage(tabID, retmsg);
+                  extension.tabs.sendMessage(tabID, retmsg);
                 } else {
                   $('#failButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#failed').show();
                   let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: false, result:res}};
-                  chrome.tabs.sendMessage(tabID, retmsg);
+                  extension.tabs.sendMessage(tabID, retmsg);
                 }
               });
           }
@@ -166,24 +167,24 @@ let CREXTdApp = {
   connect: function() {
     $("#connect").attr("disabled", true);
 
-    chrome.storage.local.get(function(result) {
+    extension.storage.local.get(function(result) {
       let access = result.access;
       access.push(receivedMessage.org);
-      chrome.storage.local.set({
+      extension.storage.local.set({
         'access': access
       });
     });
 
   let port;
   if(!Object.prototype.hasOwnProperty.call(receivedMessage.data, "fee")) {
-  		port = chrome.runtime.connect({name: "returnAccess"});
+  		port = extension.runtime.connect({name: "returnAccess"});
   		port.postMessage({CStype: "confirm", org: receivedMessage.org});
   		setTimeout(function() {
   			window.close();
   		}, 500);
   	} else {
 
-  		port = chrome.runtime.connect({name: "returnAccess"});
+  		port = extension.runtime.connect({name: "returnAccess"});
   		port.postMessage({CStype: "confirmTX", org: receivedMessage.org});
 
       checkContract(receivedMessage)
@@ -196,14 +197,14 @@ let CREXTdApp = {
       })
       .catch(function(r) {
         returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: r, id: receivedMessage.data.id}};
-        chrome.tabs.sendMessage(receivedMessage.id, returnmsg);
+        extension.tabs.sendMessage(receivedMessage.id, returnmsg);
         window.close();
       });
   	}
   },
   cancel: function() {
     returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.id}};
-  	chrome.tabs.sendMessage(tabID, returnmsg);
+  	extension.tabs.sendMessage(tabID, returnmsg);
   	window.close();
   },
   closewindow: function() {
@@ -211,17 +212,17 @@ let CREXTdApp = {
   },
   block: function() {
 
-    chrome.storage.local.get(function(result) {
+    extension.storage.local.get(function(result) {
       let blocked = result.blocked;
       blocked.push(receivedMessage.org);
-      chrome.storage.local.set({
+      extension.storage.local.set({
         'blocked': blocked
       });
     });
 
     returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: "Access denied", id: receivedMessage.data.id}};
-  	chrome.tabs.sendMessage(tabID, returnmsg);
-    var port = chrome.runtime.connect({name: "returnAccess"});
+  	extension.tabs.sendMessage(tabID, returnmsg);
+    var port = extension.runtime.connect({name: "returnAccess"});
     port.postMessage({CStype: "blockPermanent", org: receivedMessage.org});
     setTimeout(function() {
       window.close();
@@ -352,7 +353,7 @@ function dAppTX(msg, n=0) {
         content("deploytx");
       } else {
         returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: "CREXT does not recognize this request", id: receivedMessage.data.id}};
-				chrome.tabs.sendMessage(tabID, returnmsg);
+				extension.tabs.sendMessage(tabID, returnmsg);
       }
     }
 }
@@ -368,7 +369,7 @@ window.onbeforeunload = WindowCloseHanlder;
 function WindowCloseHanlder()
 {
 returnmsg = {CREXTreturn: receivedMessage.CStype, CSID: receivedMessage.CSID, data:{success: false, message: "Window closed by user", id: receivedMessage.data.id}};
-chrome.tabs.sendMessage(tabID, returnmsg);
+extension.tabs.sendMessage(tabID, returnmsg);
 }
 
 module.exports = dAppTX;

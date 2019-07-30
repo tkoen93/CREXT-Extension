@@ -1,3 +1,4 @@
+const extension = require('extensionizer');
 const main = require("../html/main");
 const mnemonicpass = require("../html/mnemonicpass");
 const mnemonicphrase = require("../html/mnemonicphrase");
@@ -46,7 +47,7 @@ let t = undefined;
 let modal;
 let latestPage;
 
-chrome.runtime.onConnect.addListener(function(port) {
+extension.runtime.onConnect.addListener(function(port) {
   console.assert(port.name == "sendData");
   port.onMessage.addListener(function(msg) {
 		msgInject = msg;
@@ -78,29 +79,29 @@ let CREXT = {
 			let url = new URL(url_string);
 			t = url.searchParams.get("t");
 
-			chrome.storage.local.get(function(result) {
+			extension.storage.local.get(function(result) {
 				let loginTime = result.loginTime;
 				let timeNow = new Date().getTime();
 				global.keyPublic = result.PublicKey;
 
 				if(((timeNow-loginTime > 1800000) || result.encryption == '') && global.keyPublic != '') {
-					chrome.storage.local.set({
+					extension.storage.local.set({
 						'encryption': ''
 					});
 					content("unlock");
 				} else {
-					chrome.storage.local.set({
+					extension.storage.local.set({
 						'loginTime': new Date().getTime()
 					});
 
 					ls = new SecureLS({encodingType: 'aes', encryptionSecret: result.encryption});
 
 						if(ls.getAllKeys().length === 0) {
-							chrome.storage.local.clear();
+							extension.storage.local.clear();
 							content("main");
 							selectNode();
 						}	else if(t === null) {
-							chrome.storage.local.get(function(result) {
+							extension.storage.local.get(function(result) {
 							global.keyPublic = result.PublicKey;
 					    if(result.encryption != undefined) {
 					        let pr = ls.get('initiate');
@@ -145,7 +146,7 @@ let CREXT = {
 			} else if(pass1 != pass2) {
 				$('#pass2error').text('Password don\'t match');
 			} else {
-	      chrome.storage.local.set({
+	      extension.storage.local.set({
 	    		'encryption': encryption,
 	        'loginTime': new Date().getTime(),
 					'access': new Array(),
@@ -177,7 +178,7 @@ let CREXT = {
 			} else {
 				var bseed = CW.fromMnemonic(p);
 				global.keyPublic = bs58.encode(bseed.getKeypair(0)._publicKey);
-	      chrome.storage.local.set({
+	      extension.storage.local.set({
 	    		'encryption': encryption,
 	        'loginTime': new Date().getTime(),
 					'access': new Array(),
@@ -194,7 +195,7 @@ let CREXT = {
         ls.set('tokens', tokensLS);
         bseed.custom = new Array();
 				ls.set('seed', bseed);
-				chrome.runtime.sendMessage('Login');
+				extension.runtime.sendMessage('Login');
 				content("index");
 			}
 		},
@@ -213,7 +214,7 @@ let CREXT = {
 			} else {
 				var bseed = CW.fromMnemonic(p);
 				global.keyPublic = bs58.encode(wallet.getKeypair(0)._publicKey);
-	      chrome.storage.local.set({
+	      extension.storage.local.set({
 	    		'encryption': encryption,
 	        'loginTime': new Date().getTime(),
 					'access': new Array(),
@@ -226,7 +227,7 @@ let CREXT = {
 				ls.set('initiate', 2);
         bseed.custom = new Array();
 				ls.set('seed', bseed);
-				chrome.runtime.sendMessage('Login');
+				extension.runtime.sendMessage('Login');
 				content("index");
 			}
 		},
@@ -285,7 +286,7 @@ let CREXT = {
 			if(cont === 4) {
 				ls.set('initiate', 2);
 				ls.remove('phrase');
-				chrome.runtime.sendMessage('Login');
+				extension.runtime.sendMessage('Login');
 				content("index");
 			}
 		},
@@ -334,7 +335,7 @@ let CREXT = {
 			}
 
 			if(initiate === 2) {
-				chrome.storage.local.set({
+				extension.storage.local.set({
 					'encryption': unlockPass,
 					'loginTime': new Date().getTime()
 				});
@@ -346,7 +347,7 @@ let CREXT = {
 					content("index");
 				}
 			} else if(ls.getAllKeys().length === 0) {
-				chrome.storage.local.clear();
+				extension.storage.local.clear();
 				content("main");
 				selectNode();
 			}
@@ -396,8 +397,8 @@ let CREXT = {
         $('#myModal').fadeOut(250);
     },
     lockCrextModal: function () {
-      chrome.storage.local.set({'loginTime': 0});
-      chrome.runtime.sendMessage('update');
+      extension.storage.local.set({'loginTime': 0});
+      extension.runtime.sendMessage('update');
       $('#myModal').fadeOut(250);
       $('#overlay').hide();
       $('#wrapper').removeClass('toggled');
@@ -406,8 +407,8 @@ let CREXT = {
     logoutModal: function () {
       ls.removeAll();
       localStorage.clear();
-      chrome.storage.local.clear();
-      chrome.runtime.sendMessage('update');
+      extension.storage.local.clear();
+      extension.runtime.sendMessage('update');
       document.location.reload();
     },
     tokensIndex: function () {
@@ -510,7 +511,7 @@ async function content(page) {
 
         global.keyPublic = bs58.encode(bseed.getKeypair(0)._publicKey);
 
-				chrome.storage.local.set({
+				extension.storage.local.set({
 	    		'PublicKey': global.keyPublic
 	    	});
 
@@ -557,7 +558,7 @@ async function content(page) {
       global.keyPublic = key.exportPublic(currentSelected);
 			$('#copyKey').text(global.keyPublic);
 			await walletBalance(global.keyPublic);
-      chrome.storage.local.set({
+      extension.storage.local.set({
         'PublicKey': global.keyPublic
       });
 			document.getElementById('refreshBalance').addEventListener('click', CREXT.refreshBalance);
@@ -610,7 +611,7 @@ async function content(page) {
         $('#curPhising').text(p);
       }
       document.getElementById('changePhising').addEventListener('click', CREXT.changePhising);
-      chrome.storage.local.get(['access','blocked'], function(r) {
+      extension.storage.local.get(['access','blocked'], function(r) {
         if(r.access.length === 0) {
           $('#accessList').append('<li class="list-group-item">No approved websites found</li>');
         } else {
@@ -701,16 +702,16 @@ $(document).on('click', '#openSetting', function(event){
 $(document).on('click', '#removeAccess', function(event){
   let removeURL = $(this).attr("data-content").split("|")[0];
   let removeID = $(this).attr("data-content").split("|")[1];
-  chrome.storage.local.get(['access'], function(r) {
+  extension.storage.local.get(['access'], function(r) {
     let n = arrayRemove(r.access, removeURL);
-    chrome.storage.local.set({
+    extension.storage.local.set({
       'access': n
     });
     $('#access' + removeID).remove();
     if(n.length === 0) {
       $('#accessList').append('<li class="list-group-item">No approved websites found</li>');
     }
-    chrome.runtime.sendMessage('update');
+    extension.runtime.sendMessage('update');
   });
 });
 
@@ -726,16 +727,16 @@ $(document).on('click', '#removeToken', function(event){
 $(document).on('click', '#removeBlocked', function(event){
   let removeURL = $(this).attr("data-content").split("|")[0];
   let removeID = $(this).attr("data-content").split("|")[1];
-  chrome.storage.local.get(['blocked'], function(r) {
+  extension.storage.local.get(['blocked'], function(r) {
     let n = arrayRemove(r.blocked, removeURL);
-    chrome.storage.local.set({
+    extension.storage.local.set({
       'blocked': n
     });
     $('#blocked' + removeID).remove();
     if(n.length === 0) {
       $('#blockedList').append('<li class="list-group-item">No blocked websites found</li>');
     }
-    chrome.runtime.sendMessage('update');
+    extension.runtime.sendMessage('update');
   });
 });
 

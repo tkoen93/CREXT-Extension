@@ -1,4 +1,5 @@
 const $ = require('jquery');
+const extension = require('extensionizer');
 const AbortController = require('abort-controller');
 const thrift = require('thrift');
 const API = require('../gen-nodejs/API');
@@ -46,10 +47,10 @@ function selectNode() {
               .then(function(r) {
                 if(r === undefined) {
                   global.nodeIP = undefined;
-                  chrome.storage.local.set({
+                  extension.storage.local.set({
                     'ip': ''
                   });
-                  chrome.runtime.sendMessage('update');
+                  extension.runtime.sendMessage('update');
                   $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                   if(currentNet === 0) {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
@@ -57,11 +58,11 @@ function selectNode() {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                   }
                 } else {
-                chrome.storage.local.set({
+                extension.storage.local.set({
             	 		'ip': r,
                   'port': 8081
             		});
-                chrome.runtime.sendMessage('update');
+                extension.runtime.sendMessage('update');
                 global.nodeIP = r;
                 $('.overlayNode').hide();
                 resolve(r);
@@ -76,10 +77,10 @@ function selectNode() {
               .then(function(r) {
                 if(r === undefined) {
                   global.nodeIP = undefined;
-                  chrome.storage.local.set({
+                  extension.storage.local.set({
                     'ip': ''
                   });
-                  chrome.runtime.sendMessage('update');
+                  extension.runtime.sendMessage('update');
                   $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                   if(currentNet === 0) {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
@@ -87,11 +88,11 @@ function selectNode() {
                     $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                   }
                 } else {
-                chrome.storage.local.set({
+                extension.storage.local.set({
             	 		'ip': r,
                   'port': 8081
             		});
-                chrome.runtime.sendMessage('update');
+                extension.runtime.sendMessage('update');
                 global.nodeIP = r;
                 $('.overlayNode').hide();
                 resolve(r);
@@ -118,10 +119,10 @@ function selectNode() {
                   .then(function(r) {
                     if(r === undefined) {
                       global.nodeIP = undefined;
-                      chrome.storage.local.set({
+                      extension.storage.local.set({
                         'ip': ''
                       });
-                      chrome.runtime.sendMessage('update');
+                      extension.runtime.sendMessage('update');
                       $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                       if(currentNet === 0) {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
@@ -129,11 +130,11 @@ function selectNode() {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                       }
                     } else {
-                    chrome.storage.local.set({
+                    extension.storage.local.set({
                       'ip': r,
                       'port': 8081
                     });
-                    chrome.runtime.sendMessage('update');
+                    extension.runtime.sendMessage('update');
                     global.nodeIP = r;
                     $('.overlayNode').hide();
                     resolve(r);
@@ -148,10 +149,10 @@ function selectNode() {
                   .then(function(r) {
                     if(r === undefined) {
                       global.nodeIP = undefined;
-                      chrome.storage.local.set({
+                      extension.storage.local.set({
                         'ip': ''
                       });
-                      chrome.runtime.sendMessage('update');
+                      extension.runtime.sendMessage('update');
                       $('.overlayNodeContent').html('<p style="color:white;">No active node found.</p><br />');
                       if(currentNet === 0) {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="CreditsNetwork">Switch to <a href="#" style="color:white;text-decoration:underline;">CreditsNetwork</a></p>');
@@ -159,11 +160,11 @@ function selectNode() {
                         $('.overlayNodeContent').append('<p style="color:white;" id="selectNet" data-content="TestNet">Switch to <a href="#" style="color:white;text-decoration:underline;">TestNet</a></p>');
                       }
                     } else {
-                    chrome.storage.local.set({
+                    extension.storage.local.set({
                       'ip': r,
                       'port': 8081
                     });
-                    chrome.runtime.sendMessage('update');
+                    extension.runtime.sendMessage('update');
                     global.nodeIP = r;
                     $('.overlayNode').hide();
                     resolve(r);

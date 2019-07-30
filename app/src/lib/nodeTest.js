@@ -1,4 +1,5 @@
 const AbortController = require('abort-controller');
+const extension = require('extensionizer');
 const selectNode = require('./selectNode');
 const thrift = require('thrift');
 const API = require('../gen-nodejs/API');
@@ -7,7 +8,7 @@ const convert = require("./convert");
 let ip;
 let port;
 
-chrome.storage.local.get(function(result) {
+extension.storage.local.get(function(result) {
   ip = result.ip;
   port = result.port;
 });
@@ -70,7 +71,7 @@ function nodeTest() {
           console.log("nodeTest.js selected node: " + r);
           global.nodeIP = r;
           global.nodePORT = 8081;
-          chrome.storage.local.set({
+          extension.storage.local.set({
             'ip': r,
             'port': 8081
           });
@@ -86,7 +87,7 @@ function nodeTest() {
 				console.log("nodeTest.js selected node: " + r);
 				global.nodeIP = r;
         global.nodePORT = 8081;
-        chrome.storage.local.set({
+        extension.storage.local.set({
           'ip': r,
           'port': 8081
         });

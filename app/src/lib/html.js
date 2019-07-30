@@ -449,8 +449,9 @@ let CREXT = {
     checkMonitor: function () {
       let currentNet = store.getState() != undefined ? store.getState().n : 1;
       let monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet-r4_2/' : 'https://monitor.credits.com/CreditsNetwork/';
-
-      window.open(monitorUrl);
+      extension.tabs.create({
+        url: monitorUrl
+      });
     }
 }
 

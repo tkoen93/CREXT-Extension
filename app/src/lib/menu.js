@@ -1,4 +1,8 @@
+const extension = require('extensionizer');
+
 function menu(n) {
+
+  let thisVersion = extension.runtime.getManifest().version;
 
     document.getElementById('wrapper').innerHTML = '';
 
@@ -41,7 +45,9 @@ function menu(n) {
   					</li>
   			</ul>
   			<p class="navfooter">
-  				<a href="https://www.credits.com" target="_blank">www.credits.com</a>
+  				<a href="https://www.credits.com" target="_blank">www.credits.com</a><br />
+          <a href="https://crext.io" target="_blank">www.crext.io</a><br />
+          v` + thisVersion + ` Beta
   			</p>
   	</nav><!-- /#sidebar-wrapper -->
 

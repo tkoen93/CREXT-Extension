@@ -4,6 +4,7 @@ const connect = require('./connect');
 const API = require('../gen-nodejs/API');
 const bs58 = require('bs58');
 const convert = require('./convert');
+const tippy = require('tippy.js');
 
 Number.prototype.noExponents= function(){
     var data= String(this).split(/[eE]/);
@@ -25,11 +26,11 @@ Number.prototype.noExponents= function(){
 
 function walletBalance(key) { // Function to show balance of public key.
 
-
 $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">');
     nodeTest().then(function(r) {
       connect().WalletBalanceGet(bs58.decode(key), function(err, response) {
           let fraction = convert(response.balance.fraction.buffer);
+          let fullfrac;
 
           if (fraction === 0) {
               fraction = '00';
@@ -41,11 +42,11 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
               }
             }
               fraction = "0." + fraction;
+              fullfrac = Number(fraction*1).noExponents().toString().split(".")[1];
               fraction = Number(fraction*1).noExponents().toString().split(".")[1].substring(0,2);
           }
 
           let totalBalance = response.balance.integral + "." + fraction;
-
           let integral = response.balance.integral.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
 
@@ -69,13 +70,28 @@ $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">
                 changeLabel = "<span class=\"label label-secondary pchange\"><p class=\"shadow tchange\">" + data.percent_change_24h + "%</p></span>";
               }
 
-              $('#balanceresult').html("<p class=\"shadow\" style=\"color:white;font-size:16px;\">CS</p> <p class=\"shadow light\" style=\"font-size:55px;color:white;\">" + integral + "</p><p class=\"shadow light\" style=\"color:white;font-size:18px;\">." + fraction + "</p><br /><p style=\"color:#8EE1F1;font-size:18px;\">$ " + totalValue + "</p> " + changeLabel);
+              $('#balanceresult').html("<div id=\"balancetippy\" style=\"padding:0;margin:0;display:inline-block\"><p class=\"shadow\" style=\"color:white;font-size:16px;\">CS</p> <p class=\"shadow light\" style=\"font-size:55px;color:white;\">" + integral + "</p><p class=\"shadow light\" style=\"color:white;font-size:18px;\">." + fraction + "</p></div><br /><p style=\"color:#8EE1F1;font-size:18px;\">$ " + totalValue + "</p> " + changeLabel);
+
+              $('#balancetippy').attr("data-tippy-content", "<p style=\"font-size:12px;\">" + integral + "." + fullfrac + " CS</p>");
+
+              tippy('#balancetippy', {
+                placement: 'top',
+                delay: 500,
+                interactive: true,
+                offset: '0, -15',
+                arrow: true,
+                arrowType: 'round',
+                a11y: false,
+                flip: false
+              });
+
             }
           });
 
     });
 
   });
+
 }
 
 module.exports = walletBalance;

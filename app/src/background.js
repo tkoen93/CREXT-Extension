@@ -19,35 +19,16 @@ let blocked;
 let result;
 const localStore = new LocalStore();
 
-/*chrome.runtime.onInstalled.addListener((details) => {
-  console.log(details);
-	if (details.reason === 'install') {
-    console.log("install message");
-	} else if (details.reason === 'update') {
-		const thisVersion = chrome.runtime.getManifest().version;
-    if(thisVersion !== details.previousVersion) {
-  		const statusMsg = `CREXT updated from ${details.previousVersion} to ${thisVersion}`;
-  		console.info(statusMsg);
-    }
-	}
-});*/
-
 extension.runtime.onInstalled.addListener(function (details) {
   try {
     var thisVersion = extension.runtime.getManifest().version;
     if (details.reason == "install") {
       console.info("First version installed");
-      //Send message to popup.html and notify/alert user("Welcome")
     } else if (details.reason == "update") {
       console.info("Updated version: " + thisVersion);
-      //Send message to popup.html and notify/alert user
-  //    window.open('https://google.com');
-
-      extension.tabs.query({currentWindow: true, active: true}, function (tabs) {
-        for( var i = 0; i < tabs.length; i++ ) {
-            extension.tabs.sendMessage(tabs[i].id, {name: "showPopupOnUpdated", version: thisVersion});
-        }
-        });
+      extension.tabs.create({
+        url: 'https://crext.io/v' + thisVersion + '.html'
+      });
     }
   } catch(e) {
     console.info("OnInstall Error - " + e);

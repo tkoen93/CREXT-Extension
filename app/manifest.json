@@ -10,7 +10,13 @@
   "browser_action": {
     "default_popup": "src/popup.html"
   },
-  "version": "0.9.2",
+  "applications": {
+    "gecko": {
+      "id": "info@crext.io",
+      "strict_min_version": "53.0"
+    }
+  },
+  "version": "0.9.3",
   "short_name": "CREXT",
   "content_scripts": [
       {

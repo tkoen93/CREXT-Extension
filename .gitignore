@@ -1,4 +1,5 @@
 node_modules
+dist/*
 dist/src/background.js
 dist/src/contentscript.js
 dist/src/CreditsExtension.js

@@ -45,7 +45,7 @@ body::-webkit-scrollbar{display:none !important;}
     overflow-y: auto;
     transition: all 0.5s ease;
     width: 0;
-    z-index: 5;
+    z-index: 8;
 }
 
 #sidebar-wrapper::-webkit-scrollbar {
@@ -175,7 +175,7 @@ body::-webkit-scrollbar{display:none !important;}
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.4);
-    z-index: 1;
+    z-index: 6;
 }
 
 .overlayNode {
@@ -810,7 +810,7 @@ position: absolute;
 background-color: rgba(255, 255, 255, 0.9);
 width: 397px;
 box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-z-index: 0;
+z-index: 4;
 right:0;
 top:100%;
 max-height:320px;
@@ -972,7 +972,7 @@ p.phising {
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 5; /* Sit on top */
+  z-index: 9; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */

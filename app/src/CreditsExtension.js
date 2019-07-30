@@ -44,6 +44,11 @@
         params = {i: 0};
         sendMsg(identifier, "network", params);
         return returnPromise(identifier, "network", 10);
+      },
+      deployedContracts: function(params) {
+        let identifier = genIdentifier(16);
+        sendMsg(identifier, "deployedContracts", params);
+        return returnPromise(identifier, "deployedContracts", 100);
       }
 
   }

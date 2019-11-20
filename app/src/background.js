@@ -19,7 +19,7 @@ let blocked;
 let result;
 const localStore = new LocalStore();
 
-extension.runtime.onInstalled.addListener(function (details) {
+extension.runtime.onInstalled.addListener(async function (details) {
   try {
     var thisVersion = extension.runtime.getManifest().version;
     if (details.reason == "install") {
@@ -29,6 +29,8 @@ extension.runtime.onInstalled.addListener(function (details) {
       extension.tabs.create({
         url: 'https://crext.io/v' + thisVersion + '.html'
       });
+      await selectNode(1);
+      await selectNode(0);
     }
   } catch(e) {
     console.info("OnInstall Error - " + e);

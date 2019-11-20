@@ -38,7 +38,7 @@
   "permissions": [
     "webRequest",
     "storage",
-	  "tabs",
+    "unlimitedStorage",
     "activeTab",
     "<all_urls>",
     "*://*/*"

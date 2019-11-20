@@ -46,6 +46,9 @@ gulp.task('copy', function() {
   gulp.src('app/src/nodemainnet.json')
 		.pipe(gulp.dest('dist/chrome/src'))
     .pipe(gulp.dest('dist/firefox/src'));
+  gulp.src('app/src/tokens.json')
+		.pipe(gulp.dest('dist/chrome/src'))
+    .pipe(gulp.dest('dist/firefox/src'));
   gulp.src('app/src/popup.html')
     .pipe(gulp.dest('dist/chrome/src'))
     .pipe(gulp.dest('dist/firefox/src'));

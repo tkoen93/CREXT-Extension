@@ -35,7 +35,7 @@ Number.prototype.noExponents= function(){
 function getTransactions(key, start, amount) { // Get transactions history
 
   let currentNet = store.getState() != undefined ? store.getState().n : 1;
-  let monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet-r4_2/' : 'https://monitor.credits.com/CreditsNetwork/';
+  let monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet/' : 'https://monitor.credits.com/CreditsNetwork/';
 
   keyPublic = key;
   $('#showtx').fadeOut(250);

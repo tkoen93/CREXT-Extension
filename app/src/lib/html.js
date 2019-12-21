@@ -305,11 +305,23 @@ let CREXT = {
 			tx.create();
 		},
 		sendTX: function() {
-			tx.send(0);
-			$('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">');
-			setTimeout(function(){
-				walletBalance(global.keyPublic);
-			}, 2500);
+      $('#balanceresult').html('<img src="../img/loader.svg" width="104" height="104">');
+			tx.send(0)
+      .then(function(r) {
+        let currentNet = store.getState() != undefined ? store.getState().n : 1;
+        let monitorUrl;
+        if(r == 0) {
+          monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet/' : 'https://monitor.credits.com/CreditsNetwork/';
+        } else {
+          monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet/transaction/' + r : 'https://monitor.credits.com/CreditsNetwork/transaction/' + r;
+        }
+        console.log(monitorUrl);
+        $("#checkMonitor").attr("data-monitorUrl", monitorUrl);
+        walletBalance(global.keyPublic);
+      })
+      .catch(function(r) {
+        walletBalance(global.keyPublic);
+      });
 		},
 		resetTX: function() {
 			content("index");
@@ -447,8 +459,7 @@ let CREXT = {
       }
     },
     checkMonitor: function () {
-      let currentNet = store.getState() != undefined ? store.getState().n : 1;
-      let monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet-r4_2/' : 'https://monitor.credits.com/CreditsNetwork/';
+      let monitorUrl = $('#checkMonitor').attr("data-monitorUrl");
       extension.tabs.create({
         url: monitorUrl
       });

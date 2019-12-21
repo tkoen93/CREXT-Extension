@@ -698,6 +698,113 @@ APIEXEC_PoolGet_result.prototype.write = function(output) {
   return;
 };
 
+var APIEXEC_GetDateTime_args = function(args) {
+  this.accessId = null;
+  if (args) {
+    if (args.accessId !== undefined && args.accessId !== null) {
+      this.accessId = args.accessId;
+    }
+  }
+};
+APIEXEC_GetDateTime_args.prototype = {};
+APIEXEC_GetDateTime_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+      if (ftype == Thrift.Type.I64) {
+        this.accessId = input.readI64();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+APIEXEC_GetDateTime_args.prototype.write = function(output) {
+  output.writeStructBegin('APIEXEC_GetDateTime_args');
+  if (this.accessId !== null && this.accessId !== undefined) {
+    output.writeFieldBegin('accessId', Thrift.Type.I64, 1);
+    output.writeI64(this.accessId);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var APIEXEC_GetDateTime_result = function(args) {
+  this.success = null;
+  if (args) {
+    if (args.success !== undefined && args.success !== null) {
+      this.success = new ttypes.GetDateTimeResult(args.success);
+    }
+  }
+};
+APIEXEC_GetDateTime_result.prototype = {};
+APIEXEC_GetDateTime_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 0:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.success = new ttypes.GetDateTimeResult();
+        this.success.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+APIEXEC_GetDateTime_result.prototype.write = function(output) {
+  output.writeStructBegin('APIEXEC_GetDateTime_result');
+  if (this.success !== null && this.success !== undefined) {
+    output.writeFieldBegin('success', Thrift.Type.STRUCT, 0);
+    this.success.write(output);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
 var APIEXECClient = exports.Client = function(output, pClass) {
     this.output = output;
     this.pClass = pClass;
@@ -1004,6 +1111,55 @@ APIEXECClient.prototype.recv_PoolGet = function(input,mtype,rseqid) {
   }
   return callback('PoolGet failed: unknown result');
 };
+APIEXECClient.prototype.GetDateTime = function(accessId, callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_GetDateTime(accessId);
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_GetDateTime(accessId);
+  }
+};
+
+APIEXECClient.prototype.send_GetDateTime = function(accessId) {
+  var output = new this.pClass(this.output);
+  output.writeMessageBegin('GetDateTime', Thrift.MessageType.CALL, this.seqid());
+  var params = {
+    accessId: accessId
+  };
+  var args = new APIEXEC_GetDateTime_args(params);
+  args.write(output);
+  output.writeMessageEnd();
+  return this.output.flush();
+};
+
+APIEXECClient.prototype.recv_GetDateTime = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new APIEXEC_GetDateTime_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  if (null !== result.success) {
+    return callback(null, result.success);
+  }
+  return callback('GetDateTime failed: unknown result');
+};
 var APIEXECProcessor = exports.Processor = function(handler) {
   this._handler = handler;
 }
@@ -1232,6 +1388,42 @@ APIEXECProcessor.prototype.process_PoolGet = function(seqid, input, output) {
       } else {
         result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
         output.writeMessageBegin("PoolGet", Thrift.MessageType.EXCEPTION, seqid);
+      }
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  }
+};
+APIEXECProcessor.prototype.process_GetDateTime = function(seqid, input, output) {
+  var args = new APIEXEC_GetDateTime_args();
+  args.read(input);
+  input.readMessageEnd();
+  if (this._handler.GetDateTime.length === 1) {
+    Q.fcall(this._handler.GetDateTime.bind(this._handler), args.accessId)
+      .then(function(result) {
+        var result_obj = new APIEXEC_GetDateTime_result({success: result});
+        output.writeMessageBegin("GetDateTime", Thrift.MessageType.REPLY, seqid);
+        result_obj.write(output);
+        output.writeMessageEnd();
+        output.flush();
+      }, function (err) {
+        var result;
+        result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("GetDateTime", Thrift.MessageType.EXCEPTION, seqid);
+        result.write(output);
+        output.writeMessageEnd();
+        output.flush();
+      });
+  } else {
+    this._handler.GetDateTime(args.accessId, function (err, result) {
+      var result_obj;
+      if ((err === null || typeof err === 'undefined')) {
+        result_obj = new APIEXEC_GetDateTime_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("GetDateTime", Thrift.MessageType.REPLY, seqid);
+      } else {
+        result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("GetDateTime", Thrift.MessageType.EXCEPTION, seqid);
       }
       result_obj.write(output);
       output.writeMessageEnd();

@@ -81,19 +81,19 @@ ContractExecutor_executeByteCode_args.prototype.read = function(input) {
       break;
       case 4:
       if (ftype == Thrift.Type.LIST) {
-        var _size94 = 0;
-        var _rtmp398;
+        var _size68 = 0;
+        var _rtmp372;
         this.methods = [];
-        var _etype97 = 0;
-        _rtmp398 = input.readListBegin();
-        _etype97 = _rtmp398.etype;
-        _size94 = _rtmp398.size;
-        for (var _i99 = 0; _i99 < _size94; ++_i99)
+        var _etype71 = 0;
+        _rtmp372 = input.readListBegin();
+        _etype71 = _rtmp372.etype;
+        _size68 = _rtmp372.size;
+        for (var _i73 = 0; _i73 < _size68; ++_i73)
         {
-          var elem100 = null;
-          elem100 = new ttypes.MethodHeader();
-          elem100.read(input);
-          this.methods.push(elem100);
+          var elem74 = null;
+          elem74 = new ttypes.MethodHeader();
+          elem74.read(input);
+          this.methods.push(elem74);
         }
         input.readListEnd();
       } else {
@@ -143,12 +143,12 @@ ContractExecutor_executeByteCode_args.prototype.write = function(output) {
   if (this.methods !== null && this.methods !== undefined) {
     output.writeFieldBegin('methods', Thrift.Type.LIST, 4);
     output.writeListBegin(Thrift.Type.STRUCT, this.methods.length);
-    for (var iter101 in this.methods)
+    for (var iter75 in this.methods)
     {
-      if (this.methods.hasOwnProperty(iter101))
+      if (this.methods.hasOwnProperty(iter75))
       {
-        iter101 = this.methods[iter101];
-        iter101.write(output);
+        iter75 = this.methods[iter75];
+        iter75.write(output);
       }
     }
     output.writeListEnd();
@@ -300,32 +300,32 @@ ContractExecutor_executeByteCodeMultiple_args.prototype.read = function(input) {
       break;
       case 5:
       if (ftype == Thrift.Type.LIST) {
-        var _size102 = 0;
-        var _rtmp3106;
+        var _size76 = 0;
+        var _rtmp380;
         this.params = [];
-        var _etype105 = 0;
-        _rtmp3106 = input.readListBegin();
-        _etype105 = _rtmp3106.etype;
-        _size102 = _rtmp3106.size;
-        for (var _i107 = 0; _i107 < _size102; ++_i107)
+        var _etype79 = 0;
+        _rtmp380 = input.readListBegin();
+        _etype79 = _rtmp380.etype;
+        _size76 = _rtmp380.size;
+        for (var _i81 = 0; _i81 < _size76; ++_i81)
         {
-          var elem108 = null;
-          var _size109 = 0;
-          var _rtmp3113;
-          elem108 = [];
-          var _etype112 = 0;
-          _rtmp3113 = input.readListBegin();
-          _etype112 = _rtmp3113.etype;
-          _size109 = _rtmp3113.size;
-          for (var _i114 = 0; _i114 < _size109; ++_i114)
+          var elem82 = null;
+          var _size83 = 0;
+          var _rtmp387;
+          elem82 = [];
+          var _etype86 = 0;
+          _rtmp387 = input.readListBegin();
+          _etype86 = _rtmp387.etype;
+          _size83 = _rtmp387.size;
+          for (var _i88 = 0; _i88 < _size83; ++_i88)
           {
-            var elem115 = null;
-            elem115 = new general_ttypes.Variant();
-            elem115.read(input);
-            elem108.push(elem115);
+            var elem89 = null;
+            elem89 = new general_ttypes.Variant();
+            elem89.read(input);
+            elem82.push(elem89);
           }
           input.readListEnd();
-          this.params.push(elem108);
+          this.params.push(elem82);
         }
         input.readListEnd();
       } else {
@@ -380,18 +380,18 @@ ContractExecutor_executeByteCodeMultiple_args.prototype.write = function(output)
   if (this.params !== null && this.params !== undefined) {
     output.writeFieldBegin('params', Thrift.Type.LIST, 5);
     output.writeListBegin(Thrift.Type.LIST, this.params.length);
-    for (var iter116 in this.params)
+    for (var iter90 in this.params)
     {
-      if (this.params.hasOwnProperty(iter116))
+      if (this.params.hasOwnProperty(iter90))
       {
-        iter116 = this.params[iter116];
-        output.writeListBegin(Thrift.Type.STRUCT, iter116.length);
-        for (var iter117 in iter116)
+        iter90 = this.params[iter90];
+        output.writeListBegin(Thrift.Type.STRUCT, iter90.length);
+        for (var iter91 in iter90)
         {
-          if (iter116.hasOwnProperty(iter117))
+          if (iter90.hasOwnProperty(iter91))
           {
-            iter117 = iter116[iter117];
-            iter117.write(output);
+            iter91 = iter90[iter91];
+            iter91.write(output);
           }
         }
         output.writeListEnd();
@@ -497,19 +497,19 @@ ContractExecutor_getContractMethods_args.prototype.read = function(input) {
     {
       case 1:
       if (ftype == Thrift.Type.LIST) {
-        var _size118 = 0;
-        var _rtmp3122;
+        var _size92 = 0;
+        var _rtmp396;
         this.byteCodeObjects = [];
-        var _etype121 = 0;
-        _rtmp3122 = input.readListBegin();
-        _etype121 = _rtmp3122.etype;
-        _size118 = _rtmp3122.size;
-        for (var _i123 = 0; _i123 < _size118; ++_i123)
+        var _etype95 = 0;
+        _rtmp396 = input.readListBegin();
+        _etype95 = _rtmp396.etype;
+        _size92 = _rtmp396.size;
+        for (var _i97 = 0; _i97 < _size92; ++_i97)
         {
-          var elem124 = null;
-          elem124 = new general_ttypes.ByteCodeObject();
-          elem124.read(input);
-          this.byteCodeObjects.push(elem124);
+          var elem98 = null;
+          elem98 = new general_ttypes.ByteCodeObject();
+          elem98.read(input);
+          this.byteCodeObjects.push(elem98);
         }
         input.readListEnd();
       } else {
@@ -537,12 +537,12 @@ ContractExecutor_getContractMethods_args.prototype.write = function(output) {
   if (this.byteCodeObjects !== null && this.byteCodeObjects !== undefined) {
     output.writeFieldBegin('byteCodeObjects', Thrift.Type.LIST, 1);
     output.writeListBegin(Thrift.Type.STRUCT, this.byteCodeObjects.length);
-    for (var iter125 in this.byteCodeObjects)
+    for (var iter99 in this.byteCodeObjects)
     {
-      if (this.byteCodeObjects.hasOwnProperty(iter125))
+      if (this.byteCodeObjects.hasOwnProperty(iter99))
       {
-        iter125 = this.byteCodeObjects[iter125];
-        iter125.write(output);
+        iter99 = this.byteCodeObjects[iter99];
+        iter99.write(output);
       }
     }
     output.writeListEnd();
@@ -644,19 +644,19 @@ ContractExecutor_getContractVariables_args.prototype.read = function(input) {
     {
       case 1:
       if (ftype == Thrift.Type.LIST) {
-        var _size126 = 0;
-        var _rtmp3130;
+        var _size100 = 0;
+        var _rtmp3104;
         this.byteCodeObjects = [];
-        var _etype129 = 0;
-        _rtmp3130 = input.readListBegin();
-        _etype129 = _rtmp3130.etype;
-        _size126 = _rtmp3130.size;
-        for (var _i131 = 0; _i131 < _size126; ++_i131)
+        var _etype103 = 0;
+        _rtmp3104 = input.readListBegin();
+        _etype103 = _rtmp3104.etype;
+        _size100 = _rtmp3104.size;
+        for (var _i105 = 0; _i105 < _size100; ++_i105)
         {
-          var elem132 = null;
-          elem132 = new general_ttypes.ByteCodeObject();
-          elem132.read(input);
-          this.byteCodeObjects.push(elem132);
+          var elem106 = null;
+          elem106 = new general_ttypes.ByteCodeObject();
+          elem106.read(input);
+          this.byteCodeObjects.push(elem106);
         }
         input.readListEnd();
       } else {
@@ -691,12 +691,12 @@ ContractExecutor_getContractVariables_args.prototype.write = function(output) {
   if (this.byteCodeObjects !== null && this.byteCodeObjects !== undefined) {
     output.writeFieldBegin('byteCodeObjects', Thrift.Type.LIST, 1);
     output.writeListBegin(Thrift.Type.STRUCT, this.byteCodeObjects.length);
-    for (var iter133 in this.byteCodeObjects)
+    for (var iter107 in this.byteCodeObjects)
     {
-      if (this.byteCodeObjects.hasOwnProperty(iter133))
+      if (this.byteCodeObjects.hasOwnProperty(iter107))
       {
-        iter133 = this.byteCodeObjects[iter133];
-        iter133.write(output);
+        iter107 = this.byteCodeObjects[iter107];
+        iter107.write(output);
       }
     }
     output.writeListEnd();
@@ -891,24 +891,16 @@ ContractExecutor_compileSourceCode_result.prototype.write = function(output) {
   return;
 };
 
-var ContractExecutor_getTokenBalances_args = function(args) {
-  this.byteCodeObjects = null;
-  this.contractState = null;
+var ContractExecutor_getExecutorBuildVersion_args = function(args) {
   this.version = null;
   if (args) {
-    if (args.byteCodeObjects !== undefined && args.byteCodeObjects !== null) {
-      this.byteCodeObjects = Thrift.copyList(args.byteCodeObjects, [general_ttypes.ByteCodeObject]);
-    }
-    if (args.contractState !== undefined && args.contractState !== null) {
-      this.contractState = args.contractState;
-    }
     if (args.version !== undefined && args.version !== null) {
       this.version = args.version;
     }
   }
 };
-ContractExecutor_getTokenBalances_args.prototype = {};
-ContractExecutor_getTokenBalances_args.prototype.read = function(input) {
+ContractExecutor_getExecutorBuildVersion_args.prototype = {};
+ContractExecutor_getExecutorBuildVersion_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true)
   {
@@ -922,40 +914,15 @@ ContractExecutor_getTokenBalances_args.prototype.read = function(input) {
     switch (fid)
     {
       case 1:
-      if (ftype == Thrift.Type.LIST) {
-        var _size134 = 0;
-        var _rtmp3138;
-        this.byteCodeObjects = [];
-        var _etype137 = 0;
-        _rtmp3138 = input.readListBegin();
-        _etype137 = _rtmp3138.etype;
-        _size134 = _rtmp3138.size;
-        for (var _i139 = 0; _i139 < _size134; ++_i139)
-        {
-          var elem140 = null;
-          elem140 = new general_ttypes.ByteCodeObject();
-          elem140.read(input);
-          this.byteCodeObjects.push(elem140);
-        }
-        input.readListEnd();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 2:
-      if (ftype == Thrift.Type.STRING) {
-        this.contractState = input.readBinary();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 3:
       if (ftype == Thrift.Type.I16) {
         this.version = input.readI16();
       } else {
         input.skip(ftype);
       }
       break;
+      case 0:
+        input.skip(ftype);
+        break;
       default:
         input.skip(ftype);
     }
@@ -965,29 +932,10 @@ ContractExecutor_getTokenBalances_args.prototype.read = function(input) {
   return;
 };
 
-ContractExecutor_getTokenBalances_args.prototype.write = function(output) {
-  output.writeStructBegin('ContractExecutor_getTokenBalances_args');
-  if (this.byteCodeObjects !== null && this.byteCodeObjects !== undefined) {
-    output.writeFieldBegin('byteCodeObjects', Thrift.Type.LIST, 1);
-    output.writeListBegin(Thrift.Type.STRUCT, this.byteCodeObjects.length);
-    for (var iter141 in this.byteCodeObjects)
-    {
-      if (this.byteCodeObjects.hasOwnProperty(iter141))
-      {
-        iter141 = this.byteCodeObjects[iter141];
-        iter141.write(output);
-      }
-    }
-    output.writeListEnd();
-    output.writeFieldEnd();
-  }
-  if (this.contractState !== null && this.contractState !== undefined) {
-    output.writeFieldBegin('contractState', Thrift.Type.STRING, 2);
-    output.writeBinary(this.contractState);
-    output.writeFieldEnd();
-  }
+ContractExecutor_getExecutorBuildVersion_args.prototype.write = function(output) {
+  output.writeStructBegin('ContractExecutor_getExecutorBuildVersion_args');
   if (this.version !== null && this.version !== undefined) {
-    output.writeFieldBegin('version', Thrift.Type.I16, 3);
+    output.writeFieldBegin('version', Thrift.Type.I16, 1);
     output.writeI16(this.version);
     output.writeFieldEnd();
   }
@@ -996,16 +944,16 @@ ContractExecutor_getTokenBalances_args.prototype.write = function(output) {
   return;
 };
 
-var ContractExecutor_getTokenBalances_result = function(args) {
+var ContractExecutor_getExecutorBuildVersion_result = function(args) {
   this.success = null;
   if (args) {
     if (args.success !== undefined && args.success !== null) {
-      this.success = new ttypes.GetTokenBalancesResult(args.success);
+      this.success = new ttypes.ExecutorBuildVersionResult(args.success);
     }
   }
 };
-ContractExecutor_getTokenBalances_result.prototype = {};
-ContractExecutor_getTokenBalances_result.prototype.read = function(input) {
+ContractExecutor_getExecutorBuildVersion_result.prototype = {};
+ContractExecutor_getExecutorBuildVersion_result.prototype.read = function(input) {
   input.readStructBegin();
   while (true)
   {
@@ -1020,7 +968,7 @@ ContractExecutor_getTokenBalances_result.prototype.read = function(input) {
     {
       case 0:
       if (ftype == Thrift.Type.STRUCT) {
-        this.success = new ttypes.GetTokenBalancesResult();
+        this.success = new ttypes.ExecutorBuildVersionResult();
         this.success.read(input);
       } else {
         input.skip(ftype);
@@ -1038,8 +986,8 @@ ContractExecutor_getTokenBalances_result.prototype.read = function(input) {
   return;
 };
 
-ContractExecutor_getTokenBalances_result.prototype.write = function(output) {
-  output.writeStructBegin('ContractExecutor_getTokenBalances_result');
+ContractExecutor_getExecutorBuildVersion_result.prototype.write = function(output) {
+  output.writeStructBegin('ContractExecutor_getExecutorBuildVersion_result');
   if (this.success !== null && this.success !== undefined) {
     output.writeFieldBegin('success', Thrift.Type.STRUCT, 0);
     this.success.write(output);
@@ -1319,7 +1267,7 @@ ContractExecutorClient.prototype.recv_compileSourceCode = function(input,mtype,r
   }
   return callback('compileSourceCode failed: unknown result');
 };
-ContractExecutorClient.prototype.getTokenBalances = function(byteCodeObjects, contractState, version, callback) {
+ContractExecutorClient.prototype.getExecutorBuildVersion = function(version, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -1330,29 +1278,27 @@ ContractExecutorClient.prototype.getTokenBalances = function(byteCodeObjects, co
         _defer.resolve(result);
       }
     };
-    this.send_getTokenBalances(byteCodeObjects, contractState, version);
+    this.send_getExecutorBuildVersion(version);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_getTokenBalances(byteCodeObjects, contractState, version);
+    this.send_getExecutorBuildVersion(version);
   }
 };
 
-ContractExecutorClient.prototype.send_getTokenBalances = function(byteCodeObjects, contractState, version) {
+ContractExecutorClient.prototype.send_getExecutorBuildVersion = function(version) {
   var output = new this.pClass(this.output);
-  output.writeMessageBegin('getTokenBalances', Thrift.MessageType.CALL, this.seqid());
+  output.writeMessageBegin('getExecutorBuildVersion', Thrift.MessageType.CALL, this.seqid());
   var params = {
-    byteCodeObjects: byteCodeObjects,
-    contractState: contractState,
     version: version
   };
-  var args = new ContractExecutor_getTokenBalances_args(params);
+  var args = new ContractExecutor_getExecutorBuildVersion_args(params);
   args.write(output);
   output.writeMessageEnd();
   return this.output.flush();
 };
 
-ContractExecutorClient.prototype.recv_getTokenBalances = function(input,mtype,rseqid) {
+ContractExecutorClient.prototype.recv_getExecutorBuildVersion = function(input,mtype,rseqid) {
   var callback = this._reqs[rseqid] || function() {};
   delete this._reqs[rseqid];
   if (mtype == Thrift.MessageType.EXCEPTION) {
@@ -1361,14 +1307,14 @@ ContractExecutorClient.prototype.recv_getTokenBalances = function(input,mtype,rs
     input.readMessageEnd();
     return callback(x);
   }
-  var result = new ContractExecutor_getTokenBalances_result();
+  var result = new ContractExecutor_getExecutorBuildVersion_result();
   result.read(input);
   input.readMessageEnd();
 
   if (null !== result.success) {
     return callback(null, result.success);
   }
-  return callback('getTokenBalances failed: unknown result');
+  return callback('getExecutorBuildVersion failed: unknown result');
 };
 var ContractExecutorProcessor = exports.Processor = function(handler) {
   this._handler = handler;
@@ -1569,35 +1515,35 @@ ContractExecutorProcessor.prototype.process_compileSourceCode = function(seqid, 
     });
   }
 };
-ContractExecutorProcessor.prototype.process_getTokenBalances = function(seqid, input, output) {
-  var args = new ContractExecutor_getTokenBalances_args();
+ContractExecutorProcessor.prototype.process_getExecutorBuildVersion = function(seqid, input, output) {
+  var args = new ContractExecutor_getExecutorBuildVersion_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.getTokenBalances.length === 3) {
-    Q.fcall(this._handler.getTokenBalances.bind(this._handler), args.byteCodeObjects, args.contractState, args.version)
+  if (this._handler.getExecutorBuildVersion.length === 1) {
+    Q.fcall(this._handler.getExecutorBuildVersion.bind(this._handler), args.version)
       .then(function(result) {
-        var result_obj = new ContractExecutor_getTokenBalances_result({success: result});
-        output.writeMessageBegin("getTokenBalances", Thrift.MessageType.REPLY, seqid);
+        var result_obj = new ContractExecutor_getExecutorBuildVersion_result({success: result});
+        output.writeMessageBegin("getExecutorBuildVersion", Thrift.MessageType.REPLY, seqid);
         result_obj.write(output);
         output.writeMessageEnd();
         output.flush();
       }, function (err) {
         var result;
         result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("getTokenBalances", Thrift.MessageType.EXCEPTION, seqid);
+        output.writeMessageBegin("getExecutorBuildVersion", Thrift.MessageType.EXCEPTION, seqid);
         result.write(output);
         output.writeMessageEnd();
         output.flush();
       });
   } else {
-    this._handler.getTokenBalances(args.byteCodeObjects, args.contractState, args.version, function (err, result) {
+    this._handler.getExecutorBuildVersion(args.version, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
-        result_obj = new ContractExecutor_getTokenBalances_result((err !== null || typeof err === 'undefined') ? err : {success: result});
-        output.writeMessageBegin("getTokenBalances", Thrift.MessageType.REPLY, seqid);
+        result_obj = new ContractExecutor_getExecutorBuildVersion_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("getExecutorBuildVersion", Thrift.MessageType.REPLY, seqid);
       } else {
         result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("getTokenBalances", Thrift.MessageType.EXCEPTION, seqid);
+        output.writeMessageBegin("getExecutorBuildVersion", Thrift.MessageType.EXCEPTION, seqid);
       }
       result_obj.write(output);
       output.writeMessageEnd();

@@ -2726,6 +2726,7 @@ var TransactionFlowResult = module.exports.TransactionFlowResult = function(args
   this.status = null;
   this.smart_contract_result = null;
   this.roundNum = null;
+  this.id = null;
   if (args) {
     if (args.status !== undefined && args.status !== null) {
       this.status = new general_ttypes.APIResponse(args.status);
@@ -2735,6 +2736,9 @@ var TransactionFlowResult = module.exports.TransactionFlowResult = function(args
     }
     if (args.roundNum !== undefined && args.roundNum !== null) {
       this.roundNum = args.roundNum;
+    }
+    if (args.id !== undefined && args.id !== null) {
+      this.id = new ttypes.TransactionId(args.id);
     }
   }
 };
@@ -2775,6 +2779,14 @@ TransactionFlowResult.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 4:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.id = new ttypes.TransactionId();
+        this.id.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -2799,6 +2811,11 @@ TransactionFlowResult.prototype.write = function(output) {
   if (this.roundNum !== null && this.roundNum !== undefined) {
     output.writeFieldBegin('roundNum', Thrift.Type.I32, 3);
     output.writeI32(this.roundNum);
+    output.writeFieldEnd();
+  }
+  if (this.id !== null && this.id !== undefined) {
+    output.writeFieldBegin('id', Thrift.Type.STRUCT, 4);
+    this.id.write(output);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -4372,6 +4389,7 @@ var TokenTransaction = module.exports.TokenTransaction = function(args) {
   this.initiator = null;
   this.method = null;
   this.params = null;
+  this.state = null;
   if (args) {
     if (args.token !== undefined && args.token !== null) {
       this.token = args.token;
@@ -4390,6 +4408,9 @@ var TokenTransaction = module.exports.TokenTransaction = function(args) {
     }
     if (args.params !== undefined && args.params !== null) {
       this.params = Thrift.copyList(args.params, [general_ttypes.Variant]);
+    }
+    if (args.state !== undefined && args.state !== null) {
+      this.state = args.state;
     }
   }
 };
@@ -4464,6 +4485,13 @@ TokenTransaction.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 7:
+      if (ftype == Thrift.Type.I32) {
+        this.state = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -4512,6 +4540,11 @@ TokenTransaction.prototype.write = function(output) {
       }
     }
     output.writeListEnd();
+    output.writeFieldEnd();
+  }
+  if (this.state !== null && this.state !== undefined) {
+    output.writeFieldBegin('state', Thrift.Type.I32, 7);
+    output.writeI32(this.state);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -4814,6 +4847,7 @@ var TokenTransfer = module.exports.TokenTransfer = function(args) {
   this.initiator = null;
   this.transaction = null;
   this.time = null;
+  this.state = null;
   if (args) {
     if (args.token !== undefined && args.token !== null) {
       this.token = args.token;
@@ -4838,6 +4872,9 @@ var TokenTransfer = module.exports.TokenTransfer = function(args) {
     }
     if (args.time !== undefined && args.time !== null) {
       this.time = args.time;
+    }
+    if (args.state !== undefined && args.state !== null) {
+      this.state = args.state;
     }
   }
 };
@@ -4912,6 +4949,13 @@ TokenTransfer.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 9:
+      if (ftype == Thrift.Type.I32) {
+        this.state = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -4961,6 +5005,11 @@ TokenTransfer.prototype.write = function(output) {
   if (this.time !== null && this.time !== undefined) {
     output.writeFieldBegin('time', Thrift.Type.I64, 8);
     output.writeI64(this.time);
+    output.writeFieldEnd();
+  }
+  if (this.state !== null && this.state !== undefined) {
+    output.writeFieldBegin('state', Thrift.Type.I32, 9);
+    output.writeI32(this.state);
     output.writeFieldEnd();
   }
   output.writeFieldStop();

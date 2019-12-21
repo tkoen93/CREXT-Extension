@@ -1683,9 +1683,17 @@ API_SmartContractGet_result.prototype.write = function(output) {
 
 var API_SmartContractsListGet_args = function(args) {
   this.deployer = null;
+  this.offset = null;
+  this.limit = null;
   if (args) {
     if (args.deployer !== undefined && args.deployer !== null) {
       this.deployer = args.deployer;
+    }
+    if (args.offset !== undefined && args.offset !== null) {
+      this.offset = args.offset;
+    }
+    if (args.limit !== undefined && args.limit !== null) {
+      this.limit = args.limit;
     }
   }
 };
@@ -1710,9 +1718,20 @@ API_SmartContractsListGet_args.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
-      case 0:
+      case 2:
+      if (ftype == Thrift.Type.I64) {
+        this.offset = input.readI64();
+      } else {
         input.skip(ftype);
-        break;
+      }
+      break;
+      case 3:
+      if (ftype == Thrift.Type.I64) {
+        this.limit = input.readI64();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -1727,6 +1746,16 @@ API_SmartContractsListGet_args.prototype.write = function(output) {
   if (this.deployer !== null && this.deployer !== undefined) {
     output.writeFieldBegin('deployer', Thrift.Type.STRING, 1);
     output.writeBinary(this.deployer);
+    output.writeFieldEnd();
+  }
+  if (this.offset !== null && this.offset !== undefined) {
+    output.writeFieldBegin('offset', Thrift.Type.I64, 2);
+    output.writeI64(this.offset);
+    output.writeFieldEnd();
+  }
+  if (this.limit !== null && this.limit !== undefined) {
+    output.writeFieldBegin('limit', Thrift.Type.I64, 3);
+    output.writeI64(this.limit);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -5244,7 +5273,7 @@ APIClient.prototype.recv_SmartContractGet = function(input,mtype,rseqid) {
   }
   return callback('SmartContractGet failed: unknown result');
 };
-APIClient.prototype.SmartContractsListGet = function(deployer, callback) {
+APIClient.prototype.SmartContractsListGet = function(deployer, offset, limit, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -5255,19 +5284,21 @@ APIClient.prototype.SmartContractsListGet = function(deployer, callback) {
         _defer.resolve(result);
       }
     };
-    this.send_SmartContractsListGet(deployer);
+    this.send_SmartContractsListGet(deployer, offset, limit);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_SmartContractsListGet(deployer);
+    this.send_SmartContractsListGet(deployer, offset, limit);
   }
 };
 
-APIClient.prototype.send_SmartContractsListGet = function(deployer) {
+APIClient.prototype.send_SmartContractsListGet = function(deployer, offset, limit) {
   var output = new this.pClass(this.output);
   output.writeMessageBegin('SmartContractsListGet', Thrift.MessageType.CALL, this.seqid());
   var params = {
-    deployer: deployer
+    deployer: deployer,
+    offset: offset,
+    limit: limit
   };
   var args = new API_SmartContractsListGet_args(params);
   args.write(output);
@@ -6954,8 +6985,8 @@ APIProcessor.prototype.process_SmartContractsListGet = function(seqid, input, ou
   var args = new API_SmartContractsListGet_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.SmartContractsListGet.length === 1) {
-    Q.fcall(this._handler.SmartContractsListGet.bind(this._handler), args.deployer)
+  if (this._handler.SmartContractsListGet.length === 3) {
+    Q.fcall(this._handler.SmartContractsListGet.bind(this._handler), args.deployer, args.offset, args.limit)
       .then(function(result) {
         var result_obj = new API_SmartContractsListGet_result({success: result});
         output.writeMessageBegin("SmartContractsListGet", Thrift.MessageType.REPLY, seqid);
@@ -6971,7 +7002,7 @@ APIProcessor.prototype.process_SmartContractsListGet = function(seqid, input, ou
         output.flush();
       });
   } else {
-    this._handler.SmartContractsListGet(args.deployer, function (err, result) {
+    this._handler.SmartContractsListGet(args.deployer, args.offset, args.limit, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new API_SmartContractsListGet_result((err !== null || typeof err === 'undefined') ? err : {success: result});

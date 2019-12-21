@@ -324,3 +324,70 @@ PoolGetResult.prototype.write = function(output) {
   return;
 };
 
+var GetDateTimeResult = module.exports.GetDateTimeResult = function(args) {
+  this.status = null;
+  this.timestamp = null;
+  if (args) {
+    if (args.status !== undefined && args.status !== null) {
+      this.status = new general_ttypes.APIResponse(args.status);
+    }
+    if (args.timestamp !== undefined && args.timestamp !== null) {
+      this.timestamp = args.timestamp;
+    }
+  }
+};
+GetDateTimeResult.prototype = {};
+GetDateTimeResult.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.status = new general_ttypes.APIResponse();
+        this.status.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 2:
+      if (ftype == Thrift.Type.I64) {
+        this.timestamp = input.readI64();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+GetDateTimeResult.prototype.write = function(output) {
+  output.writeStructBegin('GetDateTimeResult');
+  if (this.status !== null && this.status !== undefined) {
+    output.writeFieldBegin('status', Thrift.Type.STRUCT, 1);
+    this.status.write(output);
+    output.writeFieldEnd();
+  }
+  if (this.timestamp !== null && this.timestamp !== undefined) {
+    output.writeFieldBegin('timestamp', Thrift.Type.I64, 2);
+    output.writeI64(this.timestamp);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+

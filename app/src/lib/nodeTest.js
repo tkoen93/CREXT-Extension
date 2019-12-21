@@ -45,7 +45,7 @@ function nodeTest() {
 
   const timeout = setTimeout(
     () => { controller.abort(); },
-    500,
+    1000,
   );
 
   return new Promise(function(resolve, reject) {

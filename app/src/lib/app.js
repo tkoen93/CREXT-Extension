@@ -315,7 +315,6 @@ let CREXT = {
         } else {
           monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet/transaction/' + r : 'https://monitor.credits.com/CreditsNetwork/transaction/' + r;
         }
-        console.log(monitorUrl);
         $("#checkMonitor").attr("data-monitorUrl", monitorUrl);
         walletBalance(global.keyPublic);
       })
@@ -330,7 +329,20 @@ let CREXT = {
 			tokentx.create();
 		},
 		sendTokenTX: function() {
-			tokentx.send(0);
+			tokentx.send(0)
+      .then(function(r) {
+        let currentNet = store.getState() != undefined ? store.getState().n : 1;
+        let monitorUrl;
+        if(r == 0) {
+          monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet/' : 'https://monitor.credits.com/CreditsNetwork/';
+        } else {
+          monitorUrl = currentNet == 0 ? 'https://monitor.credits.com/testnet/transaction/' + r : 'https://monitor.credits.com/CreditsNetwork/transaction/' + r;
+        }
+        $("#checkMonitor").attr("data-monitorUrl", monitorUrl);
+      })
+      .catch(function(r) {
+        console.error('failed transaction ' + r);
+      });
 		},
 		resetTokenTX: function() {
 			content("tokensIndex");
@@ -616,6 +628,12 @@ async function content(page) {
       $('#selectedNetTop').show();
       returnValue = await settings();
       document.getElementById('container').insertAdjacentHTML('beforeend', returnValue);
+      d = store.getState().d;
+      if(d === undefined || d === 0) { //dappmode off
+        $('#dappmode').prop("checked", false);
+      } else {
+        $('#dappmode').prop("checked", true);
+      }
       p = store.getState().p;
       if(p === undefined) {
         $('#curPhising').text("No anti-phising code set");
@@ -699,6 +717,14 @@ $(document).on('click', '#dropdownnet', function(event){
           $('ul.dropdownSelectNet').slideDown(500);
         }
     });
+
+$(document).on('click', '#dappmode', function(event) {
+ if($(this).is(":checked")) {
+   store.putState({d: 1});
+ } else {
+   store.putState({d: 0});
+ }
+});
 
 $(document).on('click', '#openSetting', function(event){
   let set = $(this).attr("data-content");

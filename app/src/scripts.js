@@ -2,7 +2,7 @@ const $ = require('jquery');
 const extension = require('extensionizer');
 const selectNode = require('./lib/selectNode');
 const nodeTest = require('./lib/nodeTest');
-const CREXT = require('./lib/html').CREXT;
+const CREXT = require('./lib/app').CREXT;
 const bs58 = require('bs58');
 const CW = require('./lib/CW');
 

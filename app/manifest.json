@@ -16,7 +16,7 @@
       "strict_min_version": "53.0"
     }
   },
-  "version": "0.9.3",
+  "version": "0.9.4",
   "short_name": "CREXT",
   "content_scripts": [
       {

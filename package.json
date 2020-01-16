@@ -1,6 +1,6 @@
 {
   "name": "crext",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "CREXT Credits Wallet Extension",
   "keywords": [
     "CREXT",
@@ -20,6 +20,8 @@
     "extensionizer": "^1.0.1",
     "jquery": "^3.4.0",
     "js-sha512": "^0.8.0",
+    "level-js": "^4.0.1",
+    "levelup": "^4.2.0",
     "lodash": "^4.17.14",
     "secure-ls": "^1.2.5",
     "thrift": "^0.12.0",

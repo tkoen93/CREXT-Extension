@@ -5,10 +5,13 @@ const connect = require('./connect');
 const nodeTest = require('./nodeTest');
 const CreateTransaction = require('./signature');
 const bs58 = require('bs58');
+const conv = require('./convert');
 
 const LS = require('./ls');
 
 const store = new LS('CREXT');
+
+
 
 let currentSelected;
 let maximumfee;
@@ -129,6 +132,7 @@ tippy('.txerrortippy', {
       $("#confirmButtons").slideDown(250);
   });
   }
+
 }
 
 async function send(n = 0) {
@@ -143,34 +147,44 @@ async function send(n = 0) {
   let to = $('#tokey').val();
   let amount = $('#tosend').val();
 
-
-  CreateTransaction({
-    Amount: amount,
-    Fee: maximumfee,
-    Target: to
-  }).then(function(r) {
-      if(r.Message != undefined) {
-        console.error(r.Message);
-        $('#failButton').slideDown(250);
-        $('#txLoader').hide();
-        $('#failed').show();
-        $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.Message + "</div></div>");
-      } else {
-        nodeTest().then(function(nr) {
-          connect().TransactionFlow(r.Result, function(err, re) {
-            if(re.status.code === 0) {
-              $('#completeButtons').slideDown(250);
-              $('#txLoader').hide();
-              $('#completed').show();
-            } else {
-              $('#failButton').slideDown(250);
-              $('#txLoader').hide();
-              $('#failed').show();
-              $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.status.message + "</div></div>");
-            }
+  return new Promise(function(resolve, reject) {
+    CreateTransaction({
+      Amount: amount,
+      Fee: maximumfee,
+      Target: to
+    }).then(function(r) {
+        if(r.Message != undefined) {
+          console.error(r.Message);
+          $('#failButton').slideDown(250);
+          $('#txLoader').hide();
+          $('#failed').show();
+          $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.Message + "</div></div>");
+        } else {
+          nodeTest().then(function(nr) {
+            console.log(r.Result);
+            connect().TransactionFlow(r.Result, function(err, re) {
+              console.log(re);
+              if(re.status.code === 0) {
+                $('#completeButtons').slideDown(250);
+                $('#txLoader').hide();
+                $('#completed').show();
+                try {
+                  let txID = conv(re.id.poolSeq.buffer) + "." + (re.id.index + 1);
+                  resolve(txID);
+                } catch (e) {
+                  resolve(0);
+                }
+              } else {
+                $('#failButton').slideDown(250);
+                $('#txLoader').hide();
+                $('#failed').show();
+                $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + re.status.message + "</div></div>");
+                reject(0);
+              }
+            });
           });
-        });
-      }
+        }
+      });
     });
 }
 

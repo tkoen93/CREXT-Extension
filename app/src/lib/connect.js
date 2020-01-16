@@ -1,10 +1,11 @@
 const thrift = require('thrift');
+const extension = require('extensionizer');
 const API = require('../gen-nodejs/API');
 
 let ip;
 let port;
 
-chrome.storage.local.get(function(result) {
+extension.storage.local.get(function(result) {
   ip = result.ip;
   port = result.port;
 });

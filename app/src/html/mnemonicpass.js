@@ -1,7 +1,7 @@
 function html() {
   let html = `<div id="ext" style="display:none">
   <div class="logo" id="logoSmall"><img src='../img/crext.png' /></div>
-  <div class="panel panel-default rounded80 txhispanel" align="center" style="margin-top:-14px;margin-left:5px;">
+  <div class="panel panel-default rounded80 txhispanel" align="center" style="margin-top:-14px;margin-left:5px;;overflow:hidden">
     <div class="panel-body">
       <div class="form-group" style="height:75px;">
         <p class="header">Create password</p>

@@ -1,11 +1,12 @@
 const SecureLS = require('secure-ls');
+const extension = require('extensionizer');
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
 const CW = require('./CW');
 
 let ls;
 
-chrome.storage.local.get(function(result) {
+extension.storage.local.get(function(result) {
   	ls = new SecureLS({encodingType: 'aes', encryptionSecret: result.encryption});
 });
 

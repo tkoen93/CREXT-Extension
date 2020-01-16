@@ -27,7 +27,9 @@ async function contractState(params) {
           console.error(r.message);
         } else {
           connect().TransactionFlow(r.Result, function(err, r) {
-            if(r.status.code === 0 && r.smart_contract_result.v_string !== "Cannot find a method by name and parameters specified") {
+            console.log(r);
+          //  if(r.status.code === 0 && r.smart_contract_result.v_string !== "Cannot find a method by name and parameters specified") {
+          if(r.status.code === 0) {
               resolve(contractResult(r));
             } else {
               reject('failed');

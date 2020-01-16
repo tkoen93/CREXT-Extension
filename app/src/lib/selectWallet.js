@@ -1,4 +1,5 @@
 const $ = require('jquery');
+const extension = require('extensionizer');
 const LS = require('./ls');
 const nodeTest = require('./nodeTest');
 const connect = require('./connect');
@@ -78,7 +79,7 @@ async function addWallet(n) {
         }
       }
         fraction = "0." + fraction;
-        fraction = Number(fraction*1).noExponents().toString().split(".")[1].substring(0,6);
+        fraction = Number(fraction*1).noExponents().toString().split(".")[1];
     }
 
     let integral = response.balance.integral.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -96,13 +97,13 @@ $(document).on('click', '#selectWallet', function(event){
 		let newSelectedKey = $(this).attr("data-content");
     let id = $(this).attr("data-id");
 
-    chrome.storage.local.set({
+    extension.storage.local.set({
       'PublicKey': newSelectedKey
     });
 
     global.keyPublic = newSelectedKey;
 
-    chrome.runtime.sendMessage('update');
+    extension.runtime.sendMessage('update');
 
     store.putState({s: id});
 

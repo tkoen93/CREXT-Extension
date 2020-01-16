@@ -11,8 +11,8 @@ function html() {
             <div style="float:left;margin-left:15px;" class="logoCustom" id="logo">
               <p>No logo<br>available</p>
             </div>
-            <div style="float:left;" id="siteAddress" class="siteAddress">
-              <p>https://credits.com</p>
+            <div style="float:left;" class="siteAddress">
+              <p id="siteAddress"></p>
             </div>
           </div>
           <div class="row">

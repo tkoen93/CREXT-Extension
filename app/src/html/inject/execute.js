@@ -1,6 +1,7 @@
 function html() {
   let html = `<div id="ext" style="display:none">
       <!-- confirmTX -->
+      <span id="selectedNetTopInject" style="position:absolute;top:192px;left:192px;" class="label label-primary"></span>
       <div id="confirmTX">
         <div class="logoBigDapp" id="logoBigDapp" align="center"><img src="../img/crextl.png" /></div>
           <div class="panel panel-default rounded80 txdapp" align="center">

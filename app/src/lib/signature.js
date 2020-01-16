@@ -286,7 +286,8 @@ async function CreateTransaction(Obj) {
                 UserField = concatTypedArrays(UserField, new Uint8Array([11, 0, 3, 0, 0, 0, 0, 8, 0, 4, 0, 0, 0, 0, 0]));
             }
 
-            UserField = concatTypedArrays(UserField, new Uint8Array(1));
+            //UserField = concatTypedArrays(UserField, new Uint8Array(1));
+            UserField = concatTypedArrays(UserField, new Uint8Array([6, 0, 6, 0, 1, 0]));
             PerStr = concatTypedArrays(PerStr, NumbToByte(UserField.length, 4));
             PerStr = Buffer.from(concatTypedArrays(PerStr, UserField));
         }
@@ -306,7 +307,7 @@ async function CreateTransaction(Obj) {
             Hex += ArHex[Math.floor(PerStr[j] / 16)];
             Hex += ArHex[Math.floor(PerStr[j] % 16)];
         }
-    //    console.log(Hex);
+        console.log(Hex);
 
         Trans.signature = Buffer.from(nacl.sign.detached(PerStr, Private));
   //      console.log(Trans);

@@ -997,11 +997,11 @@ API_GetLastHash_result.prototype.write = function(output) {
 };
 
 var API_PoolListGetStable_args = function(args) {
-  this.hash = null;
+  this.sequence = null;
   this.limit = null;
   if (args) {
-    if (args.hash !== undefined && args.hash !== null) {
-      this.hash = args.hash;
+    if (args.sequence !== undefined && args.sequence !== null) {
+      this.sequence = args.sequence;
     }
     if (args.limit !== undefined && args.limit !== null) {
       this.limit = args.limit;
@@ -1023,8 +1023,8 @@ API_PoolListGetStable_args.prototype.read = function(input) {
     switch (fid)
     {
       case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.hash = input.readBinary();
+      if (ftype == Thrift.Type.I64) {
+        this.sequence = input.readI64();
       } else {
         input.skip(ftype);
       }
@@ -1047,9 +1047,9 @@ API_PoolListGetStable_args.prototype.read = function(input) {
 
 API_PoolListGetStable_args.prototype.write = function(output) {
   output.writeStructBegin('API_PoolListGetStable_args');
-  if (this.hash !== null && this.hash !== undefined) {
-    output.writeFieldBegin('hash', Thrift.Type.STRING, 1);
-    output.writeBinary(this.hash);
+  if (this.sequence !== null && this.sequence !== undefined) {
+    output.writeFieldBegin('sequence', Thrift.Type.I64, 1);
+    output.writeI64(this.sequence);
     output.writeFieldEnd();
   }
   if (this.limit !== null && this.limit !== undefined) {
@@ -1237,11 +1237,11 @@ API_PoolListGet_result.prototype.write = function(output) {
 };
 
 var API_PoolInfoGet_args = function(args) {
-  this.hash = null;
+  this.sequence = null;
   this.index = null;
   if (args) {
-    if (args.hash !== undefined && args.hash !== null) {
-      this.hash = args.hash;
+    if (args.sequence !== undefined && args.sequence !== null) {
+      this.sequence = args.sequence;
     }
     if (args.index !== undefined && args.index !== null) {
       this.index = args.index;
@@ -1263,8 +1263,8 @@ API_PoolInfoGet_args.prototype.read = function(input) {
     switch (fid)
     {
       case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.hash = input.readBinary();
+      if (ftype == Thrift.Type.I64) {
+        this.sequence = input.readI64();
       } else {
         input.skip(ftype);
       }
@@ -1287,9 +1287,9 @@ API_PoolInfoGet_args.prototype.read = function(input) {
 
 API_PoolInfoGet_args.prototype.write = function(output) {
   output.writeStructBegin('API_PoolInfoGet_args');
-  if (this.hash !== null && this.hash !== undefined) {
-    output.writeFieldBegin('hash', Thrift.Type.STRING, 1);
-    output.writeBinary(this.hash);
+  if (this.sequence !== null && this.sequence !== undefined) {
+    output.writeFieldBegin('sequence', Thrift.Type.I64, 1);
+    output.writeI64(this.sequence);
     output.writeFieldEnd();
   }
   if (this.index !== null && this.index !== undefined) {
@@ -1357,12 +1357,12 @@ API_PoolInfoGet_result.prototype.write = function(output) {
 };
 
 var API_PoolTransactionsGet_args = function(args) {
-  this.hash = null;
+  this.sequence = null;
   this.offset = null;
   this.limit = null;
   if (args) {
-    if (args.hash !== undefined && args.hash !== null) {
-      this.hash = args.hash;
+    if (args.sequence !== undefined && args.sequence !== null) {
+      this.sequence = args.sequence;
     }
     if (args.offset !== undefined && args.offset !== null) {
       this.offset = args.offset;
@@ -1387,8 +1387,8 @@ API_PoolTransactionsGet_args.prototype.read = function(input) {
     switch (fid)
     {
       case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.hash = input.readBinary();
+      if (ftype == Thrift.Type.I64) {
+        this.sequence = input.readI64();
       } else {
         input.skip(ftype);
       }
@@ -1418,9 +1418,9 @@ API_PoolTransactionsGet_args.prototype.read = function(input) {
 
 API_PoolTransactionsGet_args.prototype.write = function(output) {
   output.writeStructBegin('API_PoolTransactionsGet_args');
-  if (this.hash !== null && this.hash !== undefined) {
-    output.writeFieldBegin('hash', Thrift.Type.STRING, 1);
-    output.writeBinary(this.hash);
+  if (this.sequence !== null && this.sequence !== undefined) {
+    output.writeFieldBegin('sequence', Thrift.Type.I64, 1);
+    output.writeI64(this.sequence);
     output.writeFieldEnd();
   }
   if (this.offset !== null && this.offset !== undefined) {
@@ -1683,9 +1683,17 @@ API_SmartContractGet_result.prototype.write = function(output) {
 
 var API_SmartContractsListGet_args = function(args) {
   this.deployer = null;
+  this.offset = null;
+  this.limit = null;
   if (args) {
     if (args.deployer !== undefined && args.deployer !== null) {
       this.deployer = args.deployer;
+    }
+    if (args.offset !== undefined && args.offset !== null) {
+      this.offset = args.offset;
+    }
+    if (args.limit !== undefined && args.limit !== null) {
+      this.limit = args.limit;
     }
   }
 };
@@ -1710,9 +1718,20 @@ API_SmartContractsListGet_args.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
-      case 0:
+      case 2:
+      if (ftype == Thrift.Type.I64) {
+        this.offset = input.readI64();
+      } else {
         input.skip(ftype);
-        break;
+      }
+      break;
+      case 3:
+      if (ftype == Thrift.Type.I64) {
+        this.limit = input.readI64();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -1727,6 +1746,16 @@ API_SmartContractsListGet_args.prototype.write = function(output) {
   if (this.deployer !== null && this.deployer !== undefined) {
     output.writeFieldBegin('deployer', Thrift.Type.STRING, 1);
     output.writeBinary(this.deployer);
+    output.writeFieldEnd();
+  }
+  if (this.offset !== null && this.offset !== undefined) {
+    output.writeFieldBegin('offset', Thrift.Type.I64, 2);
+    output.writeI64(this.offset);
+    output.writeFieldEnd();
+  }
+  if (this.limit !== null && this.limit !== undefined) {
+    output.writeFieldBegin('limit', Thrift.Type.I64, 3);
+    output.writeI64(this.limit);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -2263,18 +2292,18 @@ API_TransactionsStateGet_args.prototype.read = function(input) {
       break;
       case 2:
       if (ftype == Thrift.Type.LIST) {
-        var _size222 = 0;
-        var _rtmp3226;
+        var _size230 = 0;
+        var _rtmp3234;
         this.id = [];
-        var _etype225 = 0;
-        _rtmp3226 = input.readListBegin();
-        _etype225 = _rtmp3226.etype;
-        _size222 = _rtmp3226.size;
-        for (var _i227 = 0; _i227 < _size222; ++_i227)
+        var _etype233 = 0;
+        _rtmp3234 = input.readListBegin();
+        _etype233 = _rtmp3234.etype;
+        _size230 = _rtmp3234.size;
+        for (var _i235 = 0; _i235 < _size230; ++_i235)
         {
-          var elem228 = null;
-          elem228 = input.readI64();
-          this.id.push(elem228);
+          var elem236 = null;
+          elem236 = input.readI64();
+          this.id.push(elem236);
         }
         input.readListEnd();
       } else {
@@ -2300,12 +2329,12 @@ API_TransactionsStateGet_args.prototype.write = function(output) {
   if (this.id !== null && this.id !== undefined) {
     output.writeFieldBegin('id', Thrift.Type.LIST, 2);
     output.writeListBegin(Thrift.Type.I64, this.id.length);
-    for (var iter229 in this.id)
+    for (var iter237 in this.id)
     {
-      if (this.id.hasOwnProperty(iter229))
+      if (this.id.hasOwnProperty(iter237))
       {
-        iter229 = this.id[iter229];
-        output.writeI64(iter229);
+        iter237 = this.id[iter237];
+        output.writeI64(iter237);
       }
     }
     output.writeListEnd();
@@ -2394,19 +2423,19 @@ API_ContractAllMethodsGet_args.prototype.read = function(input) {
     {
       case 1:
       if (ftype == Thrift.Type.LIST) {
-        var _size230 = 0;
-        var _rtmp3234;
+        var _size238 = 0;
+        var _rtmp3242;
         this.byteCodeObjects = [];
-        var _etype233 = 0;
-        _rtmp3234 = input.readListBegin();
-        _etype233 = _rtmp3234.etype;
-        _size230 = _rtmp3234.size;
-        for (var _i235 = 0; _i235 < _size230; ++_i235)
+        var _etype241 = 0;
+        _rtmp3242 = input.readListBegin();
+        _etype241 = _rtmp3242.etype;
+        _size238 = _rtmp3242.size;
+        for (var _i243 = 0; _i243 < _size238; ++_i243)
         {
-          var elem236 = null;
-          elem236 = new general_ttypes.ByteCodeObject();
-          elem236.read(input);
-          this.byteCodeObjects.push(elem236);
+          var elem244 = null;
+          elem244 = new general_ttypes.ByteCodeObject();
+          elem244.read(input);
+          this.byteCodeObjects.push(elem244);
         }
         input.readListEnd();
       } else {
@@ -2430,12 +2459,12 @@ API_ContractAllMethodsGet_args.prototype.write = function(output) {
   if (this.byteCodeObjects !== null && this.byteCodeObjects !== undefined) {
     output.writeFieldBegin('byteCodeObjects', Thrift.Type.LIST, 1);
     output.writeListBegin(Thrift.Type.STRUCT, this.byteCodeObjects.length);
-    for (var iter237 in this.byteCodeObjects)
+    for (var iter245 in this.byteCodeObjects)
     {
-      if (this.byteCodeObjects.hasOwnProperty(iter237))
+      if (this.byteCodeObjects.hasOwnProperty(iter245))
       {
-        iter237 = this.byteCodeObjects[iter237];
-        iter237.write(output);
+        iter245 = this.byteCodeObjects[iter245];
+        iter245.write(output);
       }
     }
     output.writeListEnd();
@@ -3886,6 +3915,7 @@ var API_TokensListGet_args = function(args) {
   this.limit = null;
   this.order = null;
   this.desc = null;
+  this.filters = null;
   if (args) {
     if (args.offset !== undefined && args.offset !== null) {
       this.offset = args.offset;
@@ -3898,6 +3928,9 @@ var API_TokensListGet_args = function(args) {
     }
     if (args.desc !== undefined && args.desc !== null) {
       this.desc = args.desc;
+    }
+    if (args.filters !== undefined && args.filters !== null) {
+      this.filters = new ttypes.TokenFilters(args.filters);
     }
   }
 };
@@ -3943,6 +3976,14 @@ API_TokensListGet_args.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 5:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.filters = new ttypes.TokenFilters();
+        this.filters.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -3972,6 +4013,11 @@ API_TokensListGet_args.prototype.write = function(output) {
   if (this.desc !== null && this.desc !== undefined) {
     output.writeFieldBegin('desc', Thrift.Type.BOOL, 4);
     output.writeBool(this.desc);
+    output.writeFieldEnd();
+  }
+  if (this.filters !== null && this.filters !== undefined) {
+    output.writeFieldBegin('filters', Thrift.Type.STRUCT, 5);
+    this.filters.write(output);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -4931,7 +4977,7 @@ APIClient.prototype.recv_GetLastHash = function(input,mtype,rseqid) {
   }
   return callback('GetLastHash failed: unknown result');
 };
-APIClient.prototype.PoolListGetStable = function(hash, limit, callback) {
+APIClient.prototype.PoolListGetStable = function(sequence, limit, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -4942,19 +4988,19 @@ APIClient.prototype.PoolListGetStable = function(hash, limit, callback) {
         _defer.resolve(result);
       }
     };
-    this.send_PoolListGetStable(hash, limit);
+    this.send_PoolListGetStable(sequence, limit);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_PoolListGetStable(hash, limit);
+    this.send_PoolListGetStable(sequence, limit);
   }
 };
 
-APIClient.prototype.send_PoolListGetStable = function(hash, limit) {
+APIClient.prototype.send_PoolListGetStable = function(sequence, limit) {
   var output = new this.pClass(this.output);
   output.writeMessageBegin('PoolListGetStable', Thrift.MessageType.CALL, this.seqid());
   var params = {
-    hash: hash,
+    sequence: sequence,
     limit: limit
   };
   var args = new API_PoolListGetStable_args(params);
@@ -5031,7 +5077,7 @@ APIClient.prototype.recv_PoolListGet = function(input,mtype,rseqid) {
   }
   return callback('PoolListGet failed: unknown result');
 };
-APIClient.prototype.PoolInfoGet = function(hash, index, callback) {
+APIClient.prototype.PoolInfoGet = function(sequence, index, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -5042,19 +5088,19 @@ APIClient.prototype.PoolInfoGet = function(hash, index, callback) {
         _defer.resolve(result);
       }
     };
-    this.send_PoolInfoGet(hash, index);
+    this.send_PoolInfoGet(sequence, index);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_PoolInfoGet(hash, index);
+    this.send_PoolInfoGet(sequence, index);
   }
 };
 
-APIClient.prototype.send_PoolInfoGet = function(hash, index) {
+APIClient.prototype.send_PoolInfoGet = function(sequence, index) {
   var output = new this.pClass(this.output);
   output.writeMessageBegin('PoolInfoGet', Thrift.MessageType.CALL, this.seqid());
   var params = {
-    hash: hash,
+    sequence: sequence,
     index: index
   };
   var args = new API_PoolInfoGet_args(params);
@@ -5081,7 +5127,7 @@ APIClient.prototype.recv_PoolInfoGet = function(input,mtype,rseqid) {
   }
   return callback('PoolInfoGet failed: unknown result');
 };
-APIClient.prototype.PoolTransactionsGet = function(hash, offset, limit, callback) {
+APIClient.prototype.PoolTransactionsGet = function(sequence, offset, limit, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -5092,19 +5138,19 @@ APIClient.prototype.PoolTransactionsGet = function(hash, offset, limit, callback
         _defer.resolve(result);
       }
     };
-    this.send_PoolTransactionsGet(hash, offset, limit);
+    this.send_PoolTransactionsGet(sequence, offset, limit);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_PoolTransactionsGet(hash, offset, limit);
+    this.send_PoolTransactionsGet(sequence, offset, limit);
   }
 };
 
-APIClient.prototype.send_PoolTransactionsGet = function(hash, offset, limit) {
+APIClient.prototype.send_PoolTransactionsGet = function(sequence, offset, limit) {
   var output = new this.pClass(this.output);
   output.writeMessageBegin('PoolTransactionsGet', Thrift.MessageType.CALL, this.seqid());
   var params = {
-    hash: hash,
+    sequence: sequence,
     offset: offset,
     limit: limit
   };
@@ -5227,7 +5273,7 @@ APIClient.prototype.recv_SmartContractGet = function(input,mtype,rseqid) {
   }
   return callback('SmartContractGet failed: unknown result');
 };
-APIClient.prototype.SmartContractsListGet = function(deployer, callback) {
+APIClient.prototype.SmartContractsListGet = function(deployer, offset, limit, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -5238,19 +5284,21 @@ APIClient.prototype.SmartContractsListGet = function(deployer, callback) {
         _defer.resolve(result);
       }
     };
-    this.send_SmartContractsListGet(deployer);
+    this.send_SmartContractsListGet(deployer, offset, limit);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_SmartContractsListGet(deployer);
+    this.send_SmartContractsListGet(deployer, offset, limit);
   }
 };
 
-APIClient.prototype.send_SmartContractsListGet = function(deployer) {
+APIClient.prototype.send_SmartContractsListGet = function(deployer, offset, limit) {
   var output = new this.pClass(this.output);
   output.writeMessageBegin('SmartContractsListGet', Thrift.MessageType.CALL, this.seqid());
   var params = {
-    deployer: deployer
+    deployer: deployer,
+    offset: offset,
+    limit: limit
   };
   var args = new API_SmartContractsListGet_args(params);
   args.write(output);
@@ -6125,7 +6173,7 @@ APIClient.prototype.recv_TokenHoldersGet = function(input,mtype,rseqid) {
   }
   return callback('TokenHoldersGet failed: unknown result');
 };
-APIClient.prototype.TokensListGet = function(offset, limit, order, desc, callback) {
+APIClient.prototype.TokensListGet = function(offset, limit, order, desc, filters, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -6136,22 +6184,23 @@ APIClient.prototype.TokensListGet = function(offset, limit, order, desc, callbac
         _defer.resolve(result);
       }
     };
-    this.send_TokensListGet(offset, limit, order, desc);
+    this.send_TokensListGet(offset, limit, order, desc, filters);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_TokensListGet(offset, limit, order, desc);
+    this.send_TokensListGet(offset, limit, order, desc, filters);
   }
 };
 
-APIClient.prototype.send_TokensListGet = function(offset, limit, order, desc) {
+APIClient.prototype.send_TokensListGet = function(offset, limit, order, desc, filters) {
   var output = new this.pClass(this.output);
   output.writeMessageBegin('TokensListGet', Thrift.MessageType.CALL, this.seqid());
   var params = {
     offset: offset,
     limit: limit,
     order: order,
-    desc: desc
+    desc: desc,
+    filters: filters
   };
   var args = new API_TokensListGet_args(params);
   args.write(output);
@@ -6721,7 +6770,7 @@ APIProcessor.prototype.process_PoolListGetStable = function(seqid, input, output
   args.read(input);
   input.readMessageEnd();
   if (this._handler.PoolListGetStable.length === 2) {
-    Q.fcall(this._handler.PoolListGetStable.bind(this._handler), args.hash, args.limit)
+    Q.fcall(this._handler.PoolListGetStable.bind(this._handler), args.sequence, args.limit)
       .then(function(result) {
         var result_obj = new API_PoolListGetStable_result({success: result});
         output.writeMessageBegin("PoolListGetStable", Thrift.MessageType.REPLY, seqid);
@@ -6737,7 +6786,7 @@ APIProcessor.prototype.process_PoolListGetStable = function(seqid, input, output
         output.flush();
       });
   } else {
-    this._handler.PoolListGetStable(args.hash, args.limit, function (err, result) {
+    this._handler.PoolListGetStable(args.sequence, args.limit, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new API_PoolListGetStable_result((err !== null || typeof err === 'undefined') ? err : {success: result});
@@ -6793,7 +6842,7 @@ APIProcessor.prototype.process_PoolInfoGet = function(seqid, input, output) {
   args.read(input);
   input.readMessageEnd();
   if (this._handler.PoolInfoGet.length === 2) {
-    Q.fcall(this._handler.PoolInfoGet.bind(this._handler), args.hash, args.index)
+    Q.fcall(this._handler.PoolInfoGet.bind(this._handler), args.sequence, args.index)
       .then(function(result) {
         var result_obj = new API_PoolInfoGet_result({success: result});
         output.writeMessageBegin("PoolInfoGet", Thrift.MessageType.REPLY, seqid);
@@ -6809,7 +6858,7 @@ APIProcessor.prototype.process_PoolInfoGet = function(seqid, input, output) {
         output.flush();
       });
   } else {
-    this._handler.PoolInfoGet(args.hash, args.index, function (err, result) {
+    this._handler.PoolInfoGet(args.sequence, args.index, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new API_PoolInfoGet_result((err !== null || typeof err === 'undefined') ? err : {success: result});
@@ -6829,7 +6878,7 @@ APIProcessor.prototype.process_PoolTransactionsGet = function(seqid, input, outp
   args.read(input);
   input.readMessageEnd();
   if (this._handler.PoolTransactionsGet.length === 3) {
-    Q.fcall(this._handler.PoolTransactionsGet.bind(this._handler), args.hash, args.offset, args.limit)
+    Q.fcall(this._handler.PoolTransactionsGet.bind(this._handler), args.sequence, args.offset, args.limit)
       .then(function(result) {
         var result_obj = new API_PoolTransactionsGet_result({success: result});
         output.writeMessageBegin("PoolTransactionsGet", Thrift.MessageType.REPLY, seqid);
@@ -6845,7 +6894,7 @@ APIProcessor.prototype.process_PoolTransactionsGet = function(seqid, input, outp
         output.flush();
       });
   } else {
-    this._handler.PoolTransactionsGet(args.hash, args.offset, args.limit, function (err, result) {
+    this._handler.PoolTransactionsGet(args.sequence, args.offset, args.limit, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new API_PoolTransactionsGet_result((err !== null || typeof err === 'undefined') ? err : {success: result});
@@ -6936,8 +6985,8 @@ APIProcessor.prototype.process_SmartContractsListGet = function(seqid, input, ou
   var args = new API_SmartContractsListGet_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.SmartContractsListGet.length === 1) {
-    Q.fcall(this._handler.SmartContractsListGet.bind(this._handler), args.deployer)
+  if (this._handler.SmartContractsListGet.length === 3) {
+    Q.fcall(this._handler.SmartContractsListGet.bind(this._handler), args.deployer, args.offset, args.limit)
       .then(function(result) {
         var result_obj = new API_SmartContractsListGet_result({success: result});
         output.writeMessageBegin("SmartContractsListGet", Thrift.MessageType.REPLY, seqid);
@@ -6953,7 +7002,7 @@ APIProcessor.prototype.process_SmartContractsListGet = function(seqid, input, ou
         output.flush();
       });
   } else {
-    this._handler.SmartContractsListGet(args.deployer, function (err, result) {
+    this._handler.SmartContractsListGet(args.deployer, args.offset, args.limit, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new API_SmartContractsListGet_result((err !== null || typeof err === 'undefined') ? err : {success: result});
@@ -7584,8 +7633,8 @@ APIProcessor.prototype.process_TokensListGet = function(seqid, input, output) {
   var args = new API_TokensListGet_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.TokensListGet.length === 4) {
-    Q.fcall(this._handler.TokensListGet.bind(this._handler), args.offset, args.limit, args.order, args.desc)
+  if (this._handler.TokensListGet.length === 5) {
+    Q.fcall(this._handler.TokensListGet.bind(this._handler), args.offset, args.limit, args.order, args.desc, args.filters)
       .then(function(result) {
         var result_obj = new API_TokensListGet_result({success: result});
         output.writeMessageBegin("TokensListGet", Thrift.MessageType.REPLY, seqid);
@@ -7601,7 +7650,7 @@ APIProcessor.prototype.process_TokensListGet = function(seqid, input, output) {
         output.flush();
       });
   } else {
-    this._handler.TokensListGet(args.offset, args.limit, args.order, args.desc, function (err, result) {
+    this._handler.TokensListGet(args.offset, args.limit, args.order, args.desc, args.filters, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new API_TokensListGet_result((err !== null || typeof err === 'undefined') ? err : {success: result});

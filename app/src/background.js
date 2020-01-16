@@ -1,3 +1,4 @@
+const extension = require('extensionizer');
 const bs58 = require('bs58');
 const thrift = require('thrift');
 const API = require('./gen-nodejs/API');
@@ -8,74 +9,90 @@ const connect = require('./lib/connect');
 const contractState = require('./lib/contractState');
 const checkContract = require('./lib/checkContract');
 const LS = require('./lib/ls');
+const LocalStore = require('./lib/local-store');
 
 global.nodeIP;
 global.nodePORT;
 let keyPublic;
 let access;
 let blocked;
+let result;
+const localStore = new LocalStore();
+let store = new LS('CREXT');
 
-chrome.runtime.onInstalled.addListener((details) => {
-  console.log(details);
-	if (details.reason === 'install') {
-    console.log("install message");
-	} else if (details.reason === 'update') {
-		const thisVersion = chrome.runtime.getManifest().version;
-    if(thisVersion !== details.previousVersion) {
-  		const statusMsg = `CREXT updated from ${details.previousVersion} to ${thisVersion}`;
-  		console.info(statusMsg);
+extension.runtime.onInstalled.addListener(async function (details) {
+  let currentNet = store.getState() != undefined ? store.getState().n : 1;
+  try {
+    var thisVersion = extension.runtime.getManifest().version;
+    if (details.reason == "install") {
+      console.info("First version installed");
+    } else if (details.reason == "update") {
+      console.info("Updated version: " + thisVersion);
+      extension.tabs.create({
+        url: 'https://crext.io/v' + thisVersion + '.html'
+      });
+      await selectNode(currentNet);
     }
-	}
+  } catch(e) {
+    console.info("OnInstall Error - " + e);
+  }
 });
 
 
 
-window.onload = function(e) {
+window.onload = async function(e) {
 
-  chrome.storage.local.get(function(result) {
-     global.nodeIP = result.ip;
-     global.nodePORT = result.port;
-     keyPublic = result.PublicKey;
-     access = result.access;
-     blocked = result.blocked;
+  result = await localStore.get();
 
-     if(global.nodeIP === undefined) {
-			 selectNode()
-			 .then(function(r) {
-				 global.nodeIP = r;
-				 global.nodePORT = 8081;
-         chrome.storage.local.set({
-           'ip': r,
-           'port': 8081
-         });
-			 });
-		 }
+  global.nodeIP = result.ip;
+  global.nodePORT = result.port;
+  keyPublic = result.PublicKey;
+  access = result.access;
+  blocked = result.blocked;
 
-   });
+//  result.access.push("https://crext.io");
+
+  //localStore.set(result);
+
+  if(global.nodeIP === undefined) {
+    selectNode()
+    .then(function(r) {
+      global.nodeIP = r;
+      global.nodePORT = 8081;
+      extension.storage.local.set({
+        'ip': r,
+        'port': 8081
+      });
+    });
+  }
 
 }
 
 
-    chrome.runtime.onMessage.addListener( function(message, sender, callback) {
+    extension.runtime.onMessage.addListener( async function(message, sender, callback) {
 
         let returnmsg;
 
-      if(message == 'Inject') {
-        chrome.tabs.executeScript({
-          file: 'src/inject.js'
-        });
+        let dappmode = store.getState().d;
 
-        chrome.storage.local.get(function(result) {
-  				let loginTime = result.loginTime;
-          if(loginTime > 1) {
-  				    let timeNow = new Date().getTime();
-  				    if((timeNow-loginTime > 1800000) || result.encryption == '') {
-  					     chrome.storage.local.set({
-  						      'encryption': ''
-  					     });
-              }
-          }
-        });
+      if(message == 'Inject') {
+        if(dappmode === 1) {
+          extension.tabs.executeScript({
+            file: 'src/inject.js'
+          });
+        }
+
+        result = await localStore.get();
+
+        let loginTime = result.loginTime;
+        if(loginTime > 1) {
+            let timeNow = new Date().getTime();
+            if((timeNow-loginTime > 1800000) || result.encryption == '') {
+               extension.storage.local.set({
+                  'encryption': ''
+               });
+            }
+        }
 
       } else if(message == 'Logout') {
         access = new Array();
@@ -84,15 +101,13 @@ window.onload = function(e) {
         global.nodePORT = '';
         keyPublic = '';
       } else if(message == 'Login' || message == 'update') {
-        chrome.storage.local.get(function(result) {
+        result = await localStore.get();
            global.nodeIP = result.ip;
            global.nodePORT = result.port;
            keyPublic = result.PublicKey;
            access = result.access;
            blocked = result.blocked;
-         });
       } else if(message.CStype != null) {
-
 
         let contentMessage = {CStype: message.CStype, CSID: message.CSID, data: message.data, id: sender.tab.id, org: message.org};
 
@@ -104,9 +119,9 @@ window.onload = function(e) {
             if(r) {
               switch(message.CStype) {
                 case "version":
-                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: true, result: {version: chrome.runtime.getManifest().version}}};
+                    returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: true, result: {version: extension.runtime.getManifest().version}}};
                     setTimeout(function() {
-                      chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                      extension.tabs.sendMessage(sender.tab.id, returnmsg);
                     }, 150);
                 break;
                 case "TX":
@@ -127,7 +142,7 @@ window.onload = function(e) {
                           PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                             setTimeout(
                             function() {
-                              var port = chrome.runtime.connect({name: "sendData"});
+                              var port = extension.runtime.connect({name: "sendData"});
                               port.postMessage(contentMessage);
                             }, 1000);
                       })
@@ -150,7 +165,7 @@ window.onload = function(e) {
                             PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
                               setTimeout(
                               function() {
-                                var port = chrome.runtime.connect({name: "sendData"});
+                                var port = extension.runtime.connect({name: "sendData"});
                                 port.postMessage(contentMessage);
                               }, 1000);
                         })
@@ -206,7 +221,7 @@ window.onload = function(e) {
                   case "getKey":
                     returnmsg = {CREXTreturn: "getKey", CSID: message.CSID, data:{success: true, id: message.data.id, result: {publicKey: keyPublic}}};
                       setTimeout(function() {
-                        chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                        extension.tabs.sendMessage(sender.tab.id, returnmsg);
                       }, 150);
                   break;
                   case "walletDataGet":
@@ -270,29 +285,56 @@ window.onload = function(e) {
                       contractState(message).then(function(contractStateValue) {
                         let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: true, result: contractStateValue, id: message.data.id}};
                         setTimeout(function() {
-                          chrome.tabs.sendMessage(sender.tab.id, retmsg);
+                          extension.tabs.sendMessage(sender.tab.id, retmsg);
                         }, 150);
                       })
                       .catch(function(r) {
                         let retmsg = {CREXTreturn: "contractState", CSID: message.CSID, data:{success: false, id: message.data.id}};
                         setTimeout(function() {
-                          chrome.tabs.sendMessage(sender.tab.id, retmsg);
+                          extension.tabs.sendMessage(sender.tab.id, retmsg);
                         }, 150);
                       });
                   }).catch(function(r) {
                     returnmsg = {CREXTreturn: message.CStype, CSID: message.CSID, data:{success: false, message: r, id: message.data.id}};
                     setTimeout(function() {
-                      chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                      extension.tabs.sendMessage(sender.tab.id, returnmsg);
                     }, 150);
                   });
                   break;
                   case "network":
-                    let store = new LS('CREXT');
                     let currentNet = store.getState().n;
                     returnmsg = {CREXTreturn: "network", CSID: message.CSID, data:{success: true, id: message.data.id, result: currentNet}};
                       setTimeout(function() {
-                        chrome.tabs.sendMessage(sender.tab.id, returnmsg);
+                        extension.tabs.sendMessage(sender.tab.id, returnmsg);
                       }, 150);
+                  break;
+                  case "deployedContracts":
+                  let contractPublicKey;
+                  try {
+                    contractPublicKey = bs58.decode(message.data.key);
+                  } catch(e) {
+                    returnmsg = {CREXTreturn: "deployedContracts", CSID: message.CSID, data:{success: false, id: message.data.id, message: "Invalid key"}};
+                    sendMSG(sender.tab.id, returnmsg);
+                  }
+
+                  if(contractPublicKey !== undefined) {
+                      nodeTest().then(function(r) {
+                        connect().SmartContractsListGet(contractPublicKey, function(err, response) {
+                          if(response.status.message === "Success") {
+                            for(let i=0; i<response.smartContractsList.length;i++) {
+                              response.smartContractsList[i].address = bs58.encode(Buffer.from(response.smartContractsList[i].address));
+                              response.smartContractsList[i].createTime = convert(response.smartContractsList[i].createTime.buffer);
+                              response.smartContractsList[i].deployer = bs58.encode(Buffer.from(response.smartContractsList[i].deployer));
+                            }
+                            returnmsg = {CREXTreturn: "deployedContracts", CSID: message.CSID, data:{success: true, id: message.data.id, result: response}};
+                            sendMSG(sender.tab.id, returnmsg);
+                          } else {
+                            returnmsg = {CREXTreturn: "deployedContracts", CSID: message.CSID, data:{success: false, id: message.data.id, message: balance.status.message}};
+                            sendMSG(sender.tab.id, returnmsg);
+                          }
+                      });
+                    });
+                  }
                   break;
               }
             }
@@ -303,7 +345,7 @@ window.onload = function(e) {
 
 function sendMSG(tab, msg) {
   setTimeout(function() {
-    chrome.tabs.sendMessage(tab, msg);
+    extension.tabs.sendMessage(tab, msg);
   }, 250);
 }
 
@@ -318,51 +360,69 @@ function PopupCenter(url, title, w, h) {
     var systemZoom = width / window.screen.availWidth;
     var left = (width - w) / 2 / systemZoom + dualScreenLeft
     var top = (height - h) / 2 / systemZoom + dualScreenTop
-    var newWindow = window.open(url, title, 'status=no,scrollbars=no,resizable=no, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left);
+    //var newWindow = window.open(url, title, 'status=no,scrollbars=no,resizable=no, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left);
+    //extension.windows.create({url: url});
+    //extension.windows.create({url: url, type: "popup", width: w});
 
-    // Puts focus on the newWindow
-    if (window.focus) newWindow.focus();
+    const NOTIFICATION_HEIGHT = 646
+    const NOTIFICATION_WIDTH = 510
+
+    //const {screenX, screenY, outerWidth, outerHeight} = window
+    const {outerWidth, outerHeight} = window;
+        const notificationTop = Math.round(screenY + (outerHeight / 2) - (NOTIFICATION_HEIGHT / 2));
+        const notificationLeft = Math.round(screenX + (outerWidth / 2) - (NOTIFICATION_WIDTH / 2));
+        // create new notification popup
+        const creation = extension.windows.create({
+          url: url,
+          type: 'popup',
+          width: NOTIFICATION_WIDTH,
+          height: NOTIFICATION_HEIGHT,
+          top: top,
+          left: left
+        });
+
 }
 
-    function checkAccess(url, contentmessage, callback) {
-      let returnmsg;
-      if(blocked.includes(url)) {
-        returnmsg = {CREXTreturn: contentmessage.CStype, CSID: contentmessage.CSID, data:{success: false, message: "Access denied"}};
-        sendMSG(contentmessage.id, returnmsg);
-        callback(false);
-      } else if(access.includes(url)) {
-        callback(true);
-      } else {
-        PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
-          setTimeout(
-          function() {
+function checkAccess(url, contentmessage, callback) {
+  let returnmsg;
 
-            var port = chrome.runtime.connect({name: "sendData"});
-          port.postMessage({CStype: "confirm", id: contentmessage.id, data: contentmessage});
-            port.onMessage.addListener(function(msg) {
-            });
-          }, 1000);
+  if(blocked.includes(url)) {
+    returnmsg = {CREXTreturn: contentmessage.CStype, CSID: contentmessage.CSID, data:{success: false, message: "Access denied"}};
+    sendMSG(contentmessage.id, returnmsg);
+    callback(false);
+  } else if(access.includes(url)) {
+    callback(true);
+  } else {
+    PopupCenter("src/popup.html?t=tx", "extension_popup", "500", "636");
+      setTimeout(
+      function() {
 
-          let promise1 = new Promise(function(resolve, reject) {
-            chrome.runtime.onConnect.addListener(function(port) {
-              port.onMessage.addListener(function(msg) {
-                resolve(msg);
-              });
-            });
+        var port = extension.runtime.connect({name: "sendData"});
+      port.postMessage({CStype: "confirm", id: contentmessage.id, data: contentmessage});
+        port.onMessage.addListener(function(msg) {
+        });
+      }, 1000);
+
+      let promise1 = new Promise(function(resolve, reject) {
+        extension.runtime.onConnect.addListener(function(port) {
+          port.onMessage.addListener(function(msg) {
+            resolve(msg);
           });
+        });
+      });
 
-          promise1.then(function(val) {
-            if(val.CStype == 'confirm') {
-              access.push(val.org);
-              callback(true);
-            } else if(val.CStype == 'confirmTX') {
-              access.push(val.org);
-              callback(false);
-            } else if(val.CStype == 'blockPermanent') {
-              blocked.push(val.org);
-              callback(false);
-            }
-          });
+      promise1.then(function(val) {
+        if(val.CStype == 'confirm') {
+          access.push(val.org);
+          callback(true);
+        } else if(val.CStype == 'confirmTX') {
+          access.push(val.org);
+          callback(false);
+        } else if(val.CStype == 'blockPermanent') {
+          blocked.push(val.org);
+          callback(false);
+        }
+      });
 
-      }
-    }
+  }
+}

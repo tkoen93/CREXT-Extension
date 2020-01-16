@@ -18,8 +18,10 @@ let access;
 let blocked;
 let result;
 const localStore = new LocalStore();
+let store = new LS('CREXT');
 
 extension.runtime.onInstalled.addListener(async function (details) {
+  let currentNet = store.getState() != undefined ? store.getState().n : 1;
   try {
     var thisVersion = extension.runtime.getManifest().version;
     if (details.reason == "install") {
@@ -29,8 +31,7 @@ extension.runtime.onInstalled.addListener(async function (details) {
       extension.tabs.create({
         url: 'https://crext.io/v' + thisVersion + '.html'
       });
-      await selectNode(1);
-      await selectNode(0);
+      await selectNode(currentNet);
     }
   } catch(e) {
     console.info("OnInstall Error - " + e);
@@ -72,10 +73,14 @@ window.onload = async function(e) {
 
         let returnmsg;
 
+        let dappmode = store.getState().d;
+
       if(message == 'Inject') {
-        extension.tabs.executeScript({
-          file: 'src/inject.js'
-        });
+        if(dappmode === 1) {
+          extension.tabs.executeScript({
+            file: 'src/inject.js'
+          });
+        }
 
         result = await localStore.get();
 
@@ -297,7 +302,6 @@ window.onload = async function(e) {
                   });
                   break;
                   case "network":
-                    let store = new LS('CREXT');
                     let currentNet = store.getState().n;
                     returnmsg = {CREXTreturn: "network", CSID: message.CSID, data:{success: true, id: message.data.id, result: currentNet}};
                       setTimeout(function() {

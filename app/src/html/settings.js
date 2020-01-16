@@ -6,6 +6,16 @@ function html() {
           <div class="panel-body" id="settings">
             <p class="header" style="position:relative;top:5px;">Settings</p>
             <ul class="list-group" style="margin-top:20px;">
+              <li class="list-group-item">
+              <p style="position:absolute;bottom:19px;left:129px;">
+              dApp mode
+              </p>
+                <label class="rocker rocker-small" style="left:47px;">
+                  <input type="checkbox" id="dappmode">
+                  <span class="switch-left">On</span>
+                  <span class="switch-right">Off</span>
+                </label>
+              </li>
               <a href="#" class="list-group-item" id="openSetting" data-content="phising"><span class="badge" id="phisingBadge"><i class="fas fa-angle-down"></i></span>Anti-Phishing code</a>
               <li class="list-group-item" id="phising" style="display:none">
                 <div id="mesPhising"></div>

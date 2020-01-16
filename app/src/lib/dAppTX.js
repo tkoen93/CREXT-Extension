@@ -50,6 +50,7 @@ let CREXTdApp = {
             Target: to,
             UserData: receivedMessage.data.UserData
         }).then(function(r) {
+          $('#selectedNetTopInject').hide();
           if(r.error) {
             console.error(r.message);
           } else {
@@ -90,10 +91,13 @@ let CREXTdApp = {
               },
               UserData: receivedMessage.data.UserData
         }).then(function(txres) {
+          console.log(txres);
+          $('#selectedNetTopInject').hide();
           if(txres.message !== null && txres.message !== undefined) {
             console.error(txres.message);
           } else {
               connect().TransactionFlow(txres.Result, function(err, r) {
+                console.log(r);
                 let res = r;
                 if(r.status.code === 0) {
                   $('#transactionto2').text(bs58.encode(Buffer.from(txres.Result.target)));
@@ -142,16 +146,19 @@ let CREXTdApp = {
               },
               UserData: receivedMessage.data.UserData
         }).then(function(r) {
+          $('#selectedNetTopInject').hide();
           if(r.error) {
             console.error(r.message);
           } else {
+            console.log(r.Result);
               connect().TransactionFlow(r.Result, function(err, r) {
+                console.log(r);
                 let res = r;
                 if(r.status.code === 0) {
                   $('#closeButton').slideDown(250);
                   $('#txLoader').hide();
                   $('#completed').show();
-                  let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:{roundNum: res.roundNum, smart_contract_result: contractResult(res), status:{code: res.status.code, message: res.status.message}}, id: receivedMessage.data.id}};
+                  let retmsg = {CREXTreturn: "TX", CSID: receivedMessage.CSID, data:{success: true, result:{roundNum: res.roundNum, id: res.id, smart_contract_result: contractResult(res), status:{code: res.status.code, message: res.status.message}}, id: receivedMessage.data.id}};
                   extension.tabs.sendMessage(tabID, retmsg);
                 } else {
                   $('#failButton').slideDown(250);
@@ -311,6 +318,13 @@ async function content(page) {
         $('#showPhising').text(p);
       }
     break;
+  }
+
+  let currentNet = store.getState().n;
+  if(currentNet === 1) {
+    $('#selectedNetTopInject').text("CreditsNetwork");
+  } else {
+    $('#selectedNetTopInject').text("TestNet");
   }
 
     $("#ext").slideDown(250);

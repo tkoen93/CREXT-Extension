@@ -79,7 +79,7 @@ async function addWallet(n) {
         }
       }
         fraction = "0." + fraction;
-        fraction = Number(fraction*1).noExponents().toString().split(".")[1].substring(0,6);
+        fraction = Number(fraction*1).noExponents().toString().split(".")[1];
     }
 
     let integral = response.balance.integral.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");

@@ -161,6 +161,7 @@ async function send(n = 0) {
           $('#sigError').html("<div class=\"confirmTitle\">FAILED</div><div class=\"confirmText\">" + r.Message + "</div></div>");
         } else {
           nodeTest().then(function(nr) {
+            console.log(r.Result);
             connect().TransactionFlow(r.Result, function(err, re) {
               console.log(re);
               if(re.status.code === 0) {

@@ -18,7 +18,7 @@
     "bufferutil": "^4.0.1",
     "create-hmac": "^1.1.7",
     "extensionizer": "^1.0.1",
-    "jquery": "^3.4.0",
+    "jquery": "^3.5.0",
     "js-sha512": "^0.8.0",
     "level-js": "^4.0.1",
     "levelup": "^4.2.0",
